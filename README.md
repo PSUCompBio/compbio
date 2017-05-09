@@ -1,2 +1,2 @@
 # compbio
-The PSU Comp Bio Computing Framework
+The Penn State U Comp Bio Computing Framework
