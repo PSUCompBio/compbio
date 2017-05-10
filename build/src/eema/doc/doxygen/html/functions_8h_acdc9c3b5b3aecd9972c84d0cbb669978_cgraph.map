@@ -1,8 +1,0 @@
-<map id="fe_newtonRhapson" name="fe_newtonRhapson">
-<area shape="rect" id="node2" href="$functions_8h.html#ab77a3a6d6f6b436d7e8c600bb0869927" title="fe_shapes_8" alt="" coords="197,5,295,31"/>
-<area shape="rect" id="node3" href="$functions_8h.html#a98fae74dde5fe33a7062e7457a2d3227" title="fe_shapeMatrix" alt="" coords="190,55,302,80"/>
-<area shape="rect" id="node4" href="$functions_8h.html#afc547bef246c057db6cbd04bf7f866a9" title="fe_dndr_8" alt="" coords="205,104,287,129"/>
-<area shape="rect" id="node5" href="$functions_8h.html#ac0b5524525e1f2e89bb064c15ab8e664" title="fe_dnds_8" alt="" coords="204,153,288,179"/>
-<area shape="rect" id="node6" href="$functions_8h.html#a57e8e5c9f740c98e4767f29c121c2d0a" title="fe_dndt_8" alt="" coords="205,203,286,228"/>
-<area shape="rect" id="node7" href="$functions_8h.html#a5ae3771e65b4a0d177097041a4349c28" title="fe_calJacobian" alt="" coords="191,252,301,277"/>
-</map>
