@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 2.6)
 project(compbio)
 enable_language(CXX)
 
-
 # Eigen support
 option (USE_EIGEN  "Build library with Eigen support" ON)
 set (EIGEN_INCLUDE_DIR "INCLUDE directory for Eigen library" third-party-libs/eigen3)
