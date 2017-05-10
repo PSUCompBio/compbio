@@ -1,5 +1,0 @@
-<map id="fe_mainRead" name="fe_mainRead">
-<area shape="rect" id="node2" href="$class_mesh.html#aba57df50d740f660cadf00aefe75e157" title="Mesh::readMesh" alt="" coords="163,5,284,31"/>
-<area shape="rect" id="node3" href="$class_materials.html#a06e59a5742730b2292d39b7488523505" title="Materials::readMats" alt="" coords="154,55,292,80"/>
-<area shape="rect" id="node4" href="$class_b_c.html#a8ceaa781f98b4128fa50611ff9481e1a" title="BC::readBC" alt="" coords="177,104,269,129"/>
-</map>
