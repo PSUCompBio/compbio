@@ -1,0 +1,56 @@
+\hypertarget{fe__create__bbox_8cpp_source}{}\section{fe\+\_\+create\+\_\+bbox.\+cpp}
+\label{fe__create__bbox_8cpp_source}\index{src/eema/src/\+F\+E\+M/\+Constraints/\+Embedded\+Element/fe\+\_\+create\+\_\+bbox.\+cpp@{src/eema/src/\+F\+E\+M/\+Constraints/\+Embedded\+Element/fe\+\_\+create\+\_\+bbox.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00003 
+\Hypertarget{fe__create__bbox_8cpp_source_l00004}\hyperlink{fe__create__bbox_8cpp_a150d77644eb280d58564e3ff4885e73c}{00004} MatrixXd \hyperlink{fe__create__bbox_8cpp_a150d77644eb280d58564e3ff4885e73c}{fe\_create\_bbox}(VectorXd A, MatrixXd nodes\_host, MatrixXd elements\_host, \textcolor{keywordtype}{double} 
+      length)\{
+00005 
+00006     MatrixXi elements\_host\_tmp;
+00007     
+00008     \textcolor{keywordtype}{double} tol = (3.0)*length;
+00009 
+00010     \textcolor{keywordtype}{double} xmin = A(1) - tol;
+00011     \textcolor{keywordtype}{double} xmax = A(1) + tol;
+00012     \textcolor{keywordtype}{double} ymin = A(2) - tol;
+00013     \textcolor{keywordtype}{double} ymax = A(2) + tol;
+00014     \textcolor{keywordtype}{double} zmin = A(3) - tol;
+00015     \textcolor{keywordtype}{double} zmax = A(3) + tol;
+00016 
+00017     \textcolor{keywordtype}{double} confirm;
+00018     \textcolor{keywordtype}{int} index;
+00019 
+00020     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<elements\_host.rows();i++)\{
+00021         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<elements\_host.cols()-2;j++)\{
+00022             confirm = 0;
+00023 
+00024             index = \hyperlink{functions_8h_a983304137f9a961469a558437d5d2d59}{fe\_find}(nodes\_host.col(1),elements\_host(i,j+2));
+00025             x = nodes\_host(x\_i,1);
+00026             y = nodes\_host(x\_i,2);
+00027             z = nodes\_host(x\_i,3);
+00028 
+00029             \textcolor{keywordflow}{if}((x > xmin) && (x < xmax))\{
+00030                 \textcolor{keywordflow}{if}((y > ymin) && (y < ymax))\{
+00031                     \textcolor{keywordflow}{if}((z > zmin) && (z<zmax))\{
+00032                         confirm = 1;
+00033                     \}
+00034                 \}
+00035             \}
+00036 
+00037             \textcolor{keywordflow}{if} (confirm==1) \textcolor{keywordflow}{break};
+00038 
+00039         \}
+00040 
+00041         \textcolor{keywordflow}{if}(confirm==1)\{
+00042             elements\_host\_tmp = \hyperlink{functions_8h_ac2d90cb6719488bc8551e6f9437f4f76}{fe\_concatenate\_vector2matrix}(elements\_host\_tmp,
+      elements\_host.row(i),1);
+00043         \}
+00044 
+00045     \}
+00046 
+00047     \textcolor{keywordflow}{return} elements\_host\_tmp;
+00048 
+00049 \}
+\end{DoxyCode}

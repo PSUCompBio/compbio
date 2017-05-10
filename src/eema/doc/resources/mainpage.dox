@@ -1,0 +1,15 @@
+/** @mainpage
+*
+* <h2>To install using CMake:</h2>
+* <p>1. cd embeddedfem</p>
+* <p>2. mkdir build</p>
+* <p>3. cd build</p>
+* <p>4. ccmake ..</p>
+* <p>5. make</p>
+* <h2>How to run the code:</h2>
+* <p>1. you need to compile with examples ON in the cmake configuration (step 4 above)</p>
+* <p>2. navigate to ~/embeddedfem/build/examples/example-1</p>
+* <p>3. ./example1 . input.inp</p>
+*
+* <div align="right"><a href="http://www.mne.psu.edu/compbio"> PSU Comp Bio Group</a> </div>
+*/

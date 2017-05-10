@@ -1,0 +1,23 @@
+SET(Elements_src 
+    ShapeFunctions/fe_shapes.cpp
+    ShapeFunctions/fe_shapeMatrix.cpp
+    ShapeFunctions/fe_dn_iso_8.cpp
+    ShapeFunctions/fe_dn_actual_8.cpp
+    Quadrature/fe_guass_weights_3d.cpp
+    Quadrature/fe_guass_weights.cpp
+    Quadrature/fe_guass_points_3d.cpp
+    Quadrature/fe_guass_points.cpp
+    Mass/fe_mass_hex.cpp
+    Mass/fe_massLumped.cpp
+    ElementCalculations/fe_voigt2tensor.cpp
+    ElementCalculations/fe_transformMass.cpp
+    ElementCalculations/fe_tensor2voigt.cpp
+    ElementCalculations/fe_strDispMatrix.cpp
+    ElementCalculations/fe_minElementLength.cpp
+    ElementCalculations/fe_maxElementLength.cpp
+    ElementCalculations/fe_calTransformation.cpp
+    ElementCalculations/fe_calSimpTransformation.cpp
+    ElementCalculations/fe_calJacobian.cpp
+    ElementCalculations/fe_calDefGrad.cpp
+     )
+ADD_LIBRARY(Elements OBJECT ${Elements_src})

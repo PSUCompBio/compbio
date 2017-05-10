@@ -1,0 +1,61 @@
+\hypertarget{fe__simple__elastic_8cpp}{}\section{src/eema/src/\+Materials/\+Elastic/fe\+\_\+simple\+\_\+elastic.cpp File Reference}
+\label{fe__simple__elastic_8cpp}\index{src/eema/src/\+Materials/\+Elastic/fe\+\_\+simple\+\_\+elastic.\+cpp@{src/eema/src/\+Materials/\+Elastic/fe\+\_\+simple\+\_\+elastic.\+cpp}}
+{\ttfamily \#include \char`\"{}functions.\+h\char`\"{}}\newline
+Include dependency graph for fe\+\_\+simple\+\_\+elastic.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fe__simple__elastic_8cpp__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Vector\+Xd \hyperlink{fe__simple__elastic_8cpp_ab0911abb05a0ca06eb4f330890ee0641}{fe\+\_\+simple\+\_\+elastic} (Vector\+Xd dndx, Vector\+Xd dndy, Vector\+Xd dndz, Matrix\+Xd disp\+\_\+mat, Vector\+Xd u, int opt, int return\+\_\+opt)
+\item 
+Matrix\+Xd \hyperlink{fe__simple__elastic_8cpp_abbc5cafd6bb8048b69b3bd6f26ceb5f8}{fe\+\_\+calculate\+\_\+matlmat} (int n, double E, double nu)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{fe__simple__elastic_8cpp_abbc5cafd6bb8048b69b3bd6f26ceb5f8}\label{fe__simple__elastic_8cpp_abbc5cafd6bb8048b69b3bd6f26ceb5f8}} 
+\index{fe\+\_\+simple\+\_\+elastic.\+cpp@{fe\+\_\+simple\+\_\+elastic.\+cpp}!fe\+\_\+calculate\+\_\+matlmat@{fe\+\_\+calculate\+\_\+matlmat}}
+\index{fe\+\_\+calculate\+\_\+matlmat@{fe\+\_\+calculate\+\_\+matlmat}!fe\+\_\+simple\+\_\+elastic.\+cpp@{fe\+\_\+simple\+\_\+elastic.\+cpp}}
+\subsubsection{\texorpdfstring{fe\+\_\+calculate\+\_\+matlmat()}{fe\_calculate\_matlmat()}}
+{\footnotesize\ttfamily Matrix\+Xd fe\+\_\+calculate\+\_\+matlmat (\begin{DoxyParamCaption}\item[{int}]{n,  }\item[{double}]{E,  }\item[{double}]{nu }\end{DoxyParamCaption})}
+
+Create material matrix for isotropic elastic case 
+
+Definition at line \hyperlink{fe__simple__elastic_8cpp_source_l00020}{20} of file \hyperlink{fe__simple__elastic_8cpp_source}{fe\+\_\+simple\+\_\+elastic.\+cpp}.
+
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fe__simple__elastic_8cpp_abbc5cafd6bb8048b69b3bd6f26ceb5f8_icgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{fe__simple__elastic_8cpp_ab0911abb05a0ca06eb4f330890ee0641}\label{fe__simple__elastic_8cpp_ab0911abb05a0ca06eb4f330890ee0641}} 
+\index{fe\+\_\+simple\+\_\+elastic.\+cpp@{fe\+\_\+simple\+\_\+elastic.\+cpp}!fe\+\_\+simple\+\_\+elastic@{fe\+\_\+simple\+\_\+elastic}}
+\index{fe\+\_\+simple\+\_\+elastic@{fe\+\_\+simple\+\_\+elastic}!fe\+\_\+simple\+\_\+elastic.\+cpp@{fe\+\_\+simple\+\_\+elastic.\+cpp}}
+\subsubsection{\texorpdfstring{fe\+\_\+simple\+\_\+elastic()}{fe\_simple\_elastic()}}
+{\footnotesize\ttfamily Vector\+Xd fe\+\_\+simple\+\_\+elastic (\begin{DoxyParamCaption}\item[{Vector\+Xd}]{dndx,  }\item[{Vector\+Xd}]{dndy,  }\item[{Vector\+Xd}]{dndz,  }\item[{Matrix\+Xd}]{disp\+\_\+mat,  }\item[{Vector\+Xd}]{u,  }\item[{int}]{opt,  }\item[{int}]{return\+\_\+opt }\end{DoxyParamCaption})}
+
+Function calculates the stress vector for a simple elastic (small strain) material 
+
+Definition at line \hyperlink{fe__simple__elastic_8cpp_source_l00007}{7} of file \hyperlink{fe__simple__elastic_8cpp_source}{fe\+\_\+simple\+\_\+elastic.\+cpp}.
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=319pt]{fe__simple__elastic_8cpp_ab0911abb05a0ca06eb4f330890ee0641_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fe__simple__elastic_8cpp_ab0911abb05a0ca06eb4f330890ee0641_icgraph}
+\end{center}
+\end{figure}

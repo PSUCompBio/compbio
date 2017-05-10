@@ -1,0 +1,72 @@
+\hypertarget{_mesh_8h_source}{}\section{Mesh.\+h}
+\label{_mesh_8h_source}\index{src/eema/include/\+Mesh.\+h@{src/eema/include/\+Mesh.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * Mesh.h}
+00003 \textcolor{comment}{ *}
+00004 \textcolor{comment}{ *  Created on: Dec 15, 2016}
+00005 \textcolor{comment}{ *      Author: vsg111}
+00006 \textcolor{comment}{ */}
+00007 
+00008 \textcolor{preprocessor}{#ifndef HEADERS\_MESH\_H\_}
+00009 \textcolor{preprocessor}{#define HEADERS\_MESH\_H\_}
+00010 
+00011 \textcolor{preprocessor}{#include<iostream>}
+00012 \textcolor{preprocessor}{#include<cmath>}
+00013 \textcolor{preprocessor}{#include<vector>}
+00014 \textcolor{preprocessor}{#include<fstream>}
+00015 \textcolor{preprocessor}{#include<sstream>}
+00016 \textcolor{preprocessor}{#include<string>}
+00017 
+00018 \textcolor{preprocessor}{#include "Eigen/Dense"}
+00019 \textcolor{preprocessor}{#include "Eigen/Eigenvalues"}
+00020 
+00021 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00022 
+\Hypertarget{_mesh_8h_source_l00023}\hyperlink{class_mesh}{00023} \textcolor{keyword}{class }\hyperlink{class_mesh}{Mesh}\{
+\Hypertarget{_mesh_8h_source_l00025}\hyperlink{class_mesh_aa143447b8630a7a8bf2b045fddf372c3}{00025}     MatrixXd \hyperlink{class_mesh_aa143447b8630a7a8bf2b045fddf372c3}{nodes};
+\Hypertarget{_mesh_8h_source_l00027}\hyperlink{class_mesh_a32aed9620eeb7eaf93a3f8c8f6e79bde}{00027}     MatrixXi \hyperlink{class_mesh_a32aed9620eeb7eaf93a3f8c8f6e79bde}{elements};
+\Hypertarget{_mesh_8h_source_l00029}\hyperlink{class_mesh_aa9cae59f50d13339ed395ef567401cb8}{00029}     MatrixXd \hyperlink{class_mesh_aa9cae59f50d13339ed395ef567401cb8}{nodes\_new};
+\Hypertarget{_mesh_8h_source_l00031}\hyperlink{class_mesh_a8e099460dded463a5c13fb8d6066d312}{00031}     MatrixXi \hyperlink{class_mesh_a8e099460dded463a5c13fb8d6066d312}{elements\_new};
+00032 
+\Hypertarget{_mesh_8h_source_l00034}\hyperlink{class_mesh_a950948f115bf07df771fa277042eedc1}{00034}     VectorXd \hyperlink{class_mesh_a950948f115bf07df771fa277042eedc1}{U};
+00035 
+\Hypertarget{_mesh_8h_source_l00037}\hyperlink{class_mesh_a69a99942ef6672d74a7ba569bdbd3c83}{00037}     VectorXd \hyperlink{class_mesh_a69a99942ef6672d74a7ba569bdbd3c83}{V};
+00038 
+\Hypertarget{_mesh_8h_source_l00040}\hyperlink{class_mesh_ae7202a4f96820433c69bc2ea4cc1b31d}{00040}     VectorXd \hyperlink{class_mesh_ae7202a4f96820433c69bc2ea4cc1b31d}{A};
+00041 
+\Hypertarget{_mesh_8h_source_l00043}\hyperlink{class_mesh_ae8f28f2627eeb9eccd9adcbdee1b2aa9}{00043}     MatrixXd \hyperlink{class_mesh_ae8f28f2627eeb9eccd9adcbdee1b2aa9}{stress};
+00044 
+\Hypertarget{_mesh_8h_source_l00046}\hyperlink{class_mesh_a602850c13e7383308be4e65acd5b30fe}{00046}     MatrixXd \hyperlink{class_mesh_a602850c13e7383308be4e65acd5b30fe}{strain};
+00047 
+00048 \textcolor{keyword}{public}:
+00049     \textcolor{keywordtype}{void} readMesh(MatrixXd n, MatrixXi e);
+00050     \textcolor{keywordtype}{void} readNodalKinematics(VectorXd Usystem, VectorXd Vsystem, VectorXd Asystem);
+00051     \textcolor{keywordtype}{void} readStressStrain(MatrixXd stress\_tmp,MatrixXd strain\_tmp);
+00052 
+00053     MatrixXd getNodes();
+00054     MatrixXi getElements();
+00055     MatrixXd getNewNodes();
+00056     MatrixXi getNewElements();
+00057     VectorXd getMaxCharLength(std::string choice);
+00058     VectorXd getMinCharLength(std::string choice);
+00059 
+00061     VectorXd getNodalDisp();
+00062 
+00064     VectorXd getNodalVel();
+00065 
+00067     VectorXd getNodalAcc();
+00068 
+00070     MatrixXd getCellStress();
+00071 
+00073     MatrixXd getCellStrain();
+00074 
+00075     \textcolor{keywordtype}{void} preprocessMesh();
+00076     \textcolor{keywordtype}{void} replaceNodes(MatrixXd A, std::string B);
+00077     \textcolor{keywordtype}{void} replaceElements(MatrixXi A, std::string B);
+00078     \textcolor{keywordtype}{void} checkMesh();
+00079 \};
+00080 
+00081 \textcolor{preprocessor}{#endif }\textcolor{comment}{/* HEADERS\_MESH\_H\_ */}\textcolor{preprocessor}{}
+\end{DoxyCode}

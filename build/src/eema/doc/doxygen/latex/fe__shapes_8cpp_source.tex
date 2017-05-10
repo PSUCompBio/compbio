@@ -1,0 +1,49 @@
+\hypertarget{fe__shapes_8cpp_source}{}\section{fe\+\_\+shapes.\+cpp}
+\label{fe__shapes_8cpp_source}\index{src/eema/src/\+Elements/\+Shape\+Functions/fe\+\_\+shapes.\+cpp@{src/eema/src/\+Elements/\+Shape\+Functions/fe\+\_\+shapes.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00002 
+00003 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00004 
+00005 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00006 
+\Hypertarget{fe__shapes_8cpp_source_l00007}\hyperlink{fe__shapes_8cpp_ab77a3a6d6f6b436d7e8c600bb0869927}{00007} VectorXd \hyperlink{fe__shapes_8cpp_ab77a3a6d6f6b436d7e8c600bb0869927}{fe\_shapes\_8}(\textcolor{keywordtype}{double} rvalue,\textcolor{keywordtype}{double} svalue,\textcolor{keywordtype}{double} tvalue)\{
+00008 
+00009     VectorXd shapes(8);
+00010 
+00011     \textcolor{keywordtype}{int} i = 0;
+00012     \textcolor{keywordtype}{double} tmp = 0.125*(1-rvalue)*(1-svalue)*(1-tvalue);
+00013     shapes(i) = tmp;
+00014 
+00015     i = i+1;
+00016     tmp = 0.125*(1+rvalue)*(1-svalue)*(1-tvalue);
+00017         shapes(i) = tmp;
+00018 
+00019     i = i+1;
+00020         tmp = 0.125*(1+rvalue)*(1+svalue)*(1-tvalue);
+00021         shapes(i) = tmp;
+00022 
+00023     i = i+1;
+00024         tmp = 0.125*(1-rvalue)*(1+svalue)*(1-tvalue);
+00025         shapes(i) = tmp;
+00026 
+00027     i = i+1;
+00028         tmp = 0.125*(1-rvalue)*(1-svalue)*(1+tvalue);
+00029         shapes(i) = tmp;
+00030 
+00031     i = i+1;
+00032         tmp = 0.125*(1+rvalue)*(1-svalue)*(1+tvalue);
+00033         shapes(i) = tmp;
+00034 
+00035     i = i+1;
+00036         tmp = 0.125*(1+rvalue)*(1+svalue)*(1+tvalue);
+00037         shapes(i) = tmp;
+00038 
+00039     i = i+1;
+00040         tmp = 0.125*(1-rvalue)*(1+svalue)*(1+tvalue);
+00041         shapes(i) = tmp;
+00042 
+00043     \textcolor{keywordflow}{return} shapes;
+00044 \}
+\end{DoxyCode}

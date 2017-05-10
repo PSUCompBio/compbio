@@ -1,0 +1,42 @@
+\hypertarget{fe__cal_def_grad_8cpp_source}{}\section{fe\+\_\+cal\+Def\+Grad.\+cpp}
+\label{fe__cal_def_grad_8cpp_source}\index{src/eema/src/\+Elements/\+Element\+Calculations/fe\+\_\+cal\+Def\+Grad.\+cpp@{src/eema/src/\+Elements/\+Element\+Calculations/fe\+\_\+cal\+Def\+Grad.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00004 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00005 
+00006 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00007 
+\Hypertarget{fe__cal_def_grad_8cpp_source_l00008}\hyperlink{fe__cal_def_grad_8cpp_ae50379f74802347e04dbc022897f9cb0}{00008} MatrixXd \hyperlink{fe__cal_def_grad_8cpp_ae50379f74802347e04dbc022897f9cb0}{fe\_calDefGrad}(VectorXd dndx, VectorXd dndy, VectorXd dndz, VectorXd u)\{
+00009 
+00010     MatrixXd F = MatrixXd::Zero(3,3); \textcolor{comment}{// Deformation Gradient}
+00011     MatrixXd H = MatrixXd::Zero(3,3); \textcolor{comment}{// F  = I+H and H = du/dX}
+00012     MatrixXd I = MatrixXd::Identity(3,3); \textcolor{comment}{// Identity Matrix}
+00013     \textcolor{keywordtype}{int} i1, i2, i3;
+00014 
+00015     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<dndx.size();i++)\{
+00016         i1 = i*3;
+00017         i2 = i1+1;
+00018         i3 = i2+1;
+00019 
+00020         \textcolor{comment}{// First row}
+00021         H(0,0) = H(0,0) + (dndx(i)*u(i1));
+00022         H(0,1) = H(0,1) + (dndy(i)*u(i1));
+00023         H(0,2) = H(0,2) + (dndz(i)*u(i1));
+00024 
+00025         \textcolor{comment}{//Second row}
+00026         H(1,0) = H(1,0) + (dndx(i)*u(i2));
+00027         H(1,1) = H(1,1) + (dndy(i)*u(i2));
+00028         H(1,2) = H(1,2) + (dndz(i)*u(i2));
+00029 
+00030         \textcolor{comment}{//Third row}
+00031         H(2,0) = H(2,0) + (dndx(i)*u(i3));
+00032         H(2,1) = H(2,1) + (dndy(i)*u(i3));
+00033         H(2,2) = H(2,2) + (dndz(i)*u(i3));
+00034     \}
+00035 
+00036     F = I + H;
+00037 
+00038     \textcolor{keywordflow}{return} F;
+00039 \}
+\end{DoxyCode}

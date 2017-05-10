@@ -1,0 +1,223 @@
+\hypertarget{fe__main_e_x_p_l_i_c_i_t_8cpp_source}{}\section{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp}
+\label{fe__main_e_x_p_l_i_c_i_t_8cpp_source}\index{src/eema/src/\+F\+E\+M/\+Explicit/fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp@{src/eema/src/\+F\+E\+M/\+Explicit/fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00003 
+\Hypertarget{fe__main_e_x_p_l_i_c_i_t_8cpp_source_l00004}\hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_a33157279f223d2f4775b0d78b73bc08f}{00004} \textcolor{keywordtype}{double} \hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_a33157279f223d2f4775b0d78b73bc08f}{eps\_energy} = 0.01;
+00005 
+\Hypertarget{fe__main_e_x_p_l_i_c_i_t_8cpp_source_l00010}\hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_ab2f8704631ca6c23a453d1905efbb162}{00010} \textcolor{keywordtype}{void} \hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_ab2f8704631ca6c23a453d1905efbb162}{fe\_mainEXPLICIT}()\{
+00011 
+00012     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<\hyperlink{_global_variables_8h_a509bc84434af1eff0173e4a71bd758ac}{num\_meshes};i++)\{
+00013         \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[i].\hyperlink{class_mesh_aa8a6f260e9589be4c0a2fcc146e696d5}{preprocessMesh}();
+00014     \}
+00015 
+00016     MatrixXd nodes = \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[0].\hyperlink{class_mesh_a52ecce406bbef80cbf3610db3ea5ea40}{getNewNodes}();
+00017     MatrixXi elements = \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[0].\hyperlink{class_mesh_a6e425e9499e64ab52c4555aa3763651d}{getNewElements}();
+00018     MatrixXd nodes\_truss = \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[1].\hyperlink{class_mesh_a52ecce406bbef80cbf3610db3ea5ea40}{getNewNodes}();
+00019     MatrixXi elements\_truss = \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[1].\hyperlink{class_mesh_a6e425e9499e64ab52c4555aa3763651d}{getNewElements}();
+00020 
+00021     \textcolor{comment}{// Following variables - Only for Hex Element}
+00022     \textcolor{keywordtype}{int} nel = elements.rows(); 
+00023     \textcolor{keywordtype}{int} nnel = (elements.cols()-2); \textcolor{comment}{// number of nodes per element}
+00024     \textcolor{keywordtype}{int} nnode = nodes.rows(); \textcolor{comment}{// number of nodes}
+00025     \textcolor{keywordtype}{int} sdof = nnode * \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}; \textcolor{comment}{// system degrees of freedom}
+00026     \textcolor{keywordtype}{int} edof = nnel * \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}; \textcolor{comment}{// element degrees of freedom}
+00027 
+00028     \textcolor{comment}{// Updated Nodes and Elements}
+00029     MatrixXd updated\_nodes = nodes;
+00030 
+00031     \textcolor{comment}{// Writing the Read Mesh}
+00032     \textcolor{comment}{//fe\_vtkWrite\_host("eem\_matrix",1,5,0,updated\_nodes,elements);}
+00033     \textcolor{comment}{//return;}
+00034 
+00035     \textcolor{comment}{// Initialization}
+00036     \textcolor{keywordtype}{double} dT = \hyperlink{_global_variables_8h_a068c627ac33cf3c721d8f28eab205a83}{dt\_initial};
+00037     \textcolor{keywordtype}{double} t\_half = 0; \textcolor{comment}{// t(n + 1/2)}
+00038     \textcolor{keywordtype}{double} t=\hyperlink{_global_variables_8h_a1b01a4354147da92a548ea1a5f96d592}{t\_start};
+00039     \textcolor{keywordtype}{int} size\_counter = 0; \textcolor{comment}{// time step count}
+00040     \textcolor{keywordtype}{int} time\_temp\_1 = 1;
+00041     \textcolor{keywordtype}{double} output\_temp\_1 = ((double)(\hyperlink{_global_variables_8h_a4b637c5fff609e604a3b2b2787f4a9fa}{t\_end}/\hyperlink{_global_variables_8h_ace6ace9b2f6d8d404ca9e66564289eb1}{output\_frequency}));
+00042     VectorXd A = VectorXd::Zero(sdof); \textcolor{comment}{// Acceleration Vector}
+00043     VectorXd V = VectorXd::Zero(sdof); \textcolor{comment}{// Velocity Vector}
+00044     VectorXd V\_half = VectorXd::Zero(sdof); \textcolor{comment}{// Velocity Vector at n+1/2}
+00045     VectorXd U = VectorXd::Zero(sdof); \textcolor{comment}{// Displacement Vector}
+00046     VectorXd F\_net = VectorXd::Zero(sdof); \textcolor{comment}{// Total Nodal force vector}
+00047     VectorXd fe = VectorXd::Zero(sdof); \textcolor{comment}{// External Nodal force vector}
+00048     VectorXd fe\_prev = VectorXd::Zero(sdof);
+00049     VectorXd fe\_curr = VectorXd::Zero(sdof);
+00050     VectorXd fi\_prev = VectorXd::Zero(sdof); \textcolor{comment}{// Internal nodal force vector at previous timestep}
+00051     VectorXd fi\_curr = VectorXd::Zero(sdof); \textcolor{comment}{// Internal Nodal force vector at current timestep}
+00052     VectorXd U\_prev = VectorXd::Zero(sdof); \textcolor{comment}{// Nodal displacements at previous time}
+00053     VectorXd U\_curr = VectorXd::Zero(sdof); \textcolor{comment}{// Nodal displacements at current time}
+00054     \textcolor{keywordtype}{double} energy\_int\_old = 0;
+00055     \textcolor{keywordtype}{double} energy\_int\_new = 0;
+00056     \textcolor{keywordtype}{double} energy\_ext\_old = 0;
+00057     \textcolor{keywordtype}{double} energy\_ext\_new = 0;
+00058     \textcolor{keywordtype}{double} energy\_kin = 0;
+00059     \textcolor{keywordtype}{double} energy\_total = 0;
+00060     \textcolor{keywordtype}{double} energy\_max = 0;
+00061 
+00062     std::string internal\_energy = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"/"} + \textcolor{stringliteral}{"results/internal\_energy\_system.txt"};
+00063     \hyperlink{functions_8h_ad1e19649d167234a1357071888353496}{new\_double2textWithTime}(internal\_energy,time\_temp\_1 - 1,t,energy\_int\_new);
+00064     std::string external\_energy = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"/"} +\textcolor{stringliteral}{"results/external\_energy\_system.txt"};
+00065     \hyperlink{functions_8h_ad1e19649d167234a1357071888353496}{new\_double2textWithTime}(external\_energy,time\_temp\_1 - 1,t,energy\_ext\_new);
+00066     std::string kinetic\_energy = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"/"} + \textcolor{stringliteral}{"results/kinetic\_energy\_system.txt"};
+00067     \hyperlink{functions_8h_ad1e19649d167234a1357071888353496}{new\_double2textWithTime}(kinetic\_energy,time\_temp\_1 - 1,t,energy\_kin);
+00068     std::string total\_energy = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"/"} +\textcolor{stringliteral}{"results/total\_energy\_system.txt"};
+00069     \hyperlink{functions_8h_ad1e19649d167234a1357071888353496}{new\_double2textWithTime}(total\_energy,time\_temp\_1 - 1,t,energy\_total);
+00070 
+00071 
+00072     \textcolor{comment}{// Loading Conditions}
+00073     fe = \hyperlink{functions_8h_aba32cc24bd74a4965c560fa62c5b213e}{fe\_apply\_bc\_load}(fe,0);
+00074 
+00075     \textcolor{comment}{// ----------------------------------------------------------------------------}
+00076     \textcolor{comment}{//Step-1: Calculate the mass matrix similar to that of belytschko.}
+00077 
+00078     VectorXd mm = VectorXd::Zero(sdof);
+00079     mm = \hyperlink{functions_8h_abeed10bd80ae1f3c95d79c4aed512d8f}{fe\_calculateMass}(mm,\textcolor{stringliteral}{"direct\_lumped"});
+00080 
+00081     std::string mass = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path}+\textcolor{stringliteral}{"/"}+\textcolor{stringliteral}{"results/system\_mass.txt"};
+00082     \hyperlink{functions_8h_a62d4a4906ace3f822fcebf7605c33c2b}{new\_vector2text}(mass.c\_str(),mm,mm.cols());
+00083 
+00084     \textcolor{comment}{// ----------------------------------------------------------------------------}
+00085  \textcolor{comment}{//Step-2: getforce step from Belytschko}
+00086     F\_net = \hyperlink{functions_8h_a6696827a8591495e5ea710b112fad5ef}{fe\_getforce}(nodes,elements,ndof,U,V,fe,size\_counter,nodes\_truss,elements\_truss);
+00087 
+00088     \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[0].\hyperlink{class_mesh_a2193a797388525febbac794d17bea23e}{readNodalKinematics}(U,V,A);
+00089     \hyperlink{functions_8h_a9c39148b76d7691ea87e7f2f88b02295}{fe\_vtuWrite}(\textcolor{stringliteral}{"eem\_matrix"},size\_counter,\hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[0]);
+00090     \hyperlink{functions_8h_aedbf95dc6f02a506b606328037cd58e1}{fe\_pvdNew}(\textcolor{stringliteral}{"eem\_matrix"},size\_counter,t);
+00091 
+00092     dT = \hyperlink{_global_variables_8h_a7700f3aeb1ca1c9bbbf712dbfb0aa349}{reduction} * \hyperlink{functions_8h_a537640b537f4b485607b062f2c25d974}{fe\_getTimeStep}(nodes,elements,ndof,U,V,fe);
+00093     \textcolor{keywordflow}{if}(dT>\hyperlink{_global_variables_8h_a0a612324885914b6799185d54c48b310}{dt\_min})\{
+00094         dT = \hyperlink{_global_variables_8h_a0a612324885914b6799185d54c48b310}{dt\_min};
+00095     \}
+00096 
+00097     \textcolor{comment}{// ----------------------------------------------------------------------------}
+00098 
+00099     \textcolor{comment}{//Step-3: Calculate accelerations}
+00100     A  = \hyperlink{functions_8h_a049ed85fefb5b5e80e42432fdcc640fa}{fe\_calculateAccln}(mm,F\_net);
+00101     U\_prev = U;
+00102 
+00103     \textcolor{comment}{// ----------------------------------------------------------------------------}
+00104 
+00105     \textcolor{comment}{//Step-4: Time loop starts....}
+00106     size\_counter = size\_counter+1;
+00107     clock\_t s,s\_prev,ds;
+00108     s = clock();
+00109 
+00110        \textcolor{keywordflow}{while}(t<=\hyperlink{_global_variables_8h_a4b637c5fff609e604a3b2b2787f4a9fa}{t\_end})\{
+00111 
+00113                 fe = \hyperlink{functions_8h_aba32cc24bd74a4965c560fa62c5b213e}{fe\_apply\_bc\_load}(fe,t);
+00114 
+00116                 t\_half = 0.5*(t+t+dT);
+00117 
+00119                 t = t+dT;
+00120 
+00122                 V\_half = V + (t\_half - (t-dT))*A;
+00123 
+00125                 \textcolor{comment}{//V\_half = fe\_apply\_bc\_velocity(V\_half,t\_half);}
+00126                 \textcolor{comment}{//std::cout << "V\_half: \(\backslash\)n" << V\_half << '\(\backslash\)n';}
+00127 
+00129                 U = U + dT*(V\_half);
+00130                 U = \hyperlink{functions_8h_af42938e5b32edb33ef4a35866949eba6}{fe\_apply\_bc\_displacement}(U,t);
+00131 
+00132                 F\_net = \hyperlink{functions_8h_a6696827a8591495e5ea710b112fad5ef}{fe\_getforce}(nodes,elements,ndof,U,V,fe,size\_counter,nodes\_truss,
+      elements\_truss); \textcolor{comment}{// Calculating the force term.}
+00133 
+00134                 dT = \hyperlink{_global_variables_8h_a7700f3aeb1ca1c9bbbf712dbfb0aa349}{reduction} * \hyperlink{functions_8h_a537640b537f4b485607b062f2c25d974}{fe\_getTimeStep}(nodes, elements, ndof, U, V, fe);
+00135                 \textcolor{keywordflow}{if}(dT>\hyperlink{_global_variables_8h_a0a612324885914b6799185d54c48b310}{dt\_min})\{
+00136                     dT = \hyperlink{_global_variables_8h_a0a612324885914b6799185d54c48b310}{dt\_min};
+00137                 \}
+00138                 \textcolor{keywordflow}{if}( ((t+dT) > \hyperlink{_global_variables_8h_a4b637c5fff609e604a3b2b2787f4a9fa}{t\_end}) && (t!=\hyperlink{_global_variables_8h_a4b637c5fff609e604a3b2b2787f4a9fa}{t\_end}))\{
+00139                     dT = \hyperlink{_global_variables_8h_a4b637c5fff609e604a3b2b2787f4a9fa}{t\_end}-t;
+00140                 \}
+00141 
+00143                 A = \hyperlink{functions_8h_a049ed85fefb5b5e80e42432fdcc640fa}{fe\_calculateAccln}(mm,F\_net); \textcolor{comment}{// Calculating the new accelerations from
+       total nodal forces.}
+00144                 A = \hyperlink{functions_8h_ac0ffd5f19ac286c91d431a4ec72dbab4}{fe\_apply\_bc\_acceleration}(A,t);
+00145 
+00147                 V = V\_half + (t - t\_half)*A; \textcolor{comment}{// Calculating the new velocities.}
+00148                 V = \hyperlink{functions_8h_a4627586ca0e6b9e3904cdbc7bb561e9e}{fe\_apply\_bc\_velocity}(V,t);
+00149 
+00150                 \textcolor{comment}{/* Calculating the internal energy terms */}
+00151                 U\_curr = U;
+00152                 VectorXd del\_U = U\_curr - U\_prev;
+00153                 fi\_curr = fe - F\_net;
+00154                 energy\_int\_new = energy\_int\_old + 0.5*(del\_U.dot(fi\_prev + fi\_curr));
+00155                 fi\_prev = fi\_curr;
+00156                 fi\_curr = VectorXd::Zero(sdof);
+00157                 U\_prev = U\_curr;
+00158                 energy\_int\_old = energy\_int\_new;
+00159 
+00160 
+00161                 \textcolor{comment}{/* Calculating the external energy terms */}
+00162                 fe\_curr = fe ;
+00163                 energy\_ext\_new = energy\_ext\_old + 0.5*(del\_U.dot(fe\_prev + fe\_curr));
+00164                 fe\_prev = fe\_curr;
+00165                 energy\_ext\_old = energy\_ext\_new;
+00166 
+00167                 \textcolor{comment}{/* Calculating the kinetic energy */}
+00168                 energy\_kin = \hyperlink{functions_8h_afb8a8298008daf8f2e705a9acb72b984}{fe\_calculateKE}(mm,V);
+00169 
+00170                 \textcolor{comment}{/* Calculating the total energy of the system */}
+00171                 energy\_total = std::abs(energy\_kin + energy\_int\_new - energy\_ext\_new);
+00172                 energy\_max = std::max(std::max(energy\_kin,energy\_int\_new),energy\_ext\_new);
+00173 
+00174                 \textcolor{keywordflow}{if}(energy\_total > (\hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_a33157279f223d2f4775b0d78b73bc08f}{eps\_energy}*(energy\_max)))\{
+00175                     std::cout << \textcolor{stringliteral}{"**********************************************"} << std::endl;
+00176                     std::cout << \textcolor{stringliteral}{"ALERT: INSTABILITIES IN THE SYSTEM DETECTED \(\backslash\)n BASED ON THE ENERGY
+       BALANCE CHECK \(\backslash\)n"};
+00177                     std::cout << \textcolor{stringliteral}{"**********************************************"} << std::endl;
+00178                 \}
+00179 
+00181                 \textcolor{comment}{/* */}
+00182                 \textcolor{comment}{/* */}
+00183 
+00184                 \textcolor{keywordflow}{if}(t >= (time\_temp\_1 * (output\_temp\_1)))\{
+00185 
+00186                     \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[0].\hyperlink{class_mesh_a2193a797388525febbac794d17bea23e}{readNodalKinematics}(U,V,A);
+00187 
+00188                     \hyperlink{functions_8h_a9c39148b76d7691ea87e7f2f88b02295}{fe\_vtuWrite}(\textcolor{stringliteral}{"eem\_matrix"},size\_counter,\hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[0]);
+00189                     \hyperlink{functions_8h_ab350b9dfb65474874d79a92f712078a0}{fe\_pvdAppend}(\textcolor{stringliteral}{"eem\_matrix"},size\_counter,t);
+00190 
+00191                     time\_temp\_1 = time\_temp\_1 + 1;
+00192                     \textcolor{comment}{//fe\_vtkWrite\_host("eem\_matrix",1,5,size\_counter,nodes,elements);}
+00193                     \textcolor{comment}{//fe\_vtkWrite\_truss("eem\_truss",1,5,size\_counter,nodes\_truss,elements\_truss);}
+00194             std::cout <<\textcolor{stringliteral}{"Timestep Value = "}<<std::setw(5)<<std::scientific<<std::setprecision(1)<<dT
+00195                                                     <<\textcolor{stringliteral}{"  Current Time = "}<<std::setw(5)<<std::setprecision(
+      1)<< t
+00196                                                     <<\textcolor{stringliteral}{"  Timestep Number = "}<<(size\_counter)
+00197                                                     <<\textcolor{stringliteral}{"  CPU Time = "} <<std::setw(5)<<std::setprecision(1)
+00198                                                         << ((float)ds/CLOCKS\_PER\_SEC) << \textcolor{stringliteral}{"s \(\backslash\)n"};
+00199                     \textcolor{comment}{//std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Current Precise
+       Time: " << t << "\(\backslash\)n";}
+00200                     \textcolor{comment}{//std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Z Displacement: "
+       << U(20) << "\(\backslash\)n";}
+00201                     \textcolor{comment}{//std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Internal Energy:
+       " << energy\_int\_new << "\(\backslash\)n";}
+00202                     \textcolor{comment}{//std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"External Work: "
+       << energy\_ext\_new << "\(\backslash\)n";}
+00203                     \textcolor{comment}{//std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Kinetic Energy: "
+       << energy\_kin << "\(\backslash\)n";}
+00204 
+00205                     \textcolor{comment}{/*print current frame, current time, and energy to individual .txt files*/}
+00206                     \hyperlink{functions_8h_a6908d3739a96b475c5f4c1623fad9316}{append\_double2textWithTime}(internal\_energy,time\_temp\_1 -1,t,
+      energy\_int\_new);
+00207                     \hyperlink{functions_8h_a6908d3739a96b475c5f4c1623fad9316}{append\_double2textWithTime}(external\_energy,time\_temp\_1 - 1,t,
+      energy\_ext\_new);
+00208                     \hyperlink{functions_8h_a6908d3739a96b475c5f4c1623fad9316}{append\_double2textWithTime}(kinetic\_energy,time\_temp\_1 - 1,t,
+      energy\_kin);
+00209                     \hyperlink{functions_8h_a6908d3739a96b475c5f4c1623fad9316}{append\_double2textWithTime}(total\_energy,time\_temp\_1 - 1,t,
+      energy\_total);
+00210             \}
+00211 
+00212             s\_prev = s;
+00213             s = clock();
+00214             ds = s - s\_prev;
+00215             size\_counter = size\_counter+1;
+00216         \}
+00217 
+00218 \}
+\end{DoxyCode}

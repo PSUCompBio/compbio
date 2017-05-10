@@ -1,0 +1,287 @@
+\hypertarget{fe__getforce_8cpp_source}{}\section{fe\+\_\+getforce.\+cpp}
+\label{fe__getforce_8cpp_source}\index{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+getforce.\+cpp@{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+getforce.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__getforce_8cpp_source_l00013}\hyperlink{fe__getforce_8cpp_a6696827a8591495e5ea710b112fad5ef}{00013} VectorXd \hyperlink{fe__getforce_8cpp_a6696827a8591495e5ea710b112fad5ef}{fe\_getforce}(MatrixXd nodes, MatrixXi elements, \textcolor{keywordtype}{int} \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}, VectorXd u, VectorXd v, 
+      VectorXd fext, \textcolor{keywordtype}{int} size\_counter, MatrixXd nodes\_truss, MatrixXi elements\_truss)\{
+00014 
+00015     \textcolor{keywordtype}{int} nel = elements.rows();
+00016     \textcolor{keywordtype}{int} nnel = (elements.cols()-2);
+00017     \textcolor{keywordtype}{int} nnode = nodes.rows();
+00018     \textcolor{keywordtype}{int} sdof = nnode * \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof};
+00019     \textcolor{keywordtype}{int} edof = nnel * \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof};
+00020 
+00021     MatrixXd element\_stress\_host = MatrixXd::Zero(nel,9);
+00022     MatrixXd element\_strain\_host = MatrixXd::Zero(nel,9);
+00023 
+00024     \textcolor{comment}{// node\_IntForce\_system[size\_counter] = MatrixXd::Zero(nel,nnel);}
+00025 
+00026     VectorXi nodes\_local = VectorXi::Zero(nnel);
+00027 
+00028     VectorXd xcoord = VectorXd::Zero(nnel);
+00029     VectorXd ycoord = VectorXd::Zero(nnel);
+00030     VectorXd zcoord = VectorXd::Zero(nnel);
+00031 
+00032     VectorXd f\_tot(sdof);
+00033     f\_tot = VectorXd::Zero(sdof);
+00034 
+00035     MatrixXd sigma\_all = MatrixXd::Zero(nel,8); \textcolor{comment}{// Six Stress Values and 1 element number and 1 time}
+00036 
+00037     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nel;i++)\{
+00038 
+00039         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<nnel;j++)\{
+00040             \textcolor{keywordtype}{int} g = -1;
+00041             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} f=0;f<nnode;f++)\{
+00042                 \textcolor{keywordflow}{if}(elements(i,j+2)==nodes(f,0))\{
+00043                     g = f;
+00044                     \textcolor{keywordflow}{break};
+00045                 \}
+00046             \}
+00047             nodes\_local(j) = elements(i,j+2);
+00048             xcoord(j) = nodes(g,1);
+00049             ycoord(j) = nodes(g,2);
+00050             zcoord(j) = nodes(g,3);
+00051         \}
+00052 
+00053 
+00054     \textcolor{comment}{//std::cout << "Nodes Local: " << nodes\_local << "\(\backslash\)n";}
+00055 
+00056     VectorXd u\_e = VectorXd::Zero(edof); \textcolor{comment}{// element displacements}
+00057     u\_e = \hyperlink{functions_8h_ab5053cb12ac67971a7836346e2839725}{fe\_gather}(u,u\_e,nodes\_local,sdof);
+00058 
+00059     \textcolor{comment}{/*int disp\_counter = 0;}
+00060 \textcolor{comment}{    for(int j=0;j<xcoord.size();j++)\{}
+00061 \textcolor{comment}{        xcoord(j) = xcoord(j) + u\_e(disp\_counter);}
+00062 \textcolor{comment}{        ycoord(j) = ycoord(j) + u\_e(disp\_counter+1);}
+00063 \textcolor{comment}{        zcoord(j) = zcoord(j) + u\_e(disp\_counter+2);}
+00064 \textcolor{comment}{        disp\_counter = j*3;}
+00065 \textcolor{comment}{    \}*/}
+00066 
+00067     VectorXd f\_ext\_e = VectorXd::Zero(edof);
+00068     f\_ext\_e = \hyperlink{functions_8h_ab5053cb12ac67971a7836346e2839725}{fe\_gather}(fext,f\_ext\_e,nodes\_local,sdof); \textcolor{comment}{// element external nodal forces}
+00069 
+00070     VectorXd f\_int\_e = VectorXd::Zero(edof);
+00071     f\_int\_e = VectorXd::Zero(edof); \textcolor{comment}{// element internal nodal force}
+00072 
+00073     VectorXd f\_tot\_e = VectorXd::Zero(edof);
+00074     f\_tot\_e = VectorXd::Zero(edof); \textcolor{comment}{// element total nodal force}
+00075 
+00076     \textcolor{keywordtype}{int} nglx = 2;
+00077     \textcolor{keywordtype}{int} ngly = 2;
+00078     \textcolor{keywordtype}{int} nglz = 2;
+00079 
+00080     MatrixXd disp\_mat(6,edof);
+00081 
+00082     VectorXd dndr(nnel);
+00083     VectorXd dnds(nnel);
+00084     VectorXd dndt(nnel);
+00085     VectorXd dndx(nnel);
+00086     VectorXd dndy(nnel);
+00087     VectorXd dndz(nnel);
+00088     MatrixXd jacobian(ndof,ndof);
+00089     MatrixXd invJacobian(ndof,ndof);
+00090 
+00091     MatrixXd points\_3d = \hyperlink{functions_8h_a502e3469e1cc253deb142f46c0789a78}{guass\_points\_3d}(nglx,ngly,nglz);
+00092     MatrixXd weights\_3d = \hyperlink{functions_8h_ad99b08ce65ae353e91486d7685c22024}{guass\_weights\_3d}(ndof,nglx,ngly,nglz);
+00093 
+00094     \textcolor{keywordflow}{if}(size\_counter!=0)\{ \textcolor{comment}{// if this is not the first time step the go into the loop}
+00095 
+00096     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} intx=0;intx<nglx;intx++)\{
+00097         \textcolor{keywordtype}{double} x = points\_3d(0,intx);
+00098         \textcolor{keywordtype}{double} wtx = weights\_3d(0,intx);
+00099         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} inty=0;inty<ngly;inty++)\{
+00100             \textcolor{keywordtype}{double} y = points\_3d(1,inty);
+00101             \textcolor{keywordtype}{double} wty = weights\_3d(1,inty);
+00102             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} intz=0;intz<nglz;intz++)\{
+00103                 \textcolor{keywordtype}{double} z = points\_3d(2,intz);
+00104                 \textcolor{keywordtype}{double} wtz = weights\_3d(2,intz);
+00105 
+00106                 \textcolor{comment}{//VectorXd dndr(edof);}
+00107                 dndr = \hyperlink{functions_8h_afc547bef246c057db6cbd04bf7f866a9}{fe\_dndr\_8}(x,y,z);
+00108                 \textcolor{comment}{//VectorXd dnds(edof);}
+00109                 dnds = \hyperlink{functions_8h_ac0b5524525e1f2e89bb064c15ab8e664}{fe\_dnds\_8}(x,y,z);
+00110                 \textcolor{comment}{//VectorXd dndt(edof);}
+00111                 dndt = \hyperlink{functions_8h_a57e8e5c9f740c98e4767f29c121c2d0a}{fe\_dndt\_8}(x,y,z);
+00112 
+00113                 jacobian = \hyperlink{functions_8h_a5ae3771e65b4a0d177097041a4349c28}{fe\_calJacobian}(ndof,nnel,dndr,dnds,dndt,xcoord,ycoord,zcoord);
+00114                 \textcolor{keywordtype}{double} detJacobian = jacobian.determinant();
+00115                 invJacobian = jacobian.inverse();
+00116 
+00117                 dndx = \hyperlink{functions_8h_afc6be1a5667e68156cb099e8da71170f}{fe\_dndx\_8}(nnel, dndr, dnds, dndt, invJacobian);
+00118                 dndy = \hyperlink{functions_8h_a0572d7818e085c67f7fbb84eef8ecfb4}{fe\_dndy\_8}(nnel, dndr, dnds, dndt, invJacobian);
+00119                 dndz = \hyperlink{functions_8h_aaf75db8433433807839c6ea17f2cf72c}{fe\_dndz\_8}(nnel, dndr, dnds, dndt, invJacobian);
+00120 
+00121                 disp\_mat = \hyperlink{functions_8h_a8c9fd519c93c847cdf52de947964eb67}{fe\_strDispMatrix\_totalLagrangian}(edof,nnel,dndx,
+      dndy,dndz,u\_e);
+00122                 \textcolor{comment}{// disp\_mat = fe\_strDispMatrix(edof,nnel,dndx,dndy,dndz);}
+00123 
+00124                 VectorXd sigma\_e = VectorXd::Zero(6);
+00125                 sigma\_e = \hyperlink{functions_8h_a7d0fd8cfef8b891901eb6f0f780fd9f2}{fe\_stressUpdate}(dndx,dndy,dndz,disp\_mat,u\_e,elements(i,1),0);
+00126 
+00127                 \textcolor{comment}{// f\_int\_e = f\_int\_e + ((disp\_mat.transpose())*sigma\_e*wtx*wty*wtz*detJacobian); (previous
+       correct)}
+00128                 \textcolor{comment}{//std::cout<<k<<std::endl;}
+00129 
+00130                 f\_int\_e = f\_int\_e + ((disp\_mat.transpose())*sigma\_e*wtx*wty*wtz*detJacobian);
+00131             \}
+00132         \}
+00133     \}
+00134 
+00135     \textcolor{comment}{/* Calculating Host Element Stresses and Strains at Centroids */}
+00136         dndr = \hyperlink{functions_8h_afc547bef246c057db6cbd04bf7f866a9}{fe\_dndr\_8}(0,0,0);
+00137         dnds = \hyperlink{functions_8h_ac0b5524525e1f2e89bb064c15ab8e664}{fe\_dnds\_8}(0,0,0);
+00138         dndt = \hyperlink{functions_8h_a57e8e5c9f740c98e4767f29c121c2d0a}{fe\_dndt\_8}(0,0,0);
+00139         jacobian = \hyperlink{functions_8h_a5ae3771e65b4a0d177097041a4349c28}{fe\_calJacobian}(ndof,nnel,dndr,dnds,dndt,xcoord,ycoord,zcoord);
+00140         invJacobian = jacobian.inverse();
+00141         dndx = \hyperlink{functions_8h_afc6be1a5667e68156cb099e8da71170f}{fe\_dndx\_8}(nnel, dndr, dnds, dndt, invJacobian);
+00142         dndy = \hyperlink{functions_8h_a0572d7818e085c67f7fbb84eef8ecfb4}{fe\_dndy\_8}(nnel, dndr, dnds, dndt, invJacobian);
+00143         dndz = \hyperlink{functions_8h_aaf75db8433433807839c6ea17f2cf72c}{fe\_dndz\_8}(nnel, dndr, dnds, dndt, invJacobian);
+00144         disp\_mat = \hyperlink{functions_8h_a8c9fd519c93c847cdf52de947964eb67}{fe\_strDispMatrix\_totalLagrangian}(edof,nnel,dndx,dndy,
+      dndz,u\_e);
+00145 
+00146         \textcolor{comment}{// Stress- Calculation}
+00147         VectorXd sigma\_centroid = VectorXd::Zero(6);
+00148         sigma\_centroid = \hyperlink{functions_8h_a7d0fd8cfef8b891901eb6f0f780fd9f2}{fe\_stressUpdate}(dndx,dndy,dndz,disp\_mat,u\_e,elements(i,1),1);
+00149         element\_stress\_host(i,0) = sigma\_centroid(0);
+00150         element\_stress\_host(i,1) = sigma\_centroid(3);
+00151         element\_stress\_host(i,2) = sigma\_centroid(5);
+00152         element\_stress\_host(i,3) = sigma\_centroid(3);
+00153         element\_stress\_host(i,4) = sigma\_centroid(1);
+00154         element\_stress\_host(i,5) = sigma\_centroid(4);
+00155         element\_stress\_host(i,6) = sigma\_centroid(5);
+00156         element\_stress\_host(i,7) = sigma\_centroid(4);
+00157         element\_stress\_host(i,8) = sigma\_centroid(2);
+00158 
+00159         \textcolor{comment}{// Strain - Calculation}
+00160         MatrixXd E = MatrixXd::Zero(3,3);
+00161         MatrixXd I = MatrixXd::Ones(3,3);
+00162         MatrixXd F = \hyperlink{functions_8h_ae50379f74802347e04dbc022897f9cb0}{fe\_calDefGrad}(dndx,dndy,dndz,u\_e);
+00163         \textcolor{comment}{/* Polar Deomposition of F */}
+00164         JacobiSVD<MatrixXd> svd(F, ComputeThinU | ComputeThinV); \textcolor{comment}{// F = USV}
+00165         MatrixXd Usvd = svd.matrixU();
+00166         MatrixXd Vsvd = svd.matrixV();
+00167         VectorXd Ssvd = svd.singularValues();
+00168         MatrixXd Ssvdmat = MatrixXd::Zero(3,3);
+00169         Ssvdmat(0,0) = Ssvd(0);
+00170         Ssvdmat(1,1) = Ssvd(1);
+00171         Ssvdmat(2,2) = Ssvd(2);
+00172         MatrixXd Rpd = Usvd*Vsvd.adjoint();
+00173         MatrixXd Upd = Vsvd*Ssvdmat*Vsvd.adjoint();
+00174         \textcolor{comment}{// E = 0.5*(F.transpose()*F-I);}
+00175         E = Upd.log();
+00176         element\_strain\_host(i,0) = E(0,0);
+00177         element\_strain\_host(i,1) = E(0,1);
+00178         element\_strain\_host(i,2) = E(0,2);
+00179         element\_strain\_host(i,3) = E(1,0);
+00180         element\_strain\_host(i,4) = E(1,1);
+00181         element\_strain\_host(i,5) = E(1,2);
+00182         element\_strain\_host(i,6) = E(2,0);
+00183         element\_strain\_host(i,7) = E(2,1);
+00184         element\_strain\_host(i,8) = E(2,2);
+00185 
+00186         \textcolor{comment}{// Host element internal nodal forces}
+00187 
+00188         VectorXd nat\_coord = VectorXd::Zero(3);
+00189         nat\_coord(0) = 0.005;
+00190         nat\_coord(1) = 0.005;
+00191         nat\_coord(2) = 0.005;
+00192 
+00193         VectorXd iso\_coord = \hyperlink{functions_8h_acdc9c3b5b3aecd9972c84d0cbb669978}{fe\_newtonRhapson}(nat\_coord,xcoord,ycoord,zcoord);
+00194 
+00195     \textcolor{comment}{/* TRUSS ANALYSIS - WORKS FOR ONLY SINGLE ELEMENT PROBLEMS}
+00196 \textcolor{comment}{    // truss element nodal force}
+00197 \textcolor{comment}{}
+00198 \textcolor{comment}{    int truss\_intg = 2;}
+00199 \textcolor{comment}{    VectorXd truss\_intg\_points = guass\_points(2);}
+00200 \textcolor{comment}{    VectorXd truss\_intg\_weights = guass\_weights(2);}
+00201 \textcolor{comment}{}
+00202 \textcolor{comment}{    for(int q=0;q<truss\_intg;q++)\{}
+00203 \textcolor{comment}{        double t = truss\_intg\_points(q);}
+00204 \textcolor{comment}{        double wtt = truss\_intg\_weights(q);}
+00205 \textcolor{comment}{        dndr = fe\_dndr\_8(0,0,t);}
+00206 \textcolor{comment}{        dnds = fe\_dnds\_8(0,0,t);}
+00207 \textcolor{comment}{        dndt = fe\_dndt\_8(0,0,t);}
+00208 \textcolor{comment}{        jacobian = fe\_calJacobian(ndof,nnel,dndr,dnds,dndt,xcoord,ycoord,zcoord);}
+00209 \textcolor{comment}{        invJacobian = jacobian.inverse();}
+00210 \textcolor{comment}{        dndx = fe\_dndx\_8(nnel, dndr, dnds, dndt, invJacobian);}
+00211 \textcolor{comment}{        dndy = fe\_dndy\_8(nnel, dndr, dnds, dndt, invJacobian);}
+00212 \textcolor{comment}{        dndz = fe\_dndz\_8(nnel, dndr, dnds, dndt, invJacobian);}
+00213 \textcolor{comment}{        disp\_mat = fe\_strDispMatrix\_totalLagrangian(edof,nnel,dndx,dndy,dndz,u\_e);}
+00214 \textcolor{comment}{        VectorXd sigma\_truss = VectorXd::Zero(6);}
+00215 \textcolor{comment}{        sigma\_truss = fe\_stressUpdate\_1d(dndx,dndy,dndz,u\_e,elements\_truss(0,1),nodes\_truss);}
+00216 \textcolor{comment}{        VectorXd f\_int\_truss = (disp\_mat.transpose()*sigma\_truss*wtt*0.5*0.5);}
+00217 \textcolor{comment}{}
+00218 \textcolor{comment}{        VectorXd sigma\_correction = fe\_stressUpdate\_1d(dndx,dndy,dndz,u\_e,elements(i,1),nodes\_truss);}
+00219 \textcolor{comment}{        VectorXd f\_int\_correction = (disp\_mat.transpose()*sigma\_correction*wtt*0.5*0.5);}
+00220 \textcolor{comment}{}
+00221 \textcolor{comment}{        f\_int\_e = f\_int\_e + f\_int\_truss - f\_int\_correction; // no Volume Redundancy}
+00222 \textcolor{comment}{        // f\_int\_e = (0.5*f\_int\_e) + f\_int\_truss; // no Volume Redundancy using volume fractions}
+00223 \textcolor{comment}{}
+00224 \textcolor{comment}{        // f\_int\_e = f\_int\_e + f\_int\_truss ; // With Volume Redundancy}
+00225 \textcolor{comment}{    \}}
+00226 \textcolor{comment}{}
+00227 \textcolor{comment}{    // Calculating Truss Element Stress and Strains}
+00228 \textcolor{comment}{}
+00229 \textcolor{comment}{    dndr = fe\_dndr\_8(0,0,0);}
+00230 \textcolor{comment}{    dnds = fe\_dnds\_8(0,0,0);}
+00231 \textcolor{comment}{    dndt = fe\_dndt\_8(0,0,0);}
+00232 \textcolor{comment}{    jacobian = fe\_calJacobian(ndof,nnel,dndr,dnds,dndt,xcoord,ycoord,zcoord);}
+00233 \textcolor{comment}{    invJacobian = jacobian.inverse();}
+00234 \textcolor{comment}{    dndx = fe\_dndx\_8(nnel, dndr, dnds, dndt, invJacobian);}
+00235 \textcolor{comment}{    dndy = fe\_dndy\_8(nnel, dndr, dnds, dndt, invJacobian);}
+00236 \textcolor{comment}{    dndz = fe\_dndz\_8(nnel, dndr, dnds, dndt, invJacobian);}
+00237 \textcolor{comment}{    disp\_mat = fe\_strDispMatrix\_totalLagrangian(edof,nnel,dndx,dndy,dndz,u\_e);}
+00238 \textcolor{comment}{}
+00239 \textcolor{comment}{    // Strain - Calculation}
+00240 \textcolor{comment}{        F = fe\_calDefGrad(dndx,dndy,dndz,u\_e);}
+00241 \textcolor{comment}{        MatrixXd C = F.transpose()*F;}
+00242 \textcolor{comment}{        VectorXd dir\_truss = VectorXd::Zero(3);}
+00243 \textcolor{comment}{        dir\_truss << (nodes\_truss(1,1)-nodes\_truss(0,1)) , (nodes\_truss(1,2)-nodes\_truss(0,2)),
+       (nodes\_truss(1,3)-nodes\_truss(0,3));}
+00244 \textcolor{comment}{        VectorXd deformed\_truss = C*dir\_truss;}
+00245 \textcolor{comment}{        double lambda\_tmp = dir\_truss.dot(deformed\_truss);}
+00246 \textcolor{comment}{        double lambda = sqrt(lambda\_tmp);}
+00247 \textcolor{comment}{        element\_strain\_truss(i,0) = lambda-1;}
+00248 \textcolor{comment}{        element\_strain\_truss(i,1) = 0;}
+00249 \textcolor{comment}{        element\_strain\_truss(i,2) = 0;}
+00250 \textcolor{comment}{        element\_strain\_truss(i,3) = 0;}
+00251 \textcolor{comment}{        element\_strain\_truss(i,4) = 0;}
+00252 \textcolor{comment}{        element\_strain\_truss(i,5) = 0;}
+00253 \textcolor{comment}{        element\_strain\_truss(i,6) = 0;}
+00254 \textcolor{comment}{        element\_strain\_truss(i,7) = 0;}
+00255 \textcolor{comment}{        element\_strain\_truss(i,8) = 0;}
+00256 \textcolor{comment}{}
+00257 \textcolor{comment}{    // Stress- Calculation}
+00258 \textcolor{comment}{        std::string model;}
+00259 \textcolor{comment}{        model = fe\_get\_model(elements\_truss(0,1));}
+00260 \textcolor{comment}{        double sigma = 0;}
+00261 \textcolor{comment}{        if(model=="simple\_elastic")\{}
+00262 \textcolor{comment}{            double E = fe\_get\_mats(elements\_truss(0,1),1);}
+00263 \textcolor{comment}{            sigma = E*log(lambda);}
+00264 \textcolor{comment}{        \}}
+00265 \textcolor{comment}{        element\_stress\_truss(i,0) = sigma;}
+00266 \textcolor{comment}{        element\_stress\_truss(i,1) = 0;}
+00267 \textcolor{comment}{        element\_stress\_truss(i,2) = 0;}
+00268 \textcolor{comment}{        element\_stress\_truss(i,3) = 0;}
+00269 \textcolor{comment}{        element\_stress\_truss(i,4) = 0;}
+00270 \textcolor{comment}{        element\_stress\_truss(i,5) = 0;}
+00271 \textcolor{comment}{        element\_stress\_truss(i,6) = 0;}
+00272 \textcolor{comment}{        element\_stress\_truss(i,7) = 0;}
+00273 \textcolor{comment}{        element\_stress\_truss(i,8) = 0;}
+00274 \textcolor{comment}{    */}
+00275 
+00276     \}
+00277 
+00278     f\_tot\_e = f\_ext\_e - f\_int\_e;
+00279     f\_tot = \hyperlink{functions_8h_a6b8344e12f9005795f93f60ddda26c5c}{fe\_scatter}(f\_tot,f\_tot\_e,nodes\_local,sdof);
+00280     \}
+00281 
+00282     \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[0].\hyperlink{class_mesh_a2c1456f1b3b5bda8d213624e3943dbb3}{readStressStrain}(element\_stress\_host,element\_strain\_host);
+00283 
+00284     \textcolor{keywordflow}{return} f\_tot;
+00285 \}
+\end{DoxyCode}

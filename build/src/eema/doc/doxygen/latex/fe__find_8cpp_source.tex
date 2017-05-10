@@ -1,0 +1,35 @@
+\hypertarget{fe__find_8cpp_source}{}\section{fe\+\_\+find.\+cpp}
+\label{fe__find_8cpp_source}\index{src/eema/src/\+Math/\+General\+Math/fe\+\_\+find.\+cpp@{src/eema/src/\+Math/\+General\+Math/fe\+\_\+find.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00003 
+\Hypertarget{fe__find_8cpp_source_l00004}\hyperlink{fe__find_8cpp_a983304137f9a961469a558437d5d2d59}{00004} \textcolor{keywordtype}{int} \hyperlink{fe__find_8cpp_a983304137f9a961469a558437d5d2d59}{fe\_find}(VectorXd A, \textcolor{keywordtype}{double} a)\{
+00005 
+00006   \textcolor{keywordtype}{int} number = 100000000;
+00007 
+00008   \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<A.size();i++)\{
+00009     \textcolor{keywordflow}{if}(A(i)==a)\{
+00010       number = i;
+00011       \textcolor{keywordflow}{break};
+00012     \}
+00013   \}
+00014 
+00015   \textcolor{keywordflow}{return} number;
+00016 \}
+00017 
+\Hypertarget{fe__find_8cpp_source_l00018}\hyperlink{fe__find_8cpp_a0d42c56d98efb23079057340a7133e89}{00018} \textcolor{keywordtype}{int} \hyperlink{fe__find_8cpp_a983304137f9a961469a558437d5d2d59}{fe\_find}(VectorXd A, \textcolor{keywordtype}{int} a)\{
+00019 
+00020   \textcolor{keywordtype}{int} number = 100000000;
+00021 
+00022   \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<A.size();i++)\{
+00023     \textcolor{keywordflow}{if}(A(i)==(double)a)\{
+00024       number = i;
+00025       \textcolor{keywordflow}{break};
+00026     \}
+00027   \}
+00028 
+00029   \textcolor{keywordflow}{return} number;
+00030 \}
+\end{DoxyCode}

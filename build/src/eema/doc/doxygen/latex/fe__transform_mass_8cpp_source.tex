@@ -1,0 +1,36 @@
+\hypertarget{fe__transform_mass_8cpp_source}{}\section{fe\+\_\+transform\+Mass.\+cpp}
+\label{fe__transform_mass_8cpp_source}\index{src/eema/src/\+Elements/\+Element\+Calculations/fe\+\_\+transform\+Mass.\+cpp@{src/eema/src/\+Elements/\+Element\+Calculations/fe\+\_\+transform\+Mass.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include<iostream>}
+00002 
+00003 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00004 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00005 
+\Hypertarget{fe__transform_mass_8cpp_source_l00006}\hyperlink{fe__transform_mass_8cpp_ab747d046148af042245ed13ca720c5ec}{00006} MatrixXd \hyperlink{fe__transform_mass_8cpp_ab747d046148af042245ed13ca720c5ec}{fe\_transformMass}(MatrixXd m, \textcolor{keywordtype}{int} opt)\{
+00007 
+00008     \textcolor{comment}{// opt = 1: No transformation}
+00009     \textcolor{comment}{// opt = 2: Converted to Direct lumped mass}
+00010     \textcolor{comment}{// opt = 3: Converted to Variational lumped mass}
+00011 
+00012     MatrixXd m\_new = MatrixXd::Zero(m.rows(),m.cols());
+00013 
+00014     \textcolor{keywordflow}{if}(opt==1)\{
+00015         m\_new = m;
+00016     \}
+00017 
+00018     \textcolor{keywordflow}{if} (opt==2)\{
+00019     \textcolor{keywordtype}{double} sum = 0;
+00020     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i<m.rows() ; i++)\{
+00021         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j = 0; j< m.cols(); j++)\{
+00022             sum = sum + m(i,j);
+00023         \}
+00024         m\_new(i,i) = sum;
+00025         sum = 0;
+00026     \}
+00027     \}
+00028 
+00029     \textcolor{keywordflow}{return} m\_new;
+00030 
+00031 \}
+\end{DoxyCode}

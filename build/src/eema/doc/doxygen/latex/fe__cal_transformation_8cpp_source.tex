@@ -1,0 +1,108 @@
+\hypertarget{fe__cal_transformation_8cpp_source}{}\section{fe\+\_\+cal\+Transformation.\+cpp}
+\label{fe__cal_transformation_8cpp_source}\index{src/eema/src/\+Elements/\+Element\+Calculations/fe\+\_\+cal\+Transformation.\+cpp@{src/eema/src/\+Elements/\+Element\+Calculations/fe\+\_\+cal\+Transformation.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00002 
+00003 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00004 
+00005 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00006 
+\Hypertarget{fe__cal_transformation_8cpp_source_l00007}\hyperlink{fe__cal_transformation_8cpp_aa41c40dffea4251a07a8a3f5062f47ae}{00007} MatrixXd \hyperlink{fe__cal_transformation_8cpp_aa41c40dffea4251a07a8a3f5062f47ae}{fe\_calTransformation}(MatrixXd truss\_nodes, \textcolor{keywordtype}{int} choice)\{
+00008 \textcolor{comment}{// choice - 1: Stress Transformation Matrix}
+00009 \textcolor{comment}{// choice - 2: Strain Transformation Matrix}
+00010 
+00011     MatrixXd T(6,6);
+00012     \textcolor{keywordtype}{double} l\_1,l\_2,l\_3,m\_1,m\_2,m\_3,n\_1,n\_2,n\_3;
+00013 
+00014     Vector3d dir\_truss\_x(3);
+00015     dir\_truss\_x(0) = truss\_nodes(1,1) - truss\_nodes(0,1);
+00016     dir\_truss\_x(1) = truss\_nodes(1,2) - truss\_nodes(0,2);
+00017     dir\_truss\_x(2) = truss\_nodes(1,3) - truss\_nodes(0,3);
+00018 
+00019     \textcolor{comment}{// std::cout<<"Direction of truss element is:
+       "<<dir\_truss\_x(0)<<":"<<dir\_truss\_x(1)<<":"<<dir\_truss\_x(2)<<"\(\backslash\)n";}
+00020 
+00021     Vector3d dir\_truss\_y(3);
+00022     Vector3d dir\_truss\_z(3);
+00023     
+00024     \textcolor{keywordflow}{if}(dir\_truss\_x(0)!=0)\{
+00025         dir\_truss\_y(1) = 1; 
+00026         dir\_truss\_y(2) = 0;
+00027         dir\_truss\_y(0) = -(((dir\_truss\_y(1)*dir\_truss\_x(1))+(dir\_truss\_y(2)*dir\_truss\_x(2)))/dir\_truss\_x(0)
+      );
+00028     \}
+00029     \textcolor{keywordflow}{else}\{
+00030         \textcolor{keywordflow}{if}((dir\_truss\_x(0)==0) && (dir\_truss\_x(1)!=0))\{
+00031             dir\_truss\_y(0) = 1;
+00032             dir\_truss\_y(2) = 1;
+00033             dir\_truss\_y(1) = -(((dir\_truss\_y(2)*dir\_truss\_x(2))+(dir\_truss\_y(0)*dir\_truss\_x(0)))/
+      dir\_truss\_x(1));       
+00034         \}
+00035         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}((dir\_truss\_x(0)==0) && (dir\_truss\_x(2)!=0))\{
+00036             dir\_truss\_y(0) = 0;
+00037             dir\_truss\_y(1) = 1;
+00038             dir\_truss\_y(2) = -(((dir\_truss\_y(0)*dir\_truss\_x(0))+(dir\_truss\_y(1)*dir\_truss\_x(1)))/
+      dir\_truss\_x(2)); 
+00039         \}
+00040         \textcolor{keywordflow}{else}\{
+00041             std::cout<<\textcolor{stringliteral}{"Truss element is not practically possible"}<<\textcolor{stringliteral}{"\(\backslash\)n"};
+00042         \}
+00043     \}
+00044     
+00045     dir\_truss\_z = dir\_truss\_x.cross(dir\_truss\_y);
+00046 
+00047     \textcolor{comment}{// Proof of Right Handed Coordinate System}
+00048     \textcolor{comment}{//Vector3d tmp1 = dir\_truss\_y.cross(dir\_truss\_z);}
+00049     \textcolor{comment}{//std::cout<<"Y x Z is: "<<tmp1<<"\(\backslash\)n";}
+00050     \textcolor{comment}{//std::cout<<"X is: "<<dir\_truss\_x<<"\(\backslash\)n";}
+00051 
+00052     VectorXd dir\_global\_x(3);
+00053     dir\_global\_x << 1, 0, 0;
+00054     
+00055     VectorXd dir\_global\_y(3);
+00056     dir\_global\_y << 0, 1, 0;
+00057 
+00058     VectorXd dir\_global\_z(3);
+00059     dir\_global\_z << 0, 0, 1;
+00060 
+00061     l\_1 = (dir\_global\_x.dot(dir\_truss\_x))/(dir\_global\_x.norm()*dir\_truss\_x.norm());
+00062     l\_2 = (dir\_global\_x.dot(dir\_truss\_y))/(dir\_global\_x.norm()*dir\_truss\_y.norm());
+00063     l\_3 = (dir\_global\_x.dot(dir\_truss\_z))/(dir\_global\_x.norm()*dir\_truss\_z.norm()); 
+00064     m\_1 = (dir\_global\_y.dot(dir\_truss\_x))/(dir\_global\_y.norm()*dir\_truss\_x.norm()); 
+00065     m\_2 = (dir\_global\_y.dot(dir\_truss\_y))/(dir\_global\_y.norm()*dir\_truss\_y.norm());
+00066     m\_3 = (dir\_global\_y.dot(dir\_truss\_z))/(dir\_global\_y.norm()*dir\_truss\_z.norm());
+00067     n\_1 = (dir\_global\_z.dot(dir\_truss\_x))/(dir\_global\_z.norm()*dir\_truss\_x.norm());
+00068     n\_2 = (dir\_global\_z.dot(dir\_truss\_y))/(dir\_global\_z.norm()*dir\_truss\_y.norm());
+00069     n\_3 = (dir\_global\_z.dot(dir\_truss\_z))/(dir\_global\_z.norm()*dir\_truss\_z.norm());
+00070 
+00071     \textcolor{keywordflow}{if}(choice==2)\{
+00072     T.row(0) << (l\_1*l\_1), (m\_1*m\_1), (n\_1*n\_1), (l\_1*m\_1), (m\_1*n\_1), (n\_1*l\_1);
+00073     T.row(1) << (l\_2*l\_2), (m\_2*m\_2), (n\_2*n\_2), (l\_2*m\_2), (m\_2*n\_2), (n\_2*l\_2);
+00074     T.row(2) << (l\_3*l\_3), (m\_3*m\_3), (n\_3*n\_3), (l\_3*m\_3), (m\_3*n\_3), (n\_3*l\_3);
+00075     T.row(3) << (2*l\_1*l\_2), (2*m\_1*m\_2), (2*n\_1*n\_2), ((l\_1*m\_2)+(l\_2*m\_1)), ((m\_1*n\_2)+(m\_2*n\_1)), ((l\_1*
+      n\_2)+(l\_2*n\_1));
+00076     T.row(4) << (2*l\_2*l\_3), (2*m\_2*m\_3), (2*n\_2*n\_3), ((l\_2*m\_3)+(l\_3*m\_2)), ((m\_2*n\_3)+(m\_3*n\_2)), ((l\_2*
+      n\_3)+(l\_3*n\_2));
+00077     T.row(5) << (2*l\_1*l\_3), (2*m\_1*m\_3), (2*n\_1*n\_3), ((l\_1*m\_3)+(l\_3*m\_1)), ((m\_1*n\_3)+(m\_3*n\_1)), ((l\_1*
+      n\_3)+(l\_3*n\_1));
+00078     \}
+00079     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(choice==1) \{
+00080     T.row(0) << pow(l\_1,2), pow(m\_1,2), pow(n\_1,2), (2*l\_1*m\_1), (2*m\_1*n\_1), (2*n\_1*l\_1);
+00081         T.row(1) << pow(l\_2,2), pow(m\_2,2), pow(n\_2,2), (2*l\_2*m\_2), (2*m\_2*n\_2), (2*n\_2*l\_2);
+00082         T.row(2) << pow(l\_3,2), pow(m\_3,2), pow(n\_3,2), (2*l\_3*m\_3), (2*m\_3*n\_3), (2*n\_3*l\_3);
+00083         T.row(3) << (1*l\_1*l\_2), (1*m\_1*m\_2), (1*n\_1*n\_2), ((l\_1*m\_2)+(l\_2*m\_1)), ((m\_1*n\_2)+(m\_2*n\_1)), ((
+      l\_1*n\_2)+(l\_2*n\_1));
+00084         T.row(4) << (1*l\_2*l\_3), (1*m\_2*m\_3), (1*n\_2*n\_3), ((l\_2*m\_3)+(l\_3*m\_2)), ((m\_2*n\_3)+(m\_3*n\_2)), ((
+      l\_2*n\_3)+(l\_3*n\_2));
+00085         T.row(5) << (1*l\_1*l\_3), (1*m\_1*m\_3), (1*n\_1*n\_3), ((l\_1*m\_3)+(l\_3*m\_1)), ((m\_1*n\_3)+(m\_3*n\_1)), ((
+      l\_1*n\_3)+(l\_3*n\_1));
+00086     \}
+00087     \textcolor{keywordflow}{else}\{
+00088         std::cout<<\textcolor{stringliteral}{"WRONG CHOICE OF TRANSFORMATION MATRIX\(\backslash\)n"};
+00089     \}
+00090     
+00091     \textcolor{comment}{//std::cout<<"Transformation Matrix is: "<<T<<"\(\backslash\)n";}
+00092     \textcolor{keywordflow}{return} T;
+00093 \}
+\end{DoxyCode}

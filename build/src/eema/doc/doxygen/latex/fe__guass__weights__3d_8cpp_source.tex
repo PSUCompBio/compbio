@@ -1,0 +1,39 @@
+\hypertarget{fe__guass__weights__3d_8cpp_source}{}\section{fe\+\_\+guass\+\_\+weights\+\_\+3d.\+cpp}
+\label{fe__guass__weights__3d_8cpp_source}\index{src/eema/src/\+Elements/\+Quadrature/fe\+\_\+guass\+\_\+weights\+\_\+3d.\+cpp@{src/eema/src/\+Elements/\+Quadrature/fe\+\_\+guass\+\_\+weights\+\_\+3d.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__guass__weights__3d_8cpp_source_l00005}\hyperlink{fe__guass__weights__3d_8cpp_ad99b08ce65ae353e91486d7685c22024}{00005} MatrixXd \hyperlink{fe__guass__weights__3d_8cpp_ad99b08ce65ae353e91486d7685c22024}{guass\_weights\_3d}(\textcolor{keywordtype}{int} \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}, \textcolor{keywordtype}{int} nx,\textcolor{keywordtype}{int} ny,\textcolor{keywordtype}{int} nz)\{
+00006     \textcolor{keywordtype}{int} n; \textcolor{comment}{// n should be the highest value of nx,ny and nz.}
+00007     \textcolor{keywordflow}{if}(nx>=ny)\{
+00008         \textcolor{keywordflow}{if}(nx>=nz)\{
+00009             n = nx;
+00010         \}
+00011         \textcolor{keywordflow}{else}\{
+00012             n = nz;
+00013         \}
+00014     \}
+00015     \textcolor{keywordflow}{else}\{
+00016         \textcolor{keywordflow}{if}(ny>=nz)\{
+00017             n = ny;
+00018         \}
+00019         \textcolor{keywordflow}{else}\{
+00020         n = nz;
+00021         \}
+00022     \}
+00023 
+00024     MatrixXd weights\_3d(ndof,n);
+00025     VectorXd tmp(n);
+00026 
+00027     \textcolor{keywordflow}{if}(n==2)\{
+00028         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof};i++)\{
+00029             weights\_3d(i,0) = \hyperlink{functions_8h_a84dcc9575e861bdb2872c10ba6238ee4}{guass\_weights}(2)(0);
+00030             weights\_3d(i,1) = \hyperlink{functions_8h_a84dcc9575e861bdb2872c10ba6238ee4}{guass\_weights}(2)(1);
+00031         \}
+00032     \}
+00033     \textcolor{keywordflow}{return} weights\_3d;
+00034 \}
+\end{DoxyCode}

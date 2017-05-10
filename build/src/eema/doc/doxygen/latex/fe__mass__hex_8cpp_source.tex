@@ -1,0 +1,121 @@
+\hypertarget{fe__mass__hex_8cpp_source}{}\section{fe\+\_\+mass\+\_\+hex.\+cpp}
+\label{fe__mass__hex_8cpp_source}\index{src/eema/src/\+Elements/\+Mass/fe\+\_\+mass\+\_\+hex.\+cpp@{src/eema/src/\+Elements/\+Mass/fe\+\_\+mass\+\_\+hex.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00003 
+\Hypertarget{fe__mass__hex_8cpp_source_l00004}\hyperlink{fe__mass__hex_8cpp_a0405e1196584e6fa36f29a2614a49f00}{00004} MatrixXd \hyperlink{fe__mass__hex_8cpp_a0405e1196584e6fa36f29a2614a49f00}{fe\_mass\_hex}(MatrixXd nodes, VectorXi elements\_row)\{
+00005 
+00006     \textcolor{keywordtype}{int} nnel = elements\_row.size()-2;
+00007     \textcolor{keywordtype}{int} nnode = nodes.rows();
+00008     \textcolor{keywordtype}{int} edof = nnel*\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof};
+00009 
+00010     VectorXi nodes\_local = VectorXi::Zero(nnel);
+00011     VectorXd xcoord = VectorXd::Zero(nnel);
+00012     VectorXd ycoord = VectorXd::Zero(nnel);
+00013     VectorXd zcoord = VectorXd::Zero(nnel);
+00014 
+00015     \textcolor{keywordtype}{double} rho = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(elements\_row(1),0); \textcolor{comment}{// material density}
+00016 
+00017     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<nnel;j++)\{
+00018         \textcolor{keywordtype}{int} g = -1;
+00019         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} f=0;f<nnode;f++)\{
+00020             \textcolor{keywordflow}{if}(elements\_row(j+2)==nodes(f,0))\{
+00021                 g = f;
+00022                 \textcolor{keywordflow}{break};
+00023             \}
+00024         \}
+00025         nodes\_local(j) = elements\_row(j+2);
+00026         xcoord(j) = nodes(g,1);
+00027         ycoord(j) = nodes(g,2);
+00028         zcoord(j) = nodes(g,3);
+00029     \}
+00030 
+00031     \textcolor{keywordtype}{int} nglx = 2;
+00032     \textcolor{keywordtype}{int} ngly = 2;
+00033     \textcolor{keywordtype}{int} nglz = 2;
+00034 
+00035     MatrixXd m(edof,edof); \textcolor{comment}{// element mass matrix}
+00036     m = MatrixXd::Zero(edof,edof);
+00037 
+00038     MatrixXd shape\_mat(3,edof);
+00039 
+00040     VectorXd shapes\_3d(nnel);
+00041     \textcolor{comment}{// r,s,t are the isoparametric coordinates.}
+00042     VectorXd dndr(nnel);
+00043     VectorXd dnds(nnel);
+00044     VectorXd dndt(nnel);
+00045     \textcolor{comment}{// x, y, z are the actual coordinates.}
+00046     VectorXd dndx(nnel);
+00047     VectorXd dndy(nnel);
+00048     VectorXd dndz(nnel);
+00049     MatrixXd jacobian(ndof,ndof);
+00050     MatrixXd invJacobian(ndof,ndof);
+00051 
+00052     MatrixXd points\_3d = \hyperlink{functions_8h_a502e3469e1cc253deb142f46c0789a78}{guass\_points\_3d}(nglx,ngly,nglz);
+00053     MatrixXd weights\_3d = \hyperlink{functions_8h_ad99b08ce65ae353e91486d7685c22024}{guass\_weights\_3d}(ndof,nglx,ngly,nglz);
+00054 
+00055     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} intx=0;intx<nglx;intx++)\{
+00056         \textcolor{keywordtype}{double} x = points\_3d(0,intx);
+00057         \textcolor{keywordtype}{double} wtx = weights\_3d(0,intx);
+00058         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} inty=0;inty<ngly;inty++)\{
+00059             \textcolor{keywordtype}{double} y = points\_3d(1,inty);
+00060             \textcolor{keywordtype}{double} wty = weights\_3d(1,inty);
+00061             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} intz=0;intz<nglz;intz++)\{
+00062                 \textcolor{keywordtype}{double} z = points\_3d(2,intz);
+00063                 \textcolor{keywordtype}{double} wtz = weights\_3d(2,intz);
+00064 
+00065                 \textcolor{comment}{// std::cout<<"I am here\(\backslash\)n";}
+00066 
+00067                 \textcolor{comment}{//VectorXd shapes\_3d(edof);}
+00068                 shapes\_3d = \hyperlink{functions_8h_ab77a3a6d6f6b436d7e8c600bb0869927}{fe\_shapes\_8}(x,y,z);
+00069                 \textcolor{comment}{//VectorXd dndr(edof);}
+00070                 dndr = \hyperlink{functions_8h_afc547bef246c057db6cbd04bf7f866a9}{fe\_dndr\_8}(x,y,z);
+00071                 \textcolor{comment}{//VectorXd dnds(edof);}
+00072                 dnds = \hyperlink{functions_8h_ac0b5524525e1f2e89bb064c15ab8e664}{fe\_dnds\_8}(x,y,z);
+00073                 \textcolor{comment}{//VectorXd dndt(edof);}
+00074                 dndt = \hyperlink{functions_8h_a57e8e5c9f740c98e4767f29c121c2d0a}{fe\_dndt\_8}(x,y,z);
+00075 
+00076                 \textcolor{comment}{//MatrixXd jacobian(ndof,ndof);}
+00077                 jacobian = \hyperlink{functions_8h_a5ae3771e65b4a0d177097041a4349c28}{fe\_calJacobian}(ndof,nnel,dndr,dnds,dndt,xcoord,ycoord,zcoord);
+00078                 \textcolor{keywordtype}{double} detJacobian = jacobian.determinant();
+00079                 \textcolor{comment}{//MatrixXd invJacobian(ndof,ndof);}
+00080                 \textcolor{comment}{//invJacobian = jacobian.inverse();}
+00081 
+00082                 \textcolor{comment}{//VectorXd dndx(edof);}
+00083                 \textcolor{comment}{//dndx = fe\_dndx\_8(nnel, dndr, dnds, dndt, invJacobian);}
+00084                 \textcolor{comment}{//VectorXd dndy(edof);}
+00085                 \textcolor{comment}{//dndy = fe\_dndy\_8(nnel, dndr, dnds, dndt, invJacobian);}
+00086                 \textcolor{comment}{//VectorXd dndz(edof);}
+00087                 \textcolor{comment}{//dndz = fe\_dndz\_8(nnel, dndr, dnds, dndt, invJacobian);}
+00088 
+00089 
+00090                 \textcolor{comment}{//disp\_mat = fe\_strDispMatrix(edof,nnel,dndx,dndy,dndz);}
+00091                 \textcolor{comment}{//k = k + (((disp\_mat.transpose())*matl\_mat*disp\_mat)*wtx*wty*wtz*detJacobian);}
+00092                 shape\_mat = \hyperlink{functions_8h_a98fae74dde5fe33a7062e7457a2d3227}{fe\_shapeMatrix}(edof,nnel,shapes\_3d);
+00093                 m = m + (rho*(shape\_mat.transpose())*shape\_mat*detJacobian*wtx*wty*wtz);
+00094 
+00095                 \textcolor{comment}{//std::cout<<k<<std::endl;}
+00096             \}
+00097         \}
+00098     \}
+00099 
+00100     \textcolor{keywordflow}{return} m;
+00101 \}
+00102 
+\Hypertarget{fe__mass__hex_8cpp_source_l00103}\hyperlink{fe__mass__hex_8cpp_a350d27ea0f1de929495d659b26f428d2}{00103} MatrixXd \hyperlink{fe__mass__hex_8cpp_a350d27ea0f1de929495d659b26f428d2}{fe\_mass\_truss}(\textcolor{keywordtype}{double} rho,\textcolor{keywordtype}{double} A\_truss,\textcolor{keywordtype}{int} edof,MatrixXd nodes,MatrixXd elements)\{
+00104 
+00105     \textcolor{comment}{/* Direct Lumped mass being used for truss elements */}
+00106     MatrixXd m = MatrixXd::Zero(edof,edof);
+00107     \textcolor{keywordtype}{double} mass = rho*A\_truss*1;
+00108 
+00109     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<edof;i++)\{
+00110         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<edof;j++)\{
+00111             m(i,i) = (mass/8);
+00112         \}
+00113     \}
+00114 
+00115     \textcolor{keywordflow}{return} m;
+00116 \}
+\end{DoxyCode}

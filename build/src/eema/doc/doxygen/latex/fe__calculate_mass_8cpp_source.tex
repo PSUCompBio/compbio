@@ -1,0 +1,61 @@
+\hypertarget{fe__calculate_mass_8cpp_source}{}\section{fe\+\_\+calculate\+Mass.\+cpp}
+\label{fe__calculate_mass_8cpp_source}\index{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+calculate\+Mass.\+cpp@{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+calculate\+Mass.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__calculate_mass_8cpp_source_l00005}\hyperlink{fe__calculate_mass_8cpp_abeed10bd80ae1f3c95d79c4aed512d8f}{00005} VectorXd \hyperlink{fe__calculate_mass_8cpp_abeed10bd80ae1f3c95d79c4aed512d8f}{fe\_calculateMass}(VectorXd mm, std::string type)\{
+00006 
+00007     \textcolor{keywordflow}{if}(type==\textcolor{stringliteral}{"direct\_lumped"})\{ \textcolor{comment}{// Embedded Mass}
+00008       mm = \hyperlink{fe__calculate_mass_8cpp_aca6d101baf8887cf61064067985cbd62}{fe\_calculateMassDirectLumped}(mm);
+00009     \}
+00010 
+00011   \textcolor{keywordflow}{return} mm;
+00012 \}
+00013 
+\Hypertarget{fe__calculate_mass_8cpp_source_l00014}\hyperlink{fe__calculate_mass_8cpp_aca6d101baf8887cf61064067985cbd62}{00014} VectorXd \hyperlink{fe__calculate_mass_8cpp_aca6d101baf8887cf61064067985cbd62}{fe\_calculateMassDirectLumped}(VectorXd mm)\{
+00015 
+00016   MatrixXd nodes = \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[0].\hyperlink{class_mesh_a52ecce406bbef80cbf3610db3ea5ea40}{getNewNodes}();
+00017   MatrixXi elements = \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}[0].\hyperlink{class_mesh_a6e425e9499e64ab52c4555aa3763651d}{getNewElements}();
+00018 
+00019   \textcolor{keywordtype}{int} nel = elements.rows(); 
+00020   \textcolor{keywordtype}{int} nnel = (elements.cols()-2); \textcolor{comment}{// number of nodes per element}
+00021   \textcolor{keywordtype}{int} nnode = nodes.rows(); \textcolor{comment}{// number of nodes}
+00022   \textcolor{keywordtype}{int} sdof = nnode * \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}; \textcolor{comment}{// system degrees of freedom}
+00023   \textcolor{keywordtype}{int} edof = nnel * \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}; \textcolor{comment}{// element degrees of freedom}
+00024 
+00025   \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nel;i++)\{
+00026 
+00027     VectorXi nodes\_local = VectorXi::Zero(elements.cols()-2);
+00028 
+00029         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<(elements.cols()-2);j++)\{
+00030             nodes\_local(j) = elements(i,j+2);
+00031         \}
+00032 
+00033         VectorXd m\_element = VectorXd::Zero(edof); \textcolor{comment}{// mass of hex elements}
+00034         m\_element = \hyperlink{functions_8h_aa34a87447bf9fa851463ce99101a7054}{fe\_massLumped}(nodes,elements.row(i));
+00035 
+00036         \textcolor{comment}{/* TRUSS ANALYSIS - WORKS FOR ONLY SINGLE ELEMENT}
+00037 \textcolor{comment}{        // Truss elements}
+00038 \textcolor{comment}{        // by default, mass of the truss is added to the hex element in a lumped form}
+00039 \textcolor{comment}{        double rho\_truss = fe\_get\_mats(elements\_truss(i,1),0);}
+00040 \textcolor{comment}{        double A\_truss = 0.5;}
+00041 \textcolor{comment}{        MatrixXd m\_truss = MatrixXd::Zero(edof,edof);}
+00042 \textcolor{comment}{        m\_truss = fe\_mass\_truss(rho\_truss,A\_truss,edof,nodes\_truss,elements\_truss);}
+00043 \textcolor{comment}{}
+00044 \textcolor{comment}{        MatrixXd m\_correction = MatrixXd::Zero(edof,edof);}
+00045 \textcolor{comment}{        m\_correction = fe\_mass\_truss(rho,A\_truss,edof,nodes\_truss,elements\_truss); // This is the redundant
+       volume}
+00046 \textcolor{comment}{}
+00047 \textcolor{comment}{        // mm = fe\_assemble\_mass(m\_hex+m\_truss); // This is where the mass magic happens (m\_hex + m\_truss -
+       m\_correction)*/}
+00048 
+00049     mm = \hyperlink{functions_8h_a6b8344e12f9005795f93f60ddda26c5c}{fe\_scatter}(mm,m\_element,nodes\_local,sdof);
+00050   \}
+00051 
+00052   \textcolor{keywordflow}{return} mm;
+00053 
+00054 \}
+\end{DoxyCode}

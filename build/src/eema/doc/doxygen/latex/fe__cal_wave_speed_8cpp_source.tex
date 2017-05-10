@@ -1,0 +1,31 @@
+\hypertarget{fe__cal_wave_speed_8cpp_source}{}\section{fe\+\_\+cal\+Wave\+Speed.\+cpp}
+\label{fe__cal_wave_speed_8cpp_source}\index{src/eema/src/\+Time\+Step/fe\+\_\+cal\+Wave\+Speed.\+cpp@{src/eema/src/\+Time\+Step/fe\+\_\+cal\+Wave\+Speed.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__cal_wave_speed_8cpp_source_l00006}\hyperlink{fe__cal_wave_speed_8cpp_a20aed1a2d3d8b470592491a96e60be87}{00006} \textcolor{keywordtype}{double} \hyperlink{fe__cal_wave_speed_8cpp_a20aed1a2d3d8b470592491a96e60be87}{fe\_calWaveSpeed}(\textcolor{keywordtype}{int} material\_id)\{
+00007 
+00008     std::string model = \hyperlink{functions_8h_a34d6fb85943d945b7e8600d2ef4220d0}{fe\_get\_model}(material\_id);
+00009     \textcolor{keywordtype}{double} c\_wave = 0;
+00010 
+00011     \textcolor{keywordflow}{if}(model==\textcolor{stringliteral}{"simple\_elastic"} || model == \textcolor{stringliteral}{"mooney-rivlin\_hyperelastic"})\{
+00012 
+00013         \textcolor{keywordtype}{double} E = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(material\_id,1);
+00014         \textcolor{keywordtype}{double} nu = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(material\_id,2);
+00015         \textcolor{keywordtype}{double} rho = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(material\_id,0);
+00016 
+00017         \textcolor{keywordflow}{if}(nu==0.5)\{
+00018             c\_wave = sqrt(E/rho);
+00019         \} \textcolor{keywordflow}{else}\{
+00020             c\_wave = sqrt((E*(1-nu))/(rho*(1+nu)*(1-(2*nu))));
+00021         \}
+00022 
+00023     \}
+00024 
+00025     \textcolor{keywordflow}{return} c\_wave;
+00026 
+00027 \}
+\end{DoxyCode}

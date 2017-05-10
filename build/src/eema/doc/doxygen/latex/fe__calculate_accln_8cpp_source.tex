@@ -1,0 +1,21 @@
+\hypertarget{fe__calculate_accln_8cpp_source}{}\section{fe\+\_\+calculate\+Accln.\+cpp}
+\label{fe__calculate_accln_8cpp_source}\index{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+calculate\+Accln.\+cpp@{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+calculate\+Accln.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__calculate_accln_8cpp_source_l00005}\hyperlink{fe__calculate_accln_8cpp_a049ed85fefb5b5e80e42432fdcc640fa}{00005} VectorXd \hyperlink{fe__calculate_accln_8cpp_a049ed85fefb5b5e80e42432fdcc640fa}{fe\_calculateAccln}(VectorXd mm, VectorXd F\_net)\{
+00006 
+00007   VectorXd A = VectorXd::Zero(F\_net.size());
+00008 
+00009   \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<F\_net.size();i++)\{
+00010 
+00011     A(i) = (F\_net(i)/mm(i));
+00012 
+00013   \}
+00014 
+00015   \textcolor{keywordflow}{return} A;
+00016 \}
+\end{DoxyCode}

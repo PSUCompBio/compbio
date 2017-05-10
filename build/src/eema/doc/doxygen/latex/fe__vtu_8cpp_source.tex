@@ -1,0 +1,200 @@
+\hypertarget{fe__vtu_8cpp_source}{}\section{fe\+\_\+vtu.\+cpp}
+\label{fe__vtu_8cpp_source}\index{src/eema/src/\+Input-\/\+Output/\+Output/fe\+\_\+vtu.\+cpp@{src/eema/src/\+Input-\/\+Output/\+Output/fe\+\_\+vtu.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__vtu_8cpp_source_l00005}\hyperlink{fe__vtu_8cpp_a9c39148b76d7691ea87e7f2f88b02295}{00005} \textcolor{keywordtype}{void} \hyperlink{fe__vtu_8cpp_a9c39148b76d7691ea87e7f2f88b02295}{fe\_vtuWrite}(std::string output, \textcolor{keywordtype}{int} time\_step, \hyperlink{class_mesh}{Mesh} mesh1)\{
+00006 
+00008     MatrixXd nodes = mesh1.\hyperlink{class_mesh_a52ecce406bbef80cbf3610db3ea5ea40}{getNewNodes}();
+00009 
+00011     MatrixXi elements = mesh1.\hyperlink{class_mesh_a6e425e9499e64ab52c4555aa3763651d}{getNewElements}();
+00012 
+00014     VectorXd U\_mesh = mesh1.\hyperlink{class_mesh_a3fbc4b3c21f738efc6cdf3d02e31ad23}{getNodalDisp}();
+00015 
+00017     VectorXd V\_mesh = mesh1.\hyperlink{class_mesh_a052cd330cb8ccecf63e960a7afd0a6d9}{getNodalVel}();
+00018 
+00020     VectorXd A\_mesh = mesh1.\hyperlink{class_mesh_ad41670edd4e6335071012837a58fb725}{getNodalAcc}();
+00021 
+00023     MatrixXd element\_stress = mesh1.\hyperlink{class_mesh_a4ec62fd7219adcd406a167c1f6ee81e8}{getCellStress}();
+00024 
+00026     MatrixXd element\_strain = mesh1.\hyperlink{class_mesh_a1c54802401d00d14b390db2f0e615ebb}{getCellStrain}();
+00027 
+00029     std::string name;
+00030     std::ostringstream ss;
+00031     ss << time\_step;
+00032     name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"/"} + \textcolor{stringliteral}{"results/vtu/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtu"};
+00033     std::ofstream myfile(name.c\_str());
+00034 
+00035     myfile << \textcolor{stringliteral}{"<?xml version=\(\backslash\)"1.0\(\backslash\)"?>\(\backslash\)n"};
+00036     myfile << \textcolor{stringliteral}{"<VTKFile type=\(\backslash\)"UnstructuredGrid\(\backslash\)" version=\(\backslash\)"0.1\(\backslash\)" byte\_order=\(\backslash\)"LittleEndian\(\backslash\)">\(\backslash\)n"};
+00037     myfile << \textcolor{stringliteral}{"\(\backslash\)t<UnstructuredGrid>\(\backslash\)n"};
+00038     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t<Piece NumberOfPoints=\(\backslash\)""} << nodes.rows() << \textcolor{stringliteral}{"\(\backslash\)" NumberOfCells=\(\backslash\)""} << elements.rows() <<
+       \textcolor{stringliteral}{"\(\backslash\)">\(\backslash\)n"};
+00039 
+00041     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t<Points>\(\backslash\)n"};
+00042     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t<DataArray type=\(\backslash\)"Float32\(\backslash\)" NumberOfComponents=\(\backslash\)"3\(\backslash\)" format=\(\backslash\)"ascii\(\backslash\)">\(\backslash\)n"};
+00043     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nodes.rows();i++)\{
+00044     myfile<<\textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"}<<std::setw(10)<<std::scientific<<std::setprecision(8)
+00045         <<nodes(i,1)<<\textcolor{stringliteral}{" "}
+00046         <<nodes(i,2)<<\textcolor{stringliteral}{" "}
+00047         <<nodes(i,3)<<\textcolor{stringliteral}{"\(\backslash\)n"};
+00048     \}
+00049     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t</DataArray>\(\backslash\)n"};
+00050     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t</Points>\(\backslash\)n"};
+00051 
+00053     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t<Cells>\(\backslash\)n"};
+00054     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t<DataArray type=\(\backslash\)"Int32\(\backslash\)" Name=\(\backslash\)"connectivity\(\backslash\)" format=\(\backslash\)"ascii\(\backslash\)">\(\backslash\)n"};
+00055     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<elements.rows();i++)\{
+00056                 myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} ;
+00057                 \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=2;j<elements.cols();j++)\{
+00058                           myfile<<elements(i,j)<<\textcolor{stringliteral}{"\(\backslash\)t"};
+00059                 \}
+00060     myfile << \textcolor{stringliteral}{"\(\backslash\)n"};
+00061     \}
+00062     myfile<<\textcolor{stringliteral}{"\(\backslash\)n"};
+00063     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t</DataArray>\(\backslash\)n"};
+00064     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t<DataArray type=\(\backslash\)"Int32\(\backslash\)" Name=\(\backslash\)"offsets\(\backslash\)" format=\(\backslash\)"ascii\(\backslash\)">\(\backslash\)n"};
+00065     \textcolor{keywordtype}{int} tmp = elements.row(0).cols()-2;
+00066     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<elements.rows();i++)\{
+00067             myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << tmp << \textcolor{stringliteral}{"\(\backslash\)n"};
+00068             tmp = tmp + (elements.row(i).cols()-2);
+00069     \}
+00070     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t</DataArray>\(\backslash\)n"};
+00071 
+00072     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t<DataArray type=\(\backslash\)"UInt8\(\backslash\)" Name=\(\backslash\)"types\(\backslash\)" format=\(\backslash\)"ascii\(\backslash\)">\(\backslash\)n"};
+00073     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<elements.rows();i++)\{
+00074         \textcolor{keywordflow}{if}((elements.row(i).cols()-2)==8) myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << \textcolor{stringliteral}{"12"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00075         \textcolor{keywordflow}{if}((elements.row(i).cols()-2)==2) myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << \textcolor{stringliteral}{"3"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00076     \}
+00077     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t</DataArray>\(\backslash\)n"};
+00078 
+00079     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t</Cells>\(\backslash\)n"};
+00080 
+00082     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t<PointData>\(\backslash\)n"};
+00083     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t<DataArray type=\(\backslash\)"Float32\(\backslash\)" Name=\(\backslash\)"Displacement\(\backslash\)" "}
+00084         <<\textcolor{stringliteral}{"NumberOfComponents=\(\backslash\)"3\(\backslash\)" ComponentName0=\(\backslash\)"X\(\backslash\)" "}
+00085         <<\textcolor{stringliteral}{"ComponentName1=\(\backslash\)"Y\(\backslash\)" ComponentName2=\(\backslash\)"Z\(\backslash\)" format=\(\backslash\)"ascii\(\backslash\)">\(\backslash\)n"} ;
+00086     \textcolor{keywordtype}{int} num = 0;
+00087     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nodes.rows();i++)\{
+00088         myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << std::setw(10)<<std::scientific << std::setprecision(10)
+00089         << U\_mesh(num) << \textcolor{stringliteral}{" "}
+00090         << U\_mesh(num+1) << \textcolor{stringliteral}{" "}
+00091         << U\_mesh(num+2) << \textcolor{stringliteral}{" \(\backslash\)n"};
+00092             num = num+3;
+00093     \}
+00094     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t</DataArray>\(\backslash\)n"};
+00095 
+00097     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t<DataArray type=\(\backslash\)"Float32\(\backslash\)" Name=\(\backslash\)"Velocity\(\backslash\)" "}
+00098         <<\textcolor{stringliteral}{"NumberOfComponents=\(\backslash\)"3\(\backslash\)" ComponentName0=\(\backslash\)"X\(\backslash\)" "}
+00099         <<\textcolor{stringliteral}{"ComponentName1=\(\backslash\)"Y\(\backslash\)" ComponentName2=\(\backslash\)"Z\(\backslash\)" format=\(\backslash\)"ascii\(\backslash\)">\(\backslash\)n"} ;
+00100     num = 0;
+00101     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nodes.rows();i++)\{
+00102         myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << std::setw(10)<<std::scientific << std::setprecision(10)
+00103         << V\_mesh(num) << \textcolor{stringliteral}{" "}
+00104         << V\_mesh(num+1) << \textcolor{stringliteral}{" "}
+00105         << V\_mesh(num+2) << \textcolor{stringliteral}{" \(\backslash\)n"};
+00106             num = num+3;
+00107     \}
+00108     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t</DataArray>\(\backslash\)n"};
+00109 
+00111     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t<DataArray type=\(\backslash\)"Float32\(\backslash\)" Name=\(\backslash\)"Acceleration\(\backslash\)" "}
+00112         <<\textcolor{stringliteral}{"NumberOfComponents=\(\backslash\)"3\(\backslash\)" ComponentName0=\(\backslash\)"X\(\backslash\)" "}
+00113         <<\textcolor{stringliteral}{"ComponentName1=\(\backslash\)"Y\(\backslash\)" ComponentName2=\(\backslash\)"Z\(\backslash\)" format=\(\backslash\)"ascii\(\backslash\)">\(\backslash\)n"} ;
+00114     num = 0;
+00115     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nodes.rows();i++)\{
+00116         myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << std::setw(10)<<std::scientific << std::setprecision(10)
+00117         << A\_mesh(num) << \textcolor{stringliteral}{" "}
+00118         << A\_mesh(num+1) << \textcolor{stringliteral}{" "}
+00119         << A\_mesh(num+2) << \textcolor{stringliteral}{" \(\backslash\)n"};
+00120             num = num+3;
+00121     \}
+00122     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t</DataArray>\(\backslash\)n"};
+00123     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t</PointData>\(\backslash\)n"};
+00124 
+00126     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t<CellData>\(\backslash\)n"};
+00127     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t<DataArray type=\(\backslash\)"Float32\(\backslash\)" Name=\(\backslash\)"Stress (Cauchy)\(\backslash\)" NumberOfComponents=\(\backslash\)"9\(\backslash\)"
+       ComponentName0=\(\backslash\)"XX\(\backslash\)" ComponentName1=\(\backslash\)"XY\(\backslash\)" ComponentName2=\(\backslash\)"XZ\(\backslash\)" ComponentName3=\(\backslash\)"YX\(\backslash\)" ComponentName4=\(\backslash\)"YY\(\backslash\)"
+       ComponentName5=\(\backslash\)"YZ\(\backslash\)" ComponentName6=\(\backslash\)"ZX\(\backslash\)" ComponentName7=\(\backslash\)"ZY\(\backslash\)" ComponentName8=\(\backslash\)"ZZ\(\backslash\)" format=\(\backslash\)"ascii\(\backslash\)">\(\backslash\)n"};
+00128     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<element\_stress.rows();i++)\{
+00129             myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << std::scientific << std::setprecision(10) << element\_stress(i,0) << \textcolor{stringliteral}{" 
+      "} << element\_stress(i,1) << \textcolor{stringliteral}{" "} << element\_stress(i,2) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00130             myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << std::scientific << std::setprecision(10) << element\_stress(i,3) << \textcolor{stringliteral}{" 
+      "} << element\_stress(i,4) << \textcolor{stringliteral}{" "} << element\_stress(i,5) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00131             myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << std::scientific << std::setprecision(10) << element\_stress(i,6) << \textcolor{stringliteral}{" 
+      "} << element\_stress(i,7) << \textcolor{stringliteral}{" "} << element\_stress(i,8) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00132     \}
+00133     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t</DataArray>\(\backslash\)n"};
+00134 
+00135     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t<DataArray type=\(\backslash\)"Float32\(\backslash\)" Name=\(\backslash\)"Strain (Logarithmic)\(\backslash\)" NumberOfComponents=\(\backslash\)"9\(\backslash\)"
+       ComponentName0=\(\backslash\)"XX\(\backslash\)" ComponentName1=\(\backslash\)"XY\(\backslash\)" ComponentName2=\(\backslash\)"XZ\(\backslash\)" ComponentName3=\(\backslash\)"YX\(\backslash\)" ComponentName4=\(\backslash\)"YY\(\backslash\)"
+       ComponentName5=\(\backslash\)"YZ\(\backslash\)" ComponentName6=\(\backslash\)"ZX\(\backslash\)" ComponentName7=\(\backslash\)"ZY\(\backslash\)" ComponentName8=\(\backslash\)"ZZ\(\backslash\)" format=\(\backslash\)"ascii\(\backslash\)">\(\backslash\)n
+      "};
+00136     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<element\_strain.rows();i++)\{
+00137             myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << std::scientific << std::setprecision(10) << element\_strain(i,0) << \textcolor{stringliteral}{" 
+      "} << element\_strain(i,1) << \textcolor{stringliteral}{" "} << element\_strain(i,2) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00138             myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << std::scientific << std::setprecision(10) << element\_strain(i,3) << \textcolor{stringliteral}{" 
+      "} << element\_strain(i,4) << \textcolor{stringliteral}{" "} << element\_strain(i,5) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00139             myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t"} << std::scientific << std::setprecision(10) << element\_strain(i,6) << \textcolor{stringliteral}{" 
+      "} << element\_strain(i,7) << \textcolor{stringliteral}{" "} << element\_strain(i,8) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00140     \}
+00141     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t\(\backslash\)t</DataArray>\(\backslash\)n"};
+00142     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t\(\backslash\)t</CellData>\(\backslash\)n"};
+00143 
+00144     myfile << \textcolor{stringliteral}{"\(\backslash\)t\(\backslash\)t</Piece>\(\backslash\)n"};
+00145     myfile << \textcolor{stringliteral}{"\(\backslash\)t</UnstructuredGrid>\(\backslash\)n"};
+00146     myfile << \textcolor{stringliteral}{"</VTKFile>\(\backslash\)n"};
+00147 \}
+00148 
+\Hypertarget{fe__vtu_8cpp_source_l00149}\hyperlink{fe__vtu_8cpp_aedbf95dc6f02a506b606328037cd58e1}{00149} \textcolor{keywordtype}{void} \hyperlink{fe__vtu_8cpp_aedbf95dc6f02a506b606328037cd58e1}{fe\_pvdNew}(std::string output, \textcolor{keywordtype}{int} time\_step, \textcolor{keywordtype}{double} time)\{
+00150 
+00152     std::string name;
+00153     name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"/"} + \textcolor{stringliteral}{"results/vtu/"} + output + \textcolor{stringliteral}{".pvd"};
+00154     std::ofstream myfile(name.c\_str());
+00155 
+00157     myfile << \textcolor{stringliteral}{"<?xml version=\(\backslash\)"1.0\(\backslash\)"?>\(\backslash\)n"};
+00158     myfile << \textcolor{stringliteral}{"<VTKFile type=\(\backslash\)"Collection\(\backslash\)" version=\(\backslash\)"0.1\(\backslash\)"\(\backslash\)n"};
+00159     myfile << \textcolor{stringliteral}{"\(\backslash\)t byte\_order=\(\backslash\)"LittleEndian\(\backslash\)"\(\backslash\)n"};
+00160     myfile << \textcolor{stringliteral}{"\(\backslash\)t compressor=\(\backslash\)"vtkZLibDataCompressor\(\backslash\)">\(\backslash\)n"};
+00161     myfile << \textcolor{stringliteral}{"   <Collection>\(\backslash\)n"};
+00162 
+00164     myfile << \textcolor{stringliteral}{"     <DataSet timestep= \(\backslash\)""} << std::scientific << std::setprecision(5) << time << \textcolor{stringliteral}{"\(\backslash\)" group=
+      \(\backslash\)"\(\backslash\)" part=\(\backslash\)"0\(\backslash\)"\(\backslash\)n"};
+00165     std::ostringstream ss;
+00166     ss << time\_step;
+00167     std::string vtuFileName;
+00168     \textcolor{comment}{//vtuFileName = home\_path + "/" + "results/vtu/" + output + "\_" + ss.str() + ".vtu";}
+00169     vtuFileName = output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtu"};
+00170     myfile << \textcolor{stringliteral}{"\(\backslash\)t      file=\(\backslash\)""} << vtuFileName << \textcolor{stringliteral}{"\(\backslash\)"/>\(\backslash\)n"};
+00171 \}
+00172 
+\Hypertarget{fe__vtu_8cpp_source_l00173}\hyperlink{fe__vtu_8cpp_ab350b9dfb65474874d79a92f712078a0}{00173} \textcolor{keywordtype}{void} \hyperlink{fe__vtu_8cpp_ab350b9dfb65474874d79a92f712078a0}{fe\_pvdAppend}(std::string output, \textcolor{keywordtype}{int} time\_step, \textcolor{keywordtype}{double} time)\{
+00174 
+00176     std::string name;
+00177     name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"/"} + \textcolor{stringliteral}{"results/vtu/"} + output + \textcolor{stringliteral}{".pvd"};
+00178     std::ofstream myfile(name.c\_str(), std::ios\_base::app);
+00179 
+00181     \textcolor{keywordflow}{if}(myfile.is\_open())\{
+00182         myfile << \textcolor{stringliteral}{"     <DataSet timestep= \(\backslash\)""} << std::scientific << std::setprecision(5) << time << \textcolor{stringliteral}{"\(\backslash\)"
+       group=\(\backslash\)"\(\backslash\)" part=\(\backslash\)"0\(\backslash\)"\(\backslash\)n"};
+00183         std::ostringstream ss;
+00184         ss << time\_step;
+00185         std::string vtuFileName;
+00186         \textcolor{comment}{//vtuFileName = home\_path + "/" + "results/vtu/" + output + "\_" + ss.str() + ".vtu";}
+00187     vtuFileName = output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtu"};
+00188         myfile << \textcolor{stringliteral}{"\(\backslash\)t      file=\(\backslash\)""} << vtuFileName << \textcolor{stringliteral}{"\(\backslash\)"/>\(\backslash\)n"};
+00189 
+00191         \textcolor{keywordflow}{if}(time == \hyperlink{_global_variables_8h_a4b637c5fff609e604a3b2b2787f4a9fa}{t\_end})\{
+00192         myfile << \textcolor{stringliteral}{"   </Collection>\(\backslash\)n"};
+00193         myfile << \textcolor{stringliteral}{"</VTKFile>\(\backslash\)n"};
+00194         \}
+00195     \}
+00196 
+00197     \textcolor{keywordflow}{else}\{
+00198         std::cout << \textcolor{stringliteral}{"No Such Text File With This Name Exists - "} << name << \textcolor{stringliteral}{"\(\backslash\)n"};
+00199         std::exit(-1);
+00200     \}
+00201 \}
+\end{DoxyCode}

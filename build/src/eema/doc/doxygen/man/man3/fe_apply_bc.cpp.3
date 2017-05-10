@@ -1,0 +1,55 @@
+.TH "src/eema/src/FEM/BoundaryConditions/fe_apply_bc.cpp" 3 "Wed May 10 2017" "Embedded Element Method Algorithms (EMMA)" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/eema/src/FEM/BoundaryConditions/fe_apply_bc.cpp
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'functions\&.h'\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "VectorXd \fBfe_apply_bc_displacement\fP (VectorXd U, double time)"
+.br
+.ti -1c
+.RI "VectorXd \fBfe_apply_bc_velocity\fP (VectorXd V, double time)"
+.br
+.ti -1c
+.RI "VectorXd \fBfe_apply_bc_acceleration\fP (VectorXd A, double time)"
+.br
+.ti -1c
+.RI "VectorXd \fBfe_apply_bc_load\fP (VectorXd fe, double time)"
+.br
+.ti -1c
+.RI "MatrixXd \fBfe_apply_bc_stiffness\fP (MatrixXd kk, VectorXi bcdof, VectorXd bcval)"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "VectorXd fe_apply_bc_acceleration (VectorXd A, double time)"
+Function enforces acceleration boundary condition 
+.PP
+Definition at line 56 of file fe_apply_bc\&.cpp\&.
+.SS "VectorXd fe_apply_bc_displacement (VectorXd U, double time)"
+Function enforces displacement boundary condition 
+.PP
+Definition at line 5 of file fe_apply_bc\&.cpp\&.
+.SS "VectorXd fe_apply_bc_load (VectorXd fe, double time)"
+Function updates the applied load 
+.PP
+Definition at line 99 of file fe_apply_bc\&.cpp\&.
+.SS "MatrixXd fe_apply_bc_stiffness (MatrixXd kk, VectorXi bcdof, VectorXd bcval)"
+
+.PP
+Definition at line 118 of file fe_apply_bc\&.cpp\&.
+.SS "VectorXd fe_apply_bc_velocity (VectorXd V, double time)"
+Function enforces velocity boundary condition 
+.PP
+Definition at line 24 of file fe_apply_bc\&.cpp\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Embedded Element Method Algorithms (EMMA) from the source code\&.

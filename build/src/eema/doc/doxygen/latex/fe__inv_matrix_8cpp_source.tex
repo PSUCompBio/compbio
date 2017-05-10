@@ -1,0 +1,83 @@
+\hypertarget{fe__inv_matrix_8cpp_source}{}\section{fe\+\_\+inv\+Matrix.\+cpp}
+\label{fe__inv_matrix_8cpp_source}\index{src/eema/src/\+Math/\+General\+Math/fe\+\_\+inv\+Matrix.\+cpp@{src/eema/src/\+Math/\+General\+Math/fe\+\_\+inv\+Matrix.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00002 
+00003 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00004 
+00005 \textcolor{keyword}{using namespace }\hyperlink{namespacestd}{std};
+00006 
+\Hypertarget{fe__inv_matrix_8cpp_source_l00007}\hyperlink{fe__inv_matrix_8cpp_ad4d11f46a1909b55cc804ca942ce6ea4}{00007} \textcolor{keyword}{typedef} vector<double> \hyperlink{fe__inv_matrix_8cpp_ad4d11f46a1909b55cc804ca942ce6ea4}{Vec};
+\Hypertarget{fe__inv_matrix_8cpp_source_l00008}\hyperlink{fe__inv_matrix_8cpp_a1356201aa606214a43dbef76118a8c20}{00008} \textcolor{keyword}{typedef} vector<Vec> \hyperlink{fe__inv_matrix_8cpp_a1356201aa606214a43dbef76118a8c20}{Mat};
+00009 
+\Hypertarget{fe__inv_matrix_8cpp_source_l00010}\hyperlink{fe__inv_matrix_8cpp_af9697f88b10fb6419ac04a523e5023ab}{00010} \hyperlink{fe__det_matrix_8cpp_a1356201aa606214a43dbef76118a8c20}{Mat} \hyperlink{fe__inv_matrix_8cpp_af9697f88b10fb6419ac04a523e5023ab}{fe\_invMatrix}(\hyperlink{fe__det_matrix_8cpp_a1356201aa606214a43dbef76118a8c20}{Mat} matrix)\{
+00011 
+00012     \textcolor{keywordtype}{double} ratio,a;
+00013     \textcolor{keywordtype}{int} i, j, k, n;
+00014     \textcolor{comment}{//printf("Enter order of matrix: ");}
+00015     \textcolor{comment}{//scanf("%d", &n);}
+00016     \textcolor{comment}{//Vec Row(n);}
+00017     \textcolor{comment}{//printf("Enter the matrix: \(\backslash\)n");}
+00018     \textcolor{comment}{//for(i = 0; i < n; i++)\{}
+00019     \textcolor{comment}{//    for(j = 0; j < n; j++)\{}
+00020     \textcolor{comment}{//      printf("I am here: \(\backslash\)n");}
+00021     \textcolor{comment}{//          scanf("%lf",&Row[j]);}
+00022     \textcolor{comment}{//    \}}
+00023     \textcolor{comment}{//  matrix.push\_back(Row);}
+00024     \textcolor{comment}{//\}}
+00025 
+00026     n = matrix.size(); \textcolor{comment}{// order of the matrix}
+00027 
+00028     \textcolor{keywordflow}{for}(i = 0; i < n; i++)\{
+00029         \textcolor{keywordflow}{for}(j = n; j < 2*n; j++)\{
+00030             \textcolor{keywordflow}{if}(i==(j-n))
+00031                 matrix[i][j] = 1.0;
+00032             \textcolor{keywordflow}{else}
+00033                 matrix[i][j] = 0.0;
+00034         \}
+00035     \}
+00036     \textcolor{keywordflow}{for}(i = 0; i < n; i++)\{
+00037         \textcolor{keywordflow}{for}(j = 0; j < n; j++)\{
+00038             \textcolor{keywordflow}{if}(i!=j)\{
+00039                 ratio = matrix[j][i]/matrix[i][i];
+00040                 \textcolor{keywordflow}{for}(k = 0; k < 2*n; k++)\{
+00041                     matrix[j][k] -= ratio * matrix[i][k];
+00042                 \}
+00043             \}
+00044         \}
+00045     \}
+00046     \textcolor{keywordflow}{for}(i = 0; i < n; i++)\{
+00047         a = matrix[i][i];
+00048         \textcolor{keywordflow}{for}(j = 0; j < 2*n; j++)\{
+00049             matrix[i][j] /= a;
+00050         \}
+00051     \}
+00052     printf(\textcolor{stringliteral}{"The inverse matrix is: \(\backslash\)n"});
+00053 
+00054     \textcolor{keywordflow}{for}(i = 0; i < n; i++)\{
+00055         \textcolor{keywordflow}{for}(j = n; j < 2*n; j++)\{
+00056         \textcolor{keywordflow}{if}(isnan(matrix[i][j]))\{
+00057             \textcolor{keywordflow}{goto} stop;
+00058         \}
+00059         \}
+00060     \}
+00061 
+00062     \textcolor{keywordflow}{for}(i = 0; i < n; i++)\{
+00063         \textcolor{keywordflow}{for}(j = n; j < 2*n; j++)\{
+00064             printf(\textcolor{stringliteral}{"%.2f"}, matrix[i][j]);
+00065             printf(\textcolor{stringliteral}{"\(\backslash\)t"});
+00066         \}
+00067         printf(\textcolor{stringliteral}{"\(\backslash\)n"});
+00068     \}
+00069 
+00070     stop: 
+00071     \{
+00072     cout<<\textcolor{stringliteral}{"Inverse doesn't exist \(\backslash\)n"};
+00073     \hyperlink{fe__det_matrix_8cpp_a1356201aa606214a43dbef76118a8c20}{Mat} empty;
+00074     matrix.swap(empty);
+00075     \}
+00076 
+00077     \textcolor{keywordflow}{return} matrix;
+00078 \}
+\end{DoxyCode}

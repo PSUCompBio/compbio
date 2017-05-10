@@ -1,0 +1,38 @@
+\hypertarget{fe__stress_update_8cpp_source}{}\section{fe\+\_\+stress\+Update.\+cpp}
+\label{fe__stress_update_8cpp_source}\index{src/eema/src/\+Materials/\+Stress\+Update/fe\+\_\+stress\+Update.\+cpp@{src/eema/src/\+Materials/\+Stress\+Update/fe\+\_\+stress\+Update.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/* Developed by Harsha Teja Garimella */}
+00002 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00003 
+00004 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00005 
+\Hypertarget{fe__stress_update_8cpp_source_l00007}\hyperlink{fe__stress_update_8cpp_a7d0fd8cfef8b891901eb6f0f780fd9f2}{00007} VectorXd \hyperlink{fe__stress_update_8cpp_a7d0fd8cfef8b891901eb6f0f780fd9f2}{fe\_stressUpdate}(VectorXd dndx, VectorXd dndy, VectorXd dndz, MatrixXd disp\_mat, 
+      VectorXd u, \textcolor{keywordtype}{int} opt, \textcolor{keywordtype}{int} return\_opt)\{
+00008 
+00011     std::string model;
+00012     model = \hyperlink{functions_8h_a34d6fb85943d945b7e8600d2ef4220d0}{fe\_get\_model}(opt);
+00013 
+00014     VectorXd sigma = VectorXd::Zero(\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}*2); \textcolor{comment}{//stress-vector}
+00015 
+00017     \textcolor{keywordflow}{if}(model==\textcolor{stringliteral}{"simple\_elastic"})\{
+00018         sigma = \hyperlink{functions_8h_ab0911abb05a0ca06eb4f330890ee0641}{fe\_simple\_elastic}(dndx,dndy,dndz,disp\_mat,u,opt,return\_opt);
+00019     \}
+00020 
+00021     \textcolor{keywordflow}{if}(model==\textcolor{stringliteral}{"saint\_venant"})\{
+00022         sigma = \hyperlink{functions_8h_af2a970e883d0c4a7ad750547c07c5f24}{fe\_saintvenant\_elastic}(dndx,dndy,dndz,u,opt,return\_opt);
+00023     \}
+00024 
+00026     \textcolor{keywordflow}{if}(model==\textcolor{stringliteral}{"mooney-rivlin\_hyperelastic"})\{
+00027         sigma = \hyperlink{functions_8h_a66b469439c736421744f6aef9e05a485}{fe\_mooneyrivlin\_hyperelastic}(dndx,dndy,dndz,u,opt,return\_opt);
+00028     \}
+00029 
+00031     \textcolor{keywordflow}{if}(model==\textcolor{stringliteral}{"ogden\_hyperelastic"})\{
+00032         \textcolor{comment}{/* TODO: Ogden - this material model needs work */}
+00033         \textcolor{comment}{// n = number of coefficients - used a double type for consistency}
+00034         sigma = \hyperlink{functions_8h_ab27ecb703db33cb21a8a6d2fbfbf125f}{fe\_ogden\_hyperelastic}(dndx,dndy,dndz,u,opt,return\_opt);
+00035     \}
+00036         
+00037     \textcolor{keywordflow}{return} sigma;
+00038 \}
+\end{DoxyCode}

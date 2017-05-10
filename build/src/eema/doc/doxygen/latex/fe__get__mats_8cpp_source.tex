@@ -1,0 +1,32 @@
+\hypertarget{fe__get__mats_8cpp_source}{}\section{fe\+\_\+get\+\_\+mats.\+cpp}
+\label{fe__get__mats_8cpp_source}\index{src/eema/src/\+Materials/fe\+\_\+get\+\_\+mats.\+cpp@{src/eema/src/\+Materials/fe\+\_\+get\+\_\+mats.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__get__mats_8cpp_source_l00005}\hyperlink{fe__get__mats_8cpp_af7ffbad6dfcc99fc88b130c1a7b1720a}{00005} \textcolor{keywordtype}{double} \hyperlink{fe__get__mats_8cpp_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(\textcolor{keywordtype}{int} matl\_code, \textcolor{keywordtype}{int} obj\_interest)\{
+00006     \textcolor{keywordtype}{double} mat\_param = 0;
+00007     \textcolor{keywordtype}{int} num\_pointer=0;
+00008 
+00009     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<\hyperlink{_global_variables_8h_a39328cf72d69139b3b6c5b8ef6c636fe}{material\_types};i++)\{
+00010             \textcolor{keywordflow}{if}(matl\_code == \hyperlink{_global_variables_8h_acfa6799b35f9301b5fc44e6043624797}{mat}[i].mat\_id)\{
+00011                 num\_pointer = i;
+00012                 \textcolor{keywordflow}{break};
+00013             \}
+00014     \}
+00015 
+00016     VectorXd m\_1 = \hyperlink{_global_variables_8h_acfa6799b35f9301b5fc44e6043624797}{mat}[num\_pointer].\hyperlink{class_materials_af663f6cf518ba3f857bac40a1e33eac0}{mat\_properties};
+00017     mat\_param = m\_1(obj\_interest);
+00018 
+00019     \textcolor{keywordflow}{return} mat\_param;
+00020 \}
+00021 
+00022 \textcolor{comment}{// obj\_interest table:}
+00023 \textcolor{comment}{// 0 - density}
+00024 \textcolor{comment}{// 1 - young's or bulk modulus}
+00025 \textcolor{comment}{// 2 - poisson ratio}
+00026 \textcolor{comment}{// 3 - Mooney Rivlin (C01), Ogden(),}
+00027 \textcolor{comment}{// 4 - Mooney Rivlin (C02), Ogden(),}
+\end{DoxyCode}

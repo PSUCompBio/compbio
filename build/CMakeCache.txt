@@ -179,6 +179,36 @@ CMAKE_STRIP:FILEPATH=/Applications/Xcode.app/Contents/Developer/Toolchains/Xcode
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Graphviz Dot tool for using Doxygen
+DOXYGEN_DOT_EXECUTABLE:FILEPATH=/usr/local/bin/dot
+
+//Doxygen documentation generation tool (http://www.doxygen.org)
+DOXYGEN_EXECUTABLE:FILEPATH=/usr/local/bin/doxygen
+
+//Build source documentation using Doxygen.
+EEMA_DOCUMENTATION:BOOL=ON
+
+//Activate examples
+EEMA_EXAMPLES:BOOL=ON
+
+//Build the EEMA GUI using Qt.
+EEMA_GUI:BOOL=ON
+
+//Build library with Explicit Dynamic Example 1
+EXAMPLE1:BOOL=ON
+
+//The directory containing a CMake configuration file for Qt5Core.
+Qt5Core_DIR:PATH=/usr/local/opt/qt5/lib/cmake/Qt5Core
+
+//The directory containing a CMake configuration file for Qt5Gui.
+Qt5Gui_DIR:PATH=/usr/local/opt/qt5/lib/cmake/Qt5Gui
+
+//The directory containing a CMake configuration file for Qt5Widgets.
+Qt5Widgets_DIR:PATH=/usr/local/opt/qt5/lib/cmake/Qt5Widgets
+
+//The directory containing a CMake configuration file for Qt5.
+Qt5_DIR:PATH=/usr/local/opt/qt5/lib/cmake/Qt5
+
 //Build library with Eigen support
 USE_EIGEN:BOOL=ON
 
@@ -187,6 +217,9 @@ compbio_BINARY_DIR:STATIC=/Users/rhk12/code/compbio/build
 
 //Value Computed by CMake
 compbio_SOURCE_DIR:STATIC=/Users/rhk12/code/compbio
+
+//Dependencies for target
+eema_LIB_DEPENDS:STATIC=
 
 
 ########################
@@ -281,7 +314,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=15
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -322,4 +355,18 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: DOXYGEN_DOT_EXECUTABLE
+DOXYGEN_DOT_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: DOXYGEN_EXECUTABLE
+DOXYGEN_EXECUTABLE-ADVANCED:INTERNAL=1
+//MODIFIED property for variable: EEMA_DOCUMENTATION
+EEMA_DOCUMENTATION-MODIFIED:INTERNAL=ON
+//MODIFIED property for variable: EEMA_EXAMPLES
+EEMA_EXAMPLES-MODIFIED:INTERNAL=ON
+//MODIFIED property for variable: EEMA_GUI
+EEMA_GUI-MODIFIED:INTERNAL=ON
+//MODIFIED property for variable: EXAMPLE1
+EXAMPLE1-MODIFIED:INTERNAL=ON
+//Details about finding Doxygen
+FIND_PACKAGE_MESSAGE_DETAILS_Doxygen:INTERNAL=[/usr/local/bin/doxygen][v1.8.13()]
 

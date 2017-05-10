@@ -1,0 +1,34 @@
+.TH "src/eema/src/Materials/Elastic/fe_simple_elastic.cpp" 3 "Wed May 10 2017" "Embedded Element Method Algorithms (EMMA)" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/eema/src/Materials/Elastic/fe_simple_elastic.cpp
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'functions\&.h'\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "VectorXd \fBfe_simple_elastic\fP (VectorXd dndx, VectorXd dndy, VectorXd dndz, MatrixXd disp_mat, VectorXd u, int opt, int return_opt)"
+.br
+.ti -1c
+.RI "MatrixXd \fBfe_calculate_matlmat\fP (int n, double E, double nu)"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "MatrixXd fe_calculate_matlmat (int n, double E, double nu)"
+Create material matrix for isotropic elastic case 
+.PP
+Definition at line 20 of file fe_simple_elastic\&.cpp\&.
+.SS "VectorXd fe_simple_elastic (VectorXd dndx, VectorXd dndy, VectorXd dndz, MatrixXd disp_mat, VectorXd u, int opt, int return_opt)"
+Function calculates the stress vector for a simple elastic (small strain) material 
+.PP
+Definition at line 7 of file fe_simple_elastic\&.cpp\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Embedded Element Method Algorithms (EMMA) from the source code\&.

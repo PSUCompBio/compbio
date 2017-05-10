@@ -1,0 +1,26 @@
+\hypertarget{fe__write_8cpp_source}{}\section{fe\+\_\+write.\+cpp}
+\label{fe__write_8cpp_source}\index{src/eema/src/\+Input-\/\+Output/\+Output/fe\+\_\+write.\+cpp@{src/eema/src/\+Input-\/\+Output/\+Output/fe\+\_\+write.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{comment}{/*}
+00002 \textcolor{comment}{ * fe\_write.cpp}
+00003 \textcolor{comment}{ *}
+00004 \textcolor{comment}{ *  Created on: Dec 12, 2016}
+00005 \textcolor{comment}{ *      Author: vsg111}
+00006 \textcolor{comment}{ */}
+00007 
+00008 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00009 
+00010 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00011 
+\Hypertarget{fe__write_8cpp_source_l00012}\hyperlink{fe__write_8cpp_a9dec90c41460e15aa1d8dce787683406}{00012} \textcolor{keywordtype}{void} \hyperlink{fe__write_8cpp_a9dec90c41460e15aa1d8dce787683406}{fe\_writeElementStress}(MatrixXd sigma\_all, \textcolor{keywordtype}{double} time)\{
+00013     std::ostringstream ss;
+00014     ss << time;
+00015     std::string name = \textcolor{stringliteral}{"./results/elements/stress/time\_"}+ss.str()+\textcolor{stringliteral}{".txt"};
+00016     \hyperlink{functions_8h_a346547477d2a1fbeff6b5e0b05314283}{matrix2text}(name,sigma\_all,0);
+00017 \}
+00018 
+00019 
+00020 
+00021 
+\end{DoxyCode}

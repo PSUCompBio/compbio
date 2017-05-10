@@ -1,0 +1,82 @@
+\hypertarget{fe__main_e_x_p_l_i_c_i_t_8cpp}{}\section{src/eema/src/\+F\+E\+M/\+Explicit/fe\+\_\+main\+E\+X\+P\+L\+I\+C\+IT.cpp File Reference}
+\label{fe__main_e_x_p_l_i_c_i_t_8cpp}\index{src/eema/src/\+F\+E\+M/\+Explicit/fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp@{src/eema/src/\+F\+E\+M/\+Explicit/fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp}}
+{\ttfamily \#include \char`\"{}functions.\+h\char`\"{}}\newline
+Include dependency graph for fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fe__main_e_x_p_l_i_c_i_t_8cpp__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_ab2f8704631ca6c23a453d1905efbb162}{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+IT} ()
+\begin{DoxyCompactList}\small\item\em This function carries out the explicit dynamic analysis of the F\+EM problem. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+double \hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_a33157279f223d2f4775b0d78b73bc08f}{eps\+\_\+energy} = 0.\+01
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{fe__main_e_x_p_l_i_c_i_t_8cpp_ab2f8704631ca6c23a453d1905efbb162}\label{fe__main_e_x_p_l_i_c_i_t_8cpp_ab2f8704631ca6c23a453d1905efbb162}} 
+\index{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp@{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp}!fe\+\_\+main\+E\+X\+P\+L\+I\+C\+IT@{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+IT}}
+\index{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+IT@{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+IT}!fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp@{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp}}
+\subsubsection{\texorpdfstring{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T()}{fe\_mainEXPLICIT()}}
+{\footnotesize\ttfamily void fe\+\_\+main\+E\+X\+P\+L\+I\+C\+IT (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+This function carries out the explicit dynamic analysis of the F\+EM problem. 
+
+Run the finite element analysis using an explicit dynamic method number of elements
+
+Apply Loading Conditions -\/ time dependent loading conditions
+
+Calculate the time at half time step
+
+Update the time by adding full time step
+
+Partially Update Nodal Velocities
+
+Enforce Velocity Boundary Conditions
+
+Update Nodal Displacements
+
+Calculate Accelerations
+
+Completely Update the nodal velocities
+
+Projection of displacements to the embedded mesh is needed 
+
+Definition at line \hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_source_l00010}{10} of file \hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_source}{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp}.
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fe__main_e_x_p_l_i_c_i_t_8cpp_ab2f8704631ca6c23a453d1905efbb162_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=250pt]{fe__main_e_x_p_l_i_c_i_t_8cpp_ab2f8704631ca6c23a453d1905efbb162_icgraph}
+\end{center}
+\end{figure}
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{fe__main_e_x_p_l_i_c_i_t_8cpp_a33157279f223d2f4775b0d78b73bc08f}\label{fe__main_e_x_p_l_i_c_i_t_8cpp_a33157279f223d2f4775b0d78b73bc08f}} 
+\index{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp@{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp}!eps\+\_\+energy@{eps\+\_\+energy}}
+\index{eps\+\_\+energy@{eps\+\_\+energy}!fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp@{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp}}
+\subsubsection{\texorpdfstring{eps\+\_\+energy}{eps\_energy}}
+{\footnotesize\ttfamily double eps\+\_\+energy = 0.\+01}
+
+Energy Balance Criterion 
+
+Definition at line \hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_source_l00004}{4} of file \hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_source}{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp}.
+

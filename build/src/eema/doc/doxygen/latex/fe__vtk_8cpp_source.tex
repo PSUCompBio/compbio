@@ -1,0 +1,280 @@
+\hypertarget{fe__vtk_8cpp_source}{}\section{fe\+\_\+vtk.\+cpp}
+\label{fe__vtk_8cpp_source}\index{src/eema/src/\+Input-\/\+Output/\+Output/fe\+\_\+vtk.\+cpp@{src/eema/src/\+Input-\/\+Output/\+Output/fe\+\_\+vtk.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 
+00004 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00005 
+\Hypertarget{fe__vtk_8cpp_source_l00006}\hyperlink{fe__vtk_8cpp_ae02497eb9e23d26212b7a1301fc5b04b}{00006} \textcolor{keywordtype}{void} \hyperlink{fe__vtk_8cpp_ae02497eb9e23d26212b7a1301fc5b04b}{fe\_vtkWrite\_host}(std::string output,\textcolor{keywordtype}{int} format\_choice,\textcolor{keywordtype}{int} mesh\_choice,\textcolor{keywordtype}{int} time\_step,
+      MatrixXd nodes, MatrixXi elements)\{
+00007 
+00008     std::string name;
+00009 
+00010     std::ostringstream ss;
+00011     ss << time\_step;
+00012 
+00013     \textcolor{keywordflow}{switch}(mesh\_choice)\{
+00014     \textcolor{keywordflow}{case} 1:
+00015         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00016         \textcolor{keywordflow}{break};
+00017     \textcolor{keywordflow}{case} 2:
+00018         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00019         \textcolor{keywordflow}{break};
+00020     \textcolor{keywordflow}{case} 3:
+00021         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00022         \textcolor{keywordflow}{break};
+00023     \textcolor{keywordflow}{case} 4:
+00024         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00025         \textcolor{keywordflow}{break};
+00026     \textcolor{keywordflow}{case} 5:
+00027         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00028         \textcolor{keywordflow}{break};
+00029     \textcolor{keywordflow}{default}:
+00030         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00031         \textcolor{keywordflow}{break};
+00032     \}
+00033 
+00034     std::ofstream myfile(name.c\_str());
+00035 
+00036     myfile << \textcolor{stringliteral}{"# vtk DataFile Version 3. 0.\(\backslash\)n"}; \textcolor{comment}{// 1st line - VTK file version}
+00037     myfile << output << \textcolor{stringliteral}{"\(\backslash\)n"}; \textcolor{comment}{// Title of the result}
+00038 
+00039     \textcolor{comment}{/* File Format */}
+00040     \textcolor{keywordflow}{switch}(format\_choice)\{
+00041     \textcolor{keywordflow}{case} 1:
+00042         myfile << \textcolor{stringliteral}{"ASCII"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00043         \textcolor{keywordflow}{break};
+00044     \textcolor{keywordflow}{case} 2:
+00045         myfile << \textcolor{stringliteral}{"BINARY"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00046         \textcolor{keywordflow}{break};
+00047     \textcolor{keywordflow}{default}:
+00048         myfile << \textcolor{stringliteral}{"ASCII"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00049         \textcolor{keywordflow}{break};
+00050     \}
+00051 
+00052     \textcolor{comment}{/* Mesh Type */}
+00053     \textcolor{keywordflow}{switch}(mesh\_choice)\{
+00054     \textcolor{keywordflow}{case} 1:
+00055         myfile << \textcolor{stringliteral}{"DATASET STRUCTURED\_POINTS \(\backslash\)n"};
+00056         \textcolor{keywordflow}{break};
+00057     \textcolor{keywordflow}{case} 2:
+00058         myfile << \textcolor{stringliteral}{"DATASET STRUCTURED\_GRID \(\backslash\)n"};
+00059         \textcolor{keywordflow}{break};
+00060     \textcolor{keywordflow}{case} 3:
+00061         myfile << \textcolor{stringliteral}{"DATASET RECTILLINEAR\_GRID \(\backslash\)n"};
+00062         \textcolor{keywordflow}{break};
+00063     \textcolor{keywordflow}{case} 4:
+00064         myfile << \textcolor{stringliteral}{"DATASET POLYDATA \(\backslash\)n"};
+00065         \textcolor{keywordflow}{break};
+00066     \textcolor{keywordflow}{case} 5:
+00067         myfile << \textcolor{stringliteral}{"DATASET UNSTRUCTURED\_GRID \(\backslash\)n"};
+00068         \textcolor{keywordflow}{break};
+00069     \textcolor{keywordflow}{default}:
+00070         myfile << \textcolor{stringliteral}{"DATASET UNSTRUCTURED\_GRID \(\backslash\)n"};
+00071         \textcolor{keywordflow}{break};
+00072     \}
+00073 
+00074     \textcolor{comment}{/* Unstructured Grid */}
+00075     \textcolor{keywordflow}{if}(mesh\_choice==5)\{
+00076         \textcolor{comment}{/* POINTS */}
+00077         myfile << \textcolor{stringliteral}{"POINTS"} << \textcolor{stringliteral}{" "} << nodes.rows() << \textcolor{stringliteral}{" "} << \textcolor{stringliteral}{"double"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00078         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nodes.rows();i++)\{
+00079             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=1;j<nodes.cols();j++)\{
+00080                 myfile<<std::setw(3)<<nodes(i,j)<<\textcolor{stringliteral}{" "};
+00081             \}
+00082             myfile<<\textcolor{stringliteral}{"\(\backslash\)n"};
+00083         \}
+00084 
+00085         \textcolor{comment}{/* CELLS */}
+00086         \textcolor{keywordtype}{int} size = 0;
+00087         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0;k<elements.rows();k++)\{
+00088                 size = size + 1 + (elements.row(k).cols()-2);
+00089         \}
+00090         myfile << \textcolor{stringliteral}{"CELLS"} << \textcolor{stringliteral}{" "} << elements.rows() << \textcolor{stringliteral}{" "} << size << \textcolor{stringliteral}{" "} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00091         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<elements.rows();i++)\{
+00092             myfile<<elements.row(i).cols()-2<<\textcolor{stringliteral}{" "};
+00093             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=2;j<elements.cols();j++)\{
+00094                 myfile<<std::setw(3)<<elements(i,j)<<\textcolor{stringliteral}{" "};
+00095             \}
+00096             myfile<<\textcolor{stringliteral}{"\(\backslash\)n"};
+00097         \}
+00098 
+00099         \textcolor{comment}{/* CELL TYPES */}
+00100         myfile << \textcolor{stringliteral}{"CELL\_TYPES"} << \textcolor{stringliteral}{" "} << elements.rows() << \textcolor{stringliteral}{"\(\backslash\)n"};
+00101         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<elements.rows();i++)\{
+00102                     myfile << \textcolor{stringliteral}{"12"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00103         \}
+00104         myfile << \textcolor{stringliteral}{"\(\backslash\)n"} ;
+00105 
+00106         \textcolor{comment}{/* NODAL DISPLACEMENTS */}
+00107         myfile << \textcolor{stringliteral}{"POINT\_DATA "} << nodes.rows() << \textcolor{stringliteral}{"\(\backslash\)n"};
+00108         myfile << \textcolor{stringliteral}{"VECTORS "} << \textcolor{stringliteral}{"displacement "} << \textcolor{stringliteral}{"double\(\backslash\)n"};
+00109         \textcolor{keywordtype}{int} num = 0;
+00110         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nodes.rows();i++)\{
+00111                 myfile << U\_host(num) << \textcolor{stringliteral}{" "} << U\_host(num+1) << \textcolor{stringliteral}{" "} << U\_host(num+2) << \textcolor{stringliteral}{" \(\backslash\)n"};
+00112                 num = num+3;
+00113         \}
+00114 
+00115         \textcolor{comment}{/* CELL DATA - STRESSES */}
+00116         myfile << \textcolor{stringliteral}{"CELL\_DATA "} << elements.rows() << \textcolor{stringliteral}{"\(\backslash\)n"};
+00117             myfile << \textcolor{stringliteral}{"TENSORS "} << \textcolor{stringliteral}{"Stress "} << \textcolor{stringliteral}{"double\(\backslash\)n"};
+00118         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<element\_stress\_host.rows();i++)\{
+00119                 myfile << element\_stress\_host(i,0) << \textcolor{stringliteral}{" "} << element\_stress\_host(i,1) << \textcolor{stringliteral}{" "} << 
+      element\_stress\_host(i,2) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00120                 myfile << element\_stress\_host(i,3) << \textcolor{stringliteral}{" "} << element\_stress\_host(i,4) << \textcolor{stringliteral}{" "} << 
+      element\_stress\_host(i,5) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00121                 myfile << element\_stress\_host(i,6) << \textcolor{stringliteral}{" "} << element\_stress\_host(i,7) << \textcolor{stringliteral}{" "} << 
+      element\_stress\_host(i,8) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00122                 myfile << \textcolor{stringliteral}{"\(\backslash\)n"};
+00123         \}
+00124 
+00125         \textcolor{comment}{/* CELL DATA - STRAINS */}
+00126         \textcolor{comment}{//myfile << "CELL\_DATA " << elements.rows() << "\(\backslash\)n";}
+00127             myfile << \textcolor{stringliteral}{"TENSORS "} << \textcolor{stringliteral}{"Strain "} << \textcolor{stringliteral}{"double\(\backslash\)n"};
+00128         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<element\_strain\_host.rows();i++)\{
+00129                 myfile << element\_strain\_host(i,0) << \textcolor{stringliteral}{" "} << element\_strain\_host(i,1) << \textcolor{stringliteral}{" "} << 
+      element\_strain\_host(i,2) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00130                 myfile << element\_strain\_host(i,3) << \textcolor{stringliteral}{" "} << element\_strain\_host(i,4) << \textcolor{stringliteral}{" "} << 
+      element\_strain\_host(i,5) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00131                 myfile << element\_strain\_host(i,6) << \textcolor{stringliteral}{" "} << element\_strain\_host(i,7) << \textcolor{stringliteral}{" "} << 
+      element\_strain\_host(i,8) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00132                 myfile << \textcolor{stringliteral}{"\(\backslash\)n"};
+00133         \}
+00134 
+00135     \}
+00136 \}
+00137 
+\Hypertarget{fe__vtk_8cpp_source_l00138}\hyperlink{fe__vtk_8cpp_a35bde18dc6d9d842ff0bec995327d441}{00138} \textcolor{keywordtype}{void} \hyperlink{fe__vtk_8cpp_a35bde18dc6d9d842ff0bec995327d441}{fe\_vtkWrite\_truss}(std::string output,\textcolor{keywordtype}{int} format\_choice,\textcolor{keywordtype}{int} mesh\_choice,\textcolor{keywordtype}{int} time\_step,
+      MatrixXd nodes, MatrixXi elements)\{
+00139 
+00140     std::string name;
+00141 
+00142     std::ostringstream ss;
+00143     ss << time\_step;
+00144 
+00145     \textcolor{keywordflow}{switch}(mesh\_choice)\{
+00146     \textcolor{keywordflow}{case} 1:
+00147         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00148         \textcolor{keywordflow}{break};
+00149     \textcolor{keywordflow}{case} 2:
+00150         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00151         \textcolor{keywordflow}{break};
+00152     \textcolor{keywordflow}{case} 3:
+00153         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00154         \textcolor{keywordflow}{break};
+00155     \textcolor{keywordflow}{case} 4:
+00156         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00157         \textcolor{keywordflow}{break};
+00158     \textcolor{keywordflow}{case} 5:
+00159         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00160         \textcolor{keywordflow}{break};
+00161     \textcolor{keywordflow}{default}:
+00162         name = \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\_path} + \textcolor{stringliteral}{"results/vtk/"} + output + \textcolor{stringliteral}{"\_"} + ss.str() + \textcolor{stringliteral}{".vtk"};
+00163         \textcolor{keywordflow}{break};
+00164     \}
+00165 
+00166     std::ofstream myfile(name.c\_str());
+00167 
+00168     myfile << \textcolor{stringliteral}{"# vtk DataFile Version 3. 0.\(\backslash\)n"}; \textcolor{comment}{// 1st line - VTK file version}
+00169     myfile << output << \textcolor{stringliteral}{"\(\backslash\)n"}; \textcolor{comment}{// Title of the result}
+00170 
+00171     \textcolor{comment}{/* File Format */}
+00172     \textcolor{keywordflow}{switch}(format\_choice)\{
+00173     \textcolor{keywordflow}{case} 1:
+00174         myfile << \textcolor{stringliteral}{"ASCII"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00175         \textcolor{keywordflow}{break};
+00176     \textcolor{keywordflow}{case} 2:
+00177         myfile << \textcolor{stringliteral}{"BINARY"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00178         \textcolor{keywordflow}{break};
+00179     \textcolor{keywordflow}{default}:
+00180         myfile << \textcolor{stringliteral}{"ASCII"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00181         \textcolor{keywordflow}{break};
+00182     \}
+00183 
+00184     \textcolor{comment}{/* Mesh Type */}
+00185     \textcolor{keywordflow}{switch}(mesh\_choice)\{
+00186     \textcolor{keywordflow}{case} 1:
+00187         myfile << \textcolor{stringliteral}{"DATASET STRUCTURED\_POINTS \(\backslash\)n"};
+00188         \textcolor{keywordflow}{break};
+00189     \textcolor{keywordflow}{case} 2:
+00190         myfile << \textcolor{stringliteral}{"DATASET STRUCTURED\_GRID \(\backslash\)n"};
+00191         \textcolor{keywordflow}{break};
+00192     \textcolor{keywordflow}{case} 3:
+00193         myfile << \textcolor{stringliteral}{"DATASET RECTILLINEAR\_GRID \(\backslash\)n"};
+00194         \textcolor{keywordflow}{break};
+00195     \textcolor{keywordflow}{case} 4:
+00196         myfile << \textcolor{stringliteral}{"DATASET POLYDATA \(\backslash\)n"};
+00197         \textcolor{keywordflow}{break};
+00198     \textcolor{keywordflow}{case} 5:
+00199         myfile << \textcolor{stringliteral}{"DATASET UNSTRUCTURED\_GRID \(\backslash\)n"};
+00200         \textcolor{keywordflow}{break};
+00201     \textcolor{keywordflow}{default}:
+00202         myfile << \textcolor{stringliteral}{"DATASET UNSTRUCTURED\_GRID \(\backslash\)n"};
+00203         \textcolor{keywordflow}{break};
+00204     \}
+00205 
+00206     \textcolor{comment}{/* Unstructured Grid */}
+00207     \textcolor{keywordflow}{if}(mesh\_choice==5)\{
+00208         \textcolor{comment}{/* POINTS */}
+00209         myfile << \textcolor{stringliteral}{"POINTS"} << \textcolor{stringliteral}{" "} << nodes.rows() << \textcolor{stringliteral}{" "} << \textcolor{stringliteral}{"double"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00210         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nodes.rows();i++)\{
+00211             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=1;j<nodes.cols();j++)\{
+00212                 myfile<<std::setw(3)<<nodes(i,j)<<\textcolor{stringliteral}{" "};
+00213             \}
+00214             myfile<<\textcolor{stringliteral}{"\(\backslash\)n"};
+00215         \}
+00216 
+00217         \textcolor{comment}{/* CELLS */}
+00218         \textcolor{keywordtype}{int} size = 0;
+00219         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} k=0;k<elements.rows();k++)\{
+00220                 size = size + 1 + (elements.row(k).cols()-2);
+00221         \}
+00222         myfile << \textcolor{stringliteral}{"CELLS"} << \textcolor{stringliteral}{" "} << elements.rows() << \textcolor{stringliteral}{" "} << size << \textcolor{stringliteral}{" "} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00223         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<elements.rows();i++)\{
+00224             myfile<<elements.row(i).cols()-2<<\textcolor{stringliteral}{" "};
+00225             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=2;j<elements.cols();j++)\{
+00226                 myfile<<std::setw(3)<<elements(i,j)<<\textcolor{stringliteral}{" "};
+00227             \}
+00228             myfile<<\textcolor{stringliteral}{"\(\backslash\)n"};
+00229         \}
+00230 
+00231         \textcolor{comment}{/* CELL TYPES */}
+00232         myfile << \textcolor{stringliteral}{"CELL\_TYPES"} << \textcolor{stringliteral}{" "} << elements.rows() << \textcolor{stringliteral}{"\(\backslash\)n"};
+00233         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<elements.rows();i++)\{
+00234                     myfile << \textcolor{stringliteral}{"3"} << \textcolor{stringliteral}{"\(\backslash\)n"};
+00235         \}
+00236         myfile << \textcolor{stringliteral}{"\(\backslash\)n"} ;
+00237 
+00238         \textcolor{comment}{/* CELL DATA - STRESSES */}
+00239         myfile << \textcolor{stringliteral}{"CELL\_DATA "} << elements.rows() << \textcolor{stringliteral}{"\(\backslash\)n"};
+00240             myfile << \textcolor{stringliteral}{"TENSORS "} << \textcolor{stringliteral}{"Stress "} << \textcolor{stringliteral}{"double\(\backslash\)n"};
+00241         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<element\_stress\_truss.rows();i++)\{
+00242                 myfile << element\_stress\_truss(i,0) << \textcolor{stringliteral}{" "} << element\_stress\_truss(i,1) << \textcolor{stringliteral}{" "} << 
+      element\_stress\_truss(i,2) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00243                 myfile << element\_stress\_truss(i,3) << \textcolor{stringliteral}{" "} << element\_stress\_truss(i,4) << \textcolor{stringliteral}{" "} << 
+      element\_stress\_truss(i,5) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00244                 myfile << element\_stress\_truss(i,6) << \textcolor{stringliteral}{" "} << element\_stress\_truss(i,7) << \textcolor{stringliteral}{" "} << 
+      element\_stress\_truss(i,8) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00245                 myfile << \textcolor{stringliteral}{"\(\backslash\)n"};
+00246         \}
+00247 
+00248         \textcolor{comment}{/* CELL DATA - STRAINS */}
+00249         \textcolor{comment}{//myfile << "CELL\_DATA " << elements.rows() << "\(\backslash\)n";}
+00250             myfile << \textcolor{stringliteral}{"TENSORS "} << \textcolor{stringliteral}{"Strain "} << \textcolor{stringliteral}{"double\(\backslash\)n"};
+00251         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<element\_strain\_truss.rows();i++)\{
+00252                 myfile << element\_strain\_truss(i,0) << \textcolor{stringliteral}{" "} << element\_strain\_truss(i,1) << \textcolor{stringliteral}{" "} << 
+      element\_strain\_truss(i,2) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00253                 myfile << element\_strain\_truss(i,3) << \textcolor{stringliteral}{" "} << element\_strain\_truss(i,4) << \textcolor{stringliteral}{" "} << 
+      element\_strain\_truss(i,5) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00254                 myfile << element\_strain\_truss(i,6) << \textcolor{stringliteral}{" "} << element\_strain\_truss(i,7) << \textcolor{stringliteral}{" "} << 
+      element\_strain\_truss(i,8) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00255                 myfile << \textcolor{stringliteral}{"\(\backslash\)n"};
+00256         \}
+00257 
+00258     \}
+00259 \}
+00260 
+00261 
+\end{DoxyCode}

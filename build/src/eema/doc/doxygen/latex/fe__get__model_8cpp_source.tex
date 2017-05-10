@@ -1,0 +1,23 @@
+\hypertarget{fe__get__model_8cpp_source}{}\section{fe\+\_\+get\+\_\+model.\+cpp}
+\label{fe__get__model_8cpp_source}\index{src/eema/src/\+Materials/fe\+\_\+get\+\_\+model.\+cpp@{src/eema/src/\+Materials/fe\+\_\+get\+\_\+model.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__get__model_8cpp_source_l00005}\hyperlink{fe__get__model_8cpp_a34d6fb85943d945b7e8600d2ef4220d0}{00005} std::string \hyperlink{fe__get__model_8cpp_a34d6fb85943d945b7e8600d2ef4220d0}{fe\_get\_model}(\textcolor{keywordtype}{int} matl\_code)\{
+00006     std::string model;
+00007     \textcolor{keywordtype}{int} num\_pointer=0;
+00008 
+00009     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<\hyperlink{_global_variables_8h_a39328cf72d69139b3b6c5b8ef6c636fe}{material\_types};i++)\{
+00010         \textcolor{keywordflow}{if}(matl\_code == \hyperlink{_global_variables_8h_acfa6799b35f9301b5fc44e6043624797}{mat}[i].mat\_id)\{
+00011             num\_pointer = i;
+00012             \textcolor{keywordflow}{break};
+00013         \}
+00014     \}
+00015 
+00016     model = \hyperlink{_global_variables_8h_acfa6799b35f9301b5fc44e6043624797}{mat}[num\_pointer].\hyperlink{class_materials_abe8d649257d71769de7a3aa20ff8977e}{mat\_model};
+00017     \textcolor{keywordflow}{return} model;
+00018 \}
+\end{DoxyCode}

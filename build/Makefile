@@ -56,6 +56,52 @@ CMAKE_BINARY_DIR = /Users/rhk12/code/compbio/build
 #=============================================================================
 # Targets provided globally by CMake.
 
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/Cellar/cmake/3.8.1/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/Cellar/cmake/3.8.1/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/local/Cellar/cmake/3.8.1/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/local/Cellar/cmake/3.8.1/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/local/Cellar/cmake/3.8.1/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/local/Cellar/cmake/3.8.1/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -110,14 +156,186 @@ depend:
 	$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
+#=============================================================================
+# Target rules for targets named eema
+
+# Build rule for target.
+eema: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 eema
+.PHONY : eema
+
+# fast build rule for target.
+eema/fast:
+	$(MAKE) -f src/eema/src/CMakeFiles/eema.dir/build.make src/eema/src/CMakeFiles/eema.dir/build
+.PHONY : eema/fast
+
+#=============================================================================
+# Target rules for targets named TimeStep
+
+# Build rule for target.
+TimeStep: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 TimeStep
+.PHONY : TimeStep
+
+# fast build rule for target.
+TimeStep/fast:
+	$(MAKE) -f src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/build.make src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/build
+.PHONY : TimeStep/fast
+
+#=============================================================================
+# Target rules for targets named Math
+
+# Build rule for target.
+Math: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Math
+.PHONY : Math
+
+# fast build rule for target.
+Math/fast:
+	$(MAKE) -f src/eema/src/Math/CMakeFiles/Math.dir/build.make src/eema/src/Math/CMakeFiles/Math.dir/build
+.PHONY : Math/fast
+
+#=============================================================================
+# Target rules for targets named Materials
+
+# Build rule for target.
+Materials: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Materials
+.PHONY : Materials
+
+# fast build rule for target.
+Materials/fast:
+	$(MAKE) -f src/eema/src/Materials/CMakeFiles/Materials.dir/build.make src/eema/src/Materials/CMakeFiles/Materials.dir/build
+.PHONY : Materials/fast
+
+#=============================================================================
+# Target rules for targets named Input-Output
+
+# Build rule for target.
+Input-Output: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Input-Output
+.PHONY : Input-Output
+
+# fast build rule for target.
+Input-Output/fast:
+	$(MAKE) -f src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/build.make src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/build
+.PHONY : Input-Output/fast
+
+#=============================================================================
+# Target rules for targets named Elements
+
+# Build rule for target.
+Elements: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Elements
+.PHONY : Elements
+
+# fast build rule for target.
+Elements/fast:
+	$(MAKE) -f src/eema/src/Elements/CMakeFiles/Elements.dir/build.make src/eema/src/Elements/CMakeFiles/Elements.dir/build
+.PHONY : Elements/fast
+
+#=============================================================================
+# Target rules for targets named FEM
+
+# Build rule for target.
+FEM: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 FEM
+.PHONY : FEM
+
+# fast build rule for target.
+FEM/fast:
+	$(MAKE) -f src/eema/src/FEM/CMakeFiles/FEM.dir/build.make src/eema/src/FEM/CMakeFiles/FEM.dir/build
+.PHONY : FEM/fast
+
+#=============================================================================
+# Target rules for targets named eema_example1
+
+# Build rule for target.
+eema_example1: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 eema_example1
+.PHONY : eema_example1
+
+# fast build rule for target.
+eema_example1/fast:
+	$(MAKE) -f src/eema/examples/example-1/CMakeFiles/eema_example1.dir/build.make src/eema/examples/example-1/CMakeFiles/eema_example1.dir/build
+.PHONY : eema_example1/fast
+
+#=============================================================================
+# Target rules for targets named eema-doc-forced
+
+# Build rule for target.
+eema-doc-forced: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 eema-doc-forced
+.PHONY : eema-doc-forced
+
+# fast build rule for target.
+eema-doc-forced/fast:
+	$(MAKE) -f src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/build.make src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/build
+.PHONY : eema-doc-forced/fast
+
+#=============================================================================
+# Target rules for targets named eema-doc
+
+# Build rule for target.
+eema-doc: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 eema-doc
+.PHONY : eema-doc
+
+# fast build rule for target.
+eema-doc/fast:
+	$(MAKE) -f src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/build.make src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/build
+.PHONY : eema-doc/fast
+
+#=============================================================================
+# Target rules for targets named eema_gui
+
+# Build rule for target.
+eema_gui: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 eema_gui
+.PHONY : eema_gui
+
+# fast build rule for target.
+eema_gui/fast:
+	$(MAKE) -f src/eema/gui/CMakeFiles/eema_gui.dir/build.make src/eema/gui/CMakeFiles/eema_gui.dir/build
+.PHONY : eema_gui/fast
+
+#=============================================================================
+# Target rules for targets named eema_gui_autogen
+
+# Build rule for target.
+eema_gui_autogen: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 eema_gui_autogen
+.PHONY : eema_gui_autogen
+
+# fast build rule for target.
+eema_gui_autogen/fast:
+	$(MAKE) -f src/eema/gui/CMakeFiles/eema_gui_autogen.dir/build.make src/eema/gui/CMakeFiles/eema_gui_autogen.dir/build
+.PHONY : eema_gui_autogen/fast
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... install"
+	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
+	@echo "... eema"
+	@echo "... TimeStep"
+	@echo "... Math"
+	@echo "... Materials"
+	@echo "... Input-Output"
+	@echo "... Elements"
+	@echo "... FEM"
+	@echo "... eema_example1"
+	@echo "... eema-doc-forced"
+	@echo "... eema-doc"
+	@echo "... eema_gui"
+	@echo "... eema_gui_autogen"
 .PHONY : help
 
 
