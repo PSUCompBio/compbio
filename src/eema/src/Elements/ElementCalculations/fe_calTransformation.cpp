@@ -4,7 +4,7 @@
 
 using namespace Eigen;
 
-MatrixXd fe_calTransformation(MatrixXd truss_nodes, int choice){
+MatrixXd fe_calTransformation(VectorXd x, VectorXd y, VectorXd z, int choice){
 // choice - 1: Stress Transformation Matrix
 // choice - 2: Strain Transformation Matrix
 
@@ -12,9 +12,9 @@ MatrixXd fe_calTransformation(MatrixXd truss_nodes, int choice){
 	double l_1,l_2,l_3,m_1,m_2,m_3,n_1,n_2,n_3;
 
 	Vector3d dir_truss_x(3);
-	dir_truss_x(0) = truss_nodes(1,1) - truss_nodes(0,1);
-	dir_truss_x(1) = truss_nodes(1,2) - truss_nodes(0,2);
-	dir_truss_x(2) = truss_nodes(1,3) - truss_nodes(0,3);
+	dir_truss_x(0) = x(1) - x(0);
+	dir_truss_x(1) = y(1) - y(0);
+	dir_truss_x(2) = z(1) - z(0);
 
 	// std::cout<<"Direction of truss element is: "<<dir_truss_x(0)<<":"<<dir_truss_x(1)<<":"<<dir_truss_x(2)<<"\n";
 

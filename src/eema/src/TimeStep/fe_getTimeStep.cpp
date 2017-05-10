@@ -3,58 +3,69 @@
 using namespace Eigen;
 
 /** For all elements -- this function calculates the minimum critical timestep */
-double fe_getTimeStep(MatrixXd nodes, MatrixXi elements, int ndof, VectorXd u, VectorXd v, VectorXd fext){
+double fe_getTimeStep(void)
+{
 
-	double deltaT_crit = 0;
+    //std::cout << "Started Calculating Timestep..." << "\n";
 
-	int nel = elements.rows();
-	int nnel = (elements.cols()-2);
-	int nnode = nodes.rows();
-	int sdof = nnode * ndof;
-	int edof = nnel * ndof;
-	VectorXd xcoord = VectorXd::Zero(nnel);
-	VectorXd ycoord = VectorXd::Zero(nnel);
-	VectorXd zcoord = VectorXd::Zero(nnel);
+    double deltaT_crit = 0;
 
-	VectorXd deltaT_element = VectorXd::Zero(nel);
+    MatrixXd* nodes = mesh[0].getNewNodesPointer();
+    MatrixXi* elements = mesh[0].getNewElementsPointer();
 
-	for(int i=0;i<nel;i++){
+    VectorXd u = mesh[0].getNodalDisp();
 
+    int nel   = mesh[0].getNumElements();       /*! number of elements */
+    int nnel  = mesh[0].getNumNodesPerElement(); // number of nodes per element
+    int nnode = mesh[0].getNumNodes();          // number of nodes
+    int sdof  = nnode * ndof;          // system degrees of freedom
+    int edof  = nnel * ndof;           // element degrees of freedom
+    VectorXd* element_volumes = mesh[0].getElementCharacteristicPointer();
 
-		VectorXi nodes_local = VectorXi::Zero(nnel);
+    VectorXd xcoord = VectorXd::Zero(nnel);
+    VectorXd ycoord = VectorXd::Zero(nnel);
+    VectorXd zcoord = VectorXd::Zero(nnel);
 
-		for(int j=0;j<nnel;j++){
-			int g = -1;
-			for(int f=0;f<nnode;f++){
-				if(elements(i,j+2)==nodes(f,0)){
-					g = f;
-					break;
-				}
-			}
-			nodes_local(j) = elements(i,j+2);
-			xcoord(j) = nodes(g,1);
-			ycoord(j) = nodes(g,2);
-			zcoord(j) = nodes(g,3);
-		}
+    VectorXd deltaT_element = VectorXd::Zero(nel);
 
-		VectorXd u_e(edof);
-		u_e = fe_gather(u,u_e,nodes_local,sdof);
+    for (int i = 0; i < nel; i++) {
 
-		MatrixXd nodes_new(elements.rows(),ndof);
+        //std::cout << "Here..." << i << "\n";
 
-		int counter;
+        for (int j = 0; j < nnel; j++) {
+            int g = (*elements)(i, j + 2);
+            xcoord(j) = (*nodes)(g, 1);
+            ycoord(j) = (*nodes)(g, 2);
+            zcoord(j) = (*nodes)(g, 3);
+        }
 
-		for(int j=0;j<nnel;j++){
-			counter = j*3;
-			xcoord(j) = xcoord(j)+u_e(counter);
-			ycoord(j) = ycoord(j)+u_e(counter+1);
-			zcoord(j) = zcoord(j)+u_e(counter+2);
-		}
+        VectorXd u_e = VectorXd::Zero(edof);
+        fe_gather_pbr(u, u_e, (*elements).block<1, 8>(i, 2), sdof);
+        deltaT_element(i) = fe_calTimeStep(xcoord, ycoord, zcoord, (*elements)(i, 1), u_e, (*element_volumes)(i));
+    }
 
-		deltaT_element(i) = fe_calTimeStep(xcoord,ycoord,zcoord,elements(i,1)); // reduction factor for time step added.
-	}
+    deltaT_crit = deltaT_element.minCoeff();
 
-	deltaT_crit = deltaT_element.minCoeff();
+    deltaT_crit = deltaT_crit * reduction;
 
-	return deltaT_crit;
-}
+    if (deltaT_crit < failure_time_step) {
+        std::cout << "Simulation Failed - Timestep too small" << "\n";
+        std::cout << "Timestep is: " << deltaT_crit << "\n";
+        std::exit(-1);
+    }
+
+    if (deltaT_crit > dt_min) {
+        deltaT_crit = dt_min;
+    }
+
+    if (deltaT_crit > (t_end / ((double)output_frequency))) {
+        deltaT_crit = (t_end / ((double)output_frequency));
+    }
+
+    nodes = NULL;
+    elements = NULL;
+
+    //std::cout << "Completed Calculating Timestep !!!" << "\n";
+
+    return deltaT_crit;
+} // fe_getTimeStep

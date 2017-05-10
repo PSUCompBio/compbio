@@ -1,0 +1,85 @@
+# -------------------------------
+# Enter the Dimension of the problem
+*DIMENSION
+3
+*END_DIMENSION
+# -------------------------------
+# Mesh-1 (Hex Mesh)
+*MESH
+*NAME
+Matrix
+*NODES
+8	3
+0	0	0	0
+1	0.005 	0	0
+2	0.005	0.005	0
+3	0 	0.005	0
+4	0	0	0.005
+5	0.005	0	0.005
+6	0.005	0.005	0.005
+7	0	0.005	0.005
+*ELEMENTS
+1	8
+1	1	0	1	2	3	4	5	6	7
+*END_MESH
+# -------------------------------
+# Material-1
+*MATERIAL
+1
+simple_elastic
+7800
+200e9
+0.26
+*END_MATERIAL
+# -------------------------------
+# Material-2
+*MATERIAL
+2
+simple_elastic
+7800
+200e9
+0.26
+*END_MATERIAL
+# ------------------------------
+# Time Details. Include the values in this order line by line.
+# 1. Start Time
+# 2. End Time
+# 3. Ouput Frequency
+# 4. Max Time step
+# 5. Reduction Factor
+*TIME
+0
+0.1
+100
+1e-5
+0.7
+*END_TIME
+# ------------------------------
+# Boundary Condition Details.
+# For every boundary condition, enter the following details in order line by line
+# 1. Type of BC - 'displacement' or 'load' or 'velocity' or 'acceleration'
+# 2. Amplitude
+# 3. Number of DOF's on which BC's are applied
+# 4. DOF's on which BC's are applied
+# 5. Type of time behavior curve
+# IT IS IMPORTANT TO ENSURE THAT SAME DOF'S SHOULDN'T BE ALLOTTED WITH MORE THAN 1 TYPE OF BC.
+# ------------------------------
+# BC-1 (Constrained Displacements)
+*BC
+displacement
+0
+12
+0 1 2 4 5 8 9 11 12 13 16 21
+RAMP
+*END_BC
+# ------------------------------
+# BC-2 (Load)
+*BC
+displacement
+5e-6
+4
+14 17 20 23
+RAMP
+*END_BC
+# ------------------------------
+*END
