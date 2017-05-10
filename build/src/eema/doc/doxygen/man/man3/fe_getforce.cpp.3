@@ -1,0 +1,30 @@
+.TH "src/eema/src/FEM/SolidMechanics/fe_getforce.cpp" 3 "Wed May 10 2017" "Embedded Element Method Algorithms (EMMA)" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/eema/src/FEM/SolidMechanics/fe_getforce.cpp
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'functions\&.h'\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "VectorXd \fBfe_getforce\fP (MatrixXd nodes, MatrixXi elements, int \fBndof\fP, VectorXd u, VectorXd v, VectorXd fext, int size_counter, MatrixXd nodes_truss, MatrixXi elements_truss)"
+.br
+.RI "Calculates the resultant nodal force after each time step\&. "
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "VectorXd fe_getforce (MatrixXd nodes, MatrixXi elements, int ndof, VectorXd u, VectorXd v, VectorXd fext, int size_counter, MatrixXd nodes_truss, MatrixXi elements_truss)"
+
+.PP
+Calculates the resultant nodal force after each time step\&. This function represents the 'getforce' step in Belytschko (Box 6\&.1 - Explicit FEM Algorithm)\&. For each hex element, this function calculates the internal nodal force vector and the resultant nodal force vector\&. Once, this is calculated for each element, the resultant vectors are scattered into global vectors\&. 
+.PP
+Definition at line 13 of file fe_getforce\&.cpp\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Embedded Element Method Algorithms (EMMA) from the source code\&.

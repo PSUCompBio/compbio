@@ -1,0 +1,61 @@
+.TH "src/eema/src/FEM/Explicit/fe_mainEXPLICIT.cpp" 3 "Wed May 10 2017" "Embedded Element Method Algorithms (EMMA)" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/eema/src/FEM/Explicit/fe_mainEXPLICIT.cpp
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'functions\&.h'\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBfe_mainEXPLICIT\fP ()"
+.br
+.RI "This function carries out the explicit dynamic analysis of the FEM problem\&. "
+.in -1c
+.SS "Variables"
+
+.in +1c
+.ti -1c
+.RI "double \fBeps_energy\fP = 0\&.01"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "void fe_mainEXPLICIT ()"
+
+.PP
+This function carries out the explicit dynamic analysis of the FEM problem\&. Run the finite element analysis using an explicit dynamic method number of elements
+.PP
+Apply Loading Conditions - time dependent loading conditions
+.PP
+Calculate the time at half time step
+.PP
+Update the time by adding full time step
+.PP
+Partially Update Nodal Velocities
+.PP
+Enforce Velocity Boundary Conditions
+.PP
+Update Nodal Displacements
+.PP
+Calculate Accelerations
+.PP
+Completely Update the nodal velocities
+.PP
+Projection of displacements to the embedded mesh is needed 
+.PP
+Definition at line 10 of file fe_mainEXPLICIT\&.cpp\&.
+.SH "Variable Documentation"
+.PP 
+.SS "double eps_energy = 0\&.01"
+Energy Balance Criterion 
+.PP
+Definition at line 4 of file fe_mainEXPLICIT\&.cpp\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Embedded Element Method Algorithms (EMMA) from the source code\&.

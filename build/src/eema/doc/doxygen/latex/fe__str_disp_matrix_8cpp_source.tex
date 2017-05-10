@@ -1,0 +1,85 @@
+\hypertarget{fe__str_disp_matrix_8cpp_source}{}\section{fe\+\_\+str\+Disp\+Matrix.\+cpp}
+\label{fe__str_disp_matrix_8cpp_source}\index{src/eema/src/\+Elements/\+Element\+Calculations/fe\+\_\+str\+Disp\+Matrix.\+cpp@{src/eema/src/\+Elements/\+Element\+Calculations/fe\+\_\+str\+Disp\+Matrix.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__str_disp_matrix_8cpp_source_l00005}\hyperlink{fe__str_disp_matrix_8cpp_a4b49d2df4f86e7d0755971ab4bfa48b2}{00005} MatrixXd \hyperlink{fe__str_disp_matrix_8cpp_a4b49d2df4f86e7d0755971ab4bfa48b2}{fe\_strDispMatrix}(\textcolor{keywordtype}{int} edof, \textcolor{keywordtype}{int} nnel, VectorXd dndx, VectorXd dndy, VectorXd dndz)\{
+00006     
+00007     MatrixXd disp\_mat(6,edof);
+00008     disp\_mat = MatrixXd::Zero(6,edof);
+00009     \textcolor{keywordtype}{int} i1,i2,i3;
+00010 
+00011     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nnel;i++)\{
+00012 
+00013         i1 = 0 + i*3;
+00014         i2 = i1 + 1;
+00015         i3 = i2 + 1;
+00016         disp\_mat(0,i1) = dndx(i);
+00017         disp\_mat(1,i2) = dndy(i);
+00018         disp\_mat(2,i3) = dndz(i);
+00019         disp\_mat(3,i1) = dndy(i);
+00020         disp\_mat(3,i2) = dndx(i);
+00021         disp\_mat(4,i2) = dndz(i);
+00022         disp\_mat(4,i3) = dndy(i);
+00023         disp\_mat(5,i1) = dndz(i);
+00024         disp\_mat(5,i3) = dndx(i);   
+00025 
+00026     \}
+00027     \textcolor{comment}{//std::cout<<"Exiting Strain Displacement Generator Function\(\backslash\)n";}
+00028     \textcolor{keywordflow}{return} disp\_mat;
+00029 \}
+00030 
+\Hypertarget{fe__str_disp_matrix_8cpp_source_l00031}\hyperlink{fe__str_disp_matrix_8cpp_a8c9fd519c93c847cdf52de947964eb67}{00031} MatrixXd \hyperlink{fe__str_disp_matrix_8cpp_a8c9fd519c93c847cdf52de947964eb67}{fe\_strDispMatrix\_totalLagrangian}(\textcolor{keywordtype}{int} edof, \textcolor{keywordtype}{int} nnel, VectorXd dndx
+      , VectorXd dndy, VectorXd dndz, VectorXd u)\{
+00032 
+00033     \textcolor{comment}{// Refer to Belytschko if you have questions about the formation of this matrix}
+00034 
+00035     MatrixXd disp\_mat\_modified = MatrixXd::Zero(6,edof);
+00036 
+00037     MatrixXd F = MatrixXd::Zero(3,3);
+00038     F = \hyperlink{functions_8h_ae50379f74802347e04dbc022897f9cb0}{fe\_calDefGrad}(dndx,dndy,dndz,u);
+00039     MatrixXd FT = MatrixXd::Zero(3,3);
+00040     FT = F.transpose();
+00041 
+00042     \textcolor{keywordtype}{int} i1,i2,i3;
+00043 
+00044     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nnel;i++)\{
+00045 
+00046         i1 = 0 + i*3;
+00047         i2 = i1 + 1;
+00048         i3 = i2 + 1;
+00049 
+00050         disp\_mat\_modified(0,i1) = dndx(i)*FT(0,0);
+00051         disp\_mat\_modified(0,i2) = dndx(i)*FT(0,1);
+00052         disp\_mat\_modified(0,i3) = dndx(i)*FT(0,2);
+00053 
+00054         disp\_mat\_modified(1,i1) = dndy(i)*FT(1,0);
+00055         disp\_mat\_modified(1,i2) = dndy(i)*FT(1,1);
+00056         disp\_mat\_modified(1,i3) = dndy(i)*FT(1,2);
+00057 
+00058         disp\_mat\_modified(2,i1) = dndz(i)*FT(2,0);
+00059         disp\_mat\_modified(2,i2) = dndz(i)*FT(2,1);
+00060         disp\_mat\_modified(2,i3) = dndz(i)*FT(2,2);
+00061 
+00062 
+00063         disp\_mat\_modified(3,i1) = (dndy(i)*FT(0,0)) + (dndx(i)*FT(1,0));
+00064         disp\_mat\_modified(3,i2) = (dndy(i)*FT(0,1)) + (dndx(i)*FT(1,1));
+00065         disp\_mat\_modified(3,i3) = (dndy(i)*FT(0,2)) + (dndx(i)*FT(1,2));
+00066 
+00067         disp\_mat\_modified(4,i1) = (dndz(i)*FT(1,0)) + (dndy(i)*FT(2,0));
+00068         disp\_mat\_modified(4,i2) = (dndz(i)*FT(1,1)) + (dndy(i)*FT(2,1));
+00069         disp\_mat\_modified(4,i3) = (dndz(i)*FT(1,2)) + (dndy(i)*FT(2,2));
+00070 
+00071         disp\_mat\_modified(5,i1) = (dndz(i)*FT(0,0)) + (dndx(i)*FT(2,0));
+00072         disp\_mat\_modified(5,i2) = (dndz(i)*FT(0,1)) + (dndx(i)*FT(2,1));
+00073         disp\_mat\_modified(5,i3) = (dndz(i)*FT(0,2)) + (dndx(i)*FT(2,2));
+00074 
+00075     \}
+00076     \textcolor{comment}{//std::cout<<"Exiting Strain Displacement Generator Function\(\backslash\)n";}
+00077 
+00078     \textcolor{keywordflow}{return} disp\_mat\_modified;
+00079 \}
+\end{DoxyCode}

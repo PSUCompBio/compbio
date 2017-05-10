@@ -1,0 +1,267 @@
+\hypertarget{_global_variables_8h}{}\section{src/eema/include/\+Global\+Variables.h File Reference}
+\label{_global_variables_8h}\index{src/eema/include/\+Global\+Variables.\+h@{src/eema/include/\+Global\+Variables.\+h}}
+{\ttfamily \#include $<$iostream$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$vector$>$}\newline
+{\ttfamily \#include $<$fstream$>$}\newline
+{\ttfamily \#include $<$sstream$>$}\newline
+{\ttfamily \#include $<$string$>$}\newline
+{\ttfamily \#include $<$iomanip$>$}\newline
+{\ttfamily \#include \char`\"{}Eigen/\+Dense\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Eigen/\+Eigenvalues\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}unsupported/\+Eigen/\+Matrix\+Functions\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Mesh.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Materials.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}B\+C.\+h\char`\"{}}\newline
+Include dependency graph for Global\+Variables.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_global_variables_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{_global_variables_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \hyperlink{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}{home\+\_\+path}
+\item 
+std\+::string \hyperlink{_global_variables_8h_a5e3d7c3d50f127de0e61daaa407dc7d1}{job\+\_\+file}
+\item 
+int \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}
+\item 
+int \hyperlink{_global_variables_8h_a509bc84434af1eff0173e4a71bd758ac}{num\+\_\+meshes}
+\item 
+\hyperlink{class_mesh}{Mesh} $\ast$ \hyperlink{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}{mesh}
+\item 
+double \hyperlink{_global_variables_8h_a1b01a4354147da92a548ea1a5f96d592}{t\+\_\+start}
+\item 
+double \hyperlink{_global_variables_8h_a4b637c5fff609e604a3b2b2787f4a9fa}{t\+\_\+end}
+\item 
+int \hyperlink{_global_variables_8h_ace6ace9b2f6d8d404ca9e66564289eb1}{output\+\_\+frequency}
+\item 
+double \hyperlink{_global_variables_8h_a068c627ac33cf3c721d8f28eab205a83}{dt\+\_\+initial}
+\item 
+double \hyperlink{_global_variables_8h_a0a612324885914b6799185d54c48b310}{dt\+\_\+min}
+\item 
+double \hyperlink{_global_variables_8h_a7700f3aeb1ca1c9bbbf712dbfb0aa349}{reduction}
+\item 
+int \hyperlink{_global_variables_8h_a39328cf72d69139b3b6c5b8ef6c636fe}{material\+\_\+types}
+\item 
+\hyperlink{class_materials}{Materials} $\ast$ \hyperlink{_global_variables_8h_acfa6799b35f9301b5fc44e6043624797}{mat}
+\item 
+int \hyperlink{_global_variables_8h_aad28f3904552ac6aa1642c44f0bc04e7}{bc\+\_\+types}
+\item 
+\hyperlink{class_b_c}{BC} $\ast$ \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}
+\item 
+double \hyperlink{_global_variables_8h_ad3d80cd8d6370090eb6cc57a523bcd6c}{eps\+\_\+nr}
+\item 
+double \hyperlink{_global_variables_8h_a43f0d7a4e9f3ece65db80d07bb79192f}{iterations\+\_\+nr}
+\item 
+double \hyperlink{_global_variables_8h_a33157279f223d2f4775b0d78b73bc08f}{eps\+\_\+energy}
+\end{DoxyCompactItemize}
+
+
+\subsection{Variable Documentation}
+\mbox{\Hypertarget{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}\label{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!bc@{bc}}
+\index{bc@{bc}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{bc}{bc}}
+{\footnotesize\ttfamily \hyperlink{class_b_c}{BC}$\ast$ bc}
+
+Pointer to the Boundary Condition Data 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00030}{30} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_aad28f3904552ac6aa1642c44f0bc04e7}\label{_global_variables_8h_aad28f3904552ac6aa1642c44f0bc04e7}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!bc\+\_\+types@{bc\+\_\+types}}
+\index{bc\+\_\+types@{bc\+\_\+types}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{bc\+\_\+types}{bc\_types}}
+{\footnotesize\ttfamily int bc\+\_\+types}
+
+Types of Boundary Conditions
+
+Reduces the timestep value by this amount 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00029}{29} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a068c627ac33cf3c721d8f28eab205a83}\label{_global_variables_8h_a068c627ac33cf3c721d8f28eab205a83}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!dt\+\_\+initial@{dt\+\_\+initial}}
+\index{dt\+\_\+initial@{dt\+\_\+initial}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{dt\+\_\+initial}{dt\_initial}}
+{\footnotesize\ttfamily double dt\+\_\+initial}
+
+Initial Time Step 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00024}{24} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a0a612324885914b6799185d54c48b310}\label{_global_variables_8h_a0a612324885914b6799185d54c48b310}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!dt\+\_\+min@{dt\+\_\+min}}
+\index{dt\+\_\+min@{dt\+\_\+min}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{dt\+\_\+min}{dt\_min}}
+{\footnotesize\ttfamily double dt\+\_\+min}
+
+Max Time Step
+
+Initial time step 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00025}{25} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a33157279f223d2f4775b0d78b73bc08f}\label{_global_variables_8h_a33157279f223d2f4775b0d78b73bc08f}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!eps\+\_\+energy@{eps\+\_\+energy}}
+\index{eps\+\_\+energy@{eps\+\_\+energy}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{eps\+\_\+energy}{eps\_energy}}
+{\footnotesize\ttfamily double eps\+\_\+energy}
+
+Energy Balance Criterion 
+
+Definition at line \hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_source_l00004}{4} of file \hyperlink{fe__main_e_x_p_l_i_c_i_t_8cpp_source}{fe\+\_\+main\+E\+X\+P\+L\+I\+C\+I\+T.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_ad3d80cd8d6370090eb6cc57a523bcd6c}\label{_global_variables_8h_ad3d80cd8d6370090eb6cc57a523bcd6c}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!eps\+\_\+nr@{eps\+\_\+nr}}
+\index{eps\+\_\+nr@{eps\+\_\+nr}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{eps\+\_\+nr}{eps\_nr}}
+{\footnotesize\ttfamily double eps\+\_\+nr}
+
+Convergence Criteria for Newton Rhapson Method 
+
+Definition at line \hyperlink{fe__newton_rhapson_8cpp_source_l00005}{5} of file \hyperlink{fe__newton_rhapson_8cpp_source}{fe\+\_\+newton\+Rhapson.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}\label{_global_variables_8h_a556ce46e457f991c51f3dac111579e2b}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!home\+\_\+path@{home\+\_\+path}}
+\index{home\+\_\+path@{home\+\_\+path}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{home\+\_\+path}{home\_path}}
+{\footnotesize\ttfamily std\+::string home\+\_\+path}
+
+Job Folder 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00006}{6} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a43f0d7a4e9f3ece65db80d07bb79192f}\label{_global_variables_8h_a43f0d7a4e9f3ece65db80d07bb79192f}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!iterations\+\_\+nr@{iterations\+\_\+nr}}
+\index{iterations\+\_\+nr@{iterations\+\_\+nr}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{iterations\+\_\+nr}{iterations\_nr}}
+{\footnotesize\ttfamily double iterations\+\_\+nr}
+
+Maximum iterations for Newton Rhapson Method
+
+Convergence criteria used in the newton rhapson method 
+
+Definition at line \hyperlink{fe__newton_rhapson_8cpp_source_l00006}{6} of file \hyperlink{fe__newton_rhapson_8cpp_source}{fe\+\_\+newton\+Rhapson.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a5e3d7c3d50f127de0e61daaa407dc7d1}\label{_global_variables_8h_a5e3d7c3d50f127de0e61daaa407dc7d1}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!job\+\_\+file@{job\+\_\+file}}
+\index{job\+\_\+file@{job\+\_\+file}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{job\+\_\+file}{job\_file}}
+{\footnotesize\ttfamily std\+::string job\+\_\+file}
+
+Job Input File Name
+
+Job folder name 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00007}{7} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_acfa6799b35f9301b5fc44e6043624797}\label{_global_variables_8h_acfa6799b35f9301b5fc44e6043624797}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!mat@{mat}}
+\index{mat@{mat}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{mat}{mat}}
+{\footnotesize\ttfamily \hyperlink{class_materials}{Materials}$\ast$ mat}
+
+Pointer to the Material Data 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00018}{18} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a39328cf72d69139b3b6c5b8ef6c636fe}\label{_global_variables_8h_a39328cf72d69139b3b6c5b8ef6c636fe}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!material\+\_\+types@{material\+\_\+types}}
+\index{material\+\_\+types@{material\+\_\+types}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{material\+\_\+types}{material\_types}}
+{\footnotesize\ttfamily int material\+\_\+types}
+
+Number of different material types in the simulation 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00017}{17} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}\label{_global_variables_8h_a6e08f89b32254fb4b129720418e7c6ea}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!mesh@{mesh}}
+\index{mesh@{mesh}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{mesh}{mesh}}
+{\footnotesize\ttfamily \hyperlink{class_mesh}{Mesh}$\ast$ mesh}
+
+Pointer to the \hyperlink{class_mesh}{Mesh} Data 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00014}{14} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}\label{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!ndof@{ndof}}
+\index{ndof@{ndof}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{ndof}{ndof}}
+{\footnotesize\ttfamily int ndof}
+
+Dimension of the Simulation (3 for 3D, 2 for 2D and 1 for 1D)
+
+Job input file name 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00010}{10} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a509bc84434af1eff0173e4a71bd758ac}\label{_global_variables_8h_a509bc84434af1eff0173e4a71bd758ac}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!num\+\_\+meshes@{num\+\_\+meshes}}
+\index{num\+\_\+meshes@{num\+\_\+meshes}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{num\+\_\+meshes}{num\_meshes}}
+{\footnotesize\ttfamily int num\+\_\+meshes}
+
+Number of Meshes in the simulation 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00013}{13} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_ace6ace9b2f6d8d404ca9e66564289eb1}\label{_global_variables_8h_ace6ace9b2f6d8d404ca9e66564289eb1}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!output\+\_\+frequency@{output\+\_\+frequency}}
+\index{output\+\_\+frequency@{output\+\_\+frequency}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{output\+\_\+frequency}{output\_frequency}}
+{\footnotesize\ttfamily int output\+\_\+frequency}
+
+Output Frequency -\/ Number of output states desired
+
+End Time 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00023}{23} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a7700f3aeb1ca1c9bbbf712dbfb0aa349}\label{_global_variables_8h_a7700f3aeb1ca1c9bbbf712dbfb0aa349}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!reduction@{reduction}}
+\index{reduction@{reduction}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{reduction}{reduction}}
+{\footnotesize\ttfamily double reduction}
+
+Reduction Factor for the Time Step
+
+Minimum time step 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00026}{26} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a4b637c5fff609e604a3b2b2787f4a9fa}\label{_global_variables_8h_a4b637c5fff609e604a3b2b2787f4a9fa}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!t\+\_\+end@{t\+\_\+end}}
+\index{t\+\_\+end@{t\+\_\+end}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{t\+\_\+end}{t\_end}}
+{\footnotesize\ttfamily double t\+\_\+end}
+
+End Time of the Simulation
+
+Start Time 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00022}{22} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+
+\mbox{\Hypertarget{_global_variables_8h_a1b01a4354147da92a548ea1a5f96d592}\label{_global_variables_8h_a1b01a4354147da92a548ea1a5f96d592}} 
+\index{Global\+Variables.\+h@{Global\+Variables.\+h}!t\+\_\+start@{t\+\_\+start}}
+\index{t\+\_\+start@{t\+\_\+start}!Global\+Variables.\+h@{Global\+Variables.\+h}}
+\subsubsection{\texorpdfstring{t\+\_\+start}{t\_start}}
+{\footnotesize\ttfamily double t\+\_\+start}
+
+Start Time of the Simulation 
+
+Definition at line \hyperlink{fe__main_read_8cpp_source_l00021}{21} of file \hyperlink{fe__main_read_8cpp_source}{fe\+\_\+main\+Read.\+cpp}.
+

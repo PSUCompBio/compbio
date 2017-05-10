@@ -1,0 +1,61 @@
+\hypertarget{fe__mooneyrivlin__hyperelastic_8cpp_source}{}\section{fe\+\_\+mooneyrivlin\+\_\+hyperelastic.\+cpp}
+\label{fe__mooneyrivlin__hyperelastic_8cpp_source}\index{src/eema/src/\+Materials/\+Mooney-\/\+Rivlin-\/\+Hyperelastic/fe\+\_\+mooneyrivlin\+\_\+hyperelastic.\+cpp@{src/eema/src/\+Materials/\+Mooney-\/\+Rivlin-\/\+Hyperelastic/fe\+\_\+mooneyrivlin\+\_\+hyperelastic.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__mooneyrivlin__hyperelastic_8cpp_source_l00005}\hyperlink{fe__mooneyrivlin__hyperelastic_8cpp_a66b469439c736421744f6aef9e05a485}{00005} VectorXd \hyperlink{fe__mooneyrivlin__hyperelastic_8cpp_a66b469439c736421744f6aef9e05a485}{fe\_mooneyrivlin\_hyperelastic}(VectorXd dndx, VectorXd dndy, VectorXd 
+      dndz, VectorXd u, \textcolor{keywordtype}{int} opt, \textcolor{keywordtype}{int} return\_opt)\{
+00006 
+00007     VectorXd sigma\_local = VectorXd::Zero(\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}*2);
+00008 
+00009     \textcolor{keywordtype}{double} one\_third = 1.0/3.0;
+00010         \textcolor{keywordtype}{double} two\_third = 2.0/3.0;
+00011         \textcolor{keywordtype}{double} four\_third = 4.0/3.0;
+00012         \textcolor{keywordtype}{double} one\_half = 1.0/2.0;
+00013 
+00014         MatrixXd F = MatrixXd::Zero(\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof},\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}); \textcolor{comment}{// deformation gradient}
+00015         F = \hyperlink{functions_8h_ae50379f74802347e04dbc022897f9cb0}{fe\_calDefGrad}(dndx,dndy,dndz,u);
+00016 
+00017         MatrixXd I = MatrixXd::Identity(\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof},\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof});
+00018 
+00019         MatrixXd B = MatrixXd::Zero(\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof},\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}); \textcolor{comment}{// Left Cauchy-Green Deformation Tensor}
+00020         B = F*F.transpose();
+00021 
+00022         \textcolor{keywordtype}{double} I1 =  B.trace();\textcolor{comment}{// First Invariant}
+00023         MatrixXd B\_square = B*B; \textcolor{comment}{// Second Invariant}
+00024         \textcolor{keywordtype}{double} tmp1 = B\_square.trace();
+00025         \textcolor{keywordtype}{double} I2 =  (((pow(I1,2) - (tmp1))*(one\_half)));
+00026         \textcolor{comment}{// double I3 = B.determinant(); // Third Invariant}
+00027 
+00028         \textcolor{keywordtype}{double} defJacobian = F.determinant(); \textcolor{comment}{// Jacobian - determinant of deformation gradient}
+00029         \textcolor{keywordtype}{double} defJacobian\_frac = (2/defJacobian);
+00030 
+00031         \textcolor{keywordtype}{double} I1\_bar = I1*(pow(defJacobian,(-1*two\_third)));
+00032         \textcolor{keywordtype}{double} I2\_bar = I2*(pow(defJacobian,(-1*four\_third)));
+00033         MatrixXd B\_bar = B*(pow(defJacobian,(-1*two\_third)));
+00034 
+00035         MatrixXd cauchy\_sigma = MatrixXd::Zero(\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof},\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof});
+00036         \textcolor{keywordtype}{double} c1 = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(opt,3);
+00037         \textcolor{keywordtype}{double} c2 = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(opt,4);
+00038         \textcolor{keywordtype}{double} D = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(opt,1)/2;
+00039 
+00040         \textcolor{keywordtype}{double} p = -2*D*(defJacobian-1);
+00041 
+00042         cauchy\_sigma = ((-p)*I) + ((defJacobian\_frac)*(c1 + (I1\_bar*c2))*B\_bar) - ((defJacobian\_frac)*c2*
+      B\_bar*B\_bar) - ((defJacobian\_frac)*(one\_third)*((c1*I1\_bar)+(2*c2*I2\_bar))*I);
+00043 
+00044         MatrixXd pk\_S = MatrixXd::Zero(\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof},\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof});
+00045         MatrixXd F\_inv = F.inverse();
+00046         pk\_S = defJacobian*F\_inv*cauchy\_sigma*F\_inv.transpose();
+00047 
+00048         sigma\_local = \hyperlink{functions_8h_a73c4523ec7068af2af9e8431021f5fdf}{fe\_tensor2voigt}(pk\_S); 
+00050         \textcolor{keywordflow}{if}(return\_opt==1)\{
+00051             sigma\_local = \hyperlink{functions_8h_a73c4523ec7068af2af9e8431021f5fdf}{fe\_tensor2voigt}(cauchy\_sigma); 
+00052         \}
+00053 
+00054     \textcolor{keywordflow}{return} sigma\_local;
+00055 \}
+\end{DoxyCode}

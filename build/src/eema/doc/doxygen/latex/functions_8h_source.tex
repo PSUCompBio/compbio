@@ -1,0 +1,186 @@
+\hypertarget{functions_8h_source}{}\section{functions.\+h}
+\label{functions_8h_source}\index{src/eema/include/functions.\+h@{src/eema/include/functions.\+h}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#ifndef FUNCTIONS\_H\_}
+00002 \textcolor{preprocessor}{#define FUNCTIONS\_H\_}
+00003 
+00004 \textcolor{preprocessor}{#include<iostream>}
+00005 \textcolor{preprocessor}{#include<cmath>}
+00006 \textcolor{preprocessor}{#include<vector>}
+00007 \textcolor{preprocessor}{#include<fstream>}
+00008 \textcolor{preprocessor}{#include<sstream>}
+00009 \textcolor{preprocessor}{#include<string>}
+00010 \textcolor{preprocessor}{#include<iomanip>}
+00011 
+00012 \textcolor{preprocessor}{#include "Eigen/Dense"}
+00013 \textcolor{preprocessor}{#include "Eigen/Eigenvalues"}
+00014 \textcolor{preprocessor}{#include "unsupported/Eigen/MatrixFunctions"}
+00015 
+00016 \textcolor{preprocessor}{#include "\hyperlink{_mesh_8h}{Mesh.h}"}
+00017 \textcolor{preprocessor}{#include "\hyperlink{_materials_8h}{Materials.h}"}
+00018 \textcolor{preprocessor}{#include "\hyperlink{_b_c_8h}{BC.h}"}
+00019 
+00020 \textcolor{preprocessor}{#include "\hyperlink{_global_variables_8h}{GlobalVariables.h}"}
+00021 
+00022 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00023 
+00024 \textcolor{comment}{/* Input-Output */}
+00025 
+00027 MatrixXd \hyperlink{functions_8h_add4fca63e194477644c3388febf88023}{text2matrix}(std::string name, \textcolor{keywordtype}{int} cols);
+00029 \textcolor{keywordtype}{void} \hyperlink{functions_8h_a346547477d2a1fbeff6b5e0b05314283}{matrix2text}(std::string name,MatrixXd new\_slave\_master,\textcolor{keywordtype}{int} width);
+00031 \textcolor{keywordtype}{void} \hyperlink{functions_8h_a62d4a4906ace3f822fcebf7605c33c2b}{new\_vector2text}(std::string name, VectorXd vector, \textcolor{keywordtype}{int} width);
+00033 \textcolor{keywordtype}{void} \hyperlink{functions_8h_aab8577bce9169902e0f328ddbc334cdc}{append\_double2text}(std::string name, \textcolor{keywordtype}{double} a);
+00035 \textcolor{keywordtype}{void} \hyperlink{functions_8h_a6908d3739a96b475c5f4c1623fad9316}{append\_double2textWithTime}(std::string name, \textcolor{keywordtype}{int} frame, \textcolor{keywordtype}{double} time, \textcolor{keywordtype}{double} 
+      value);
+00037 \textcolor{keywordtype}{void} \hyperlink{functions_8h_ac861444df7684273e6c70504541eb892}{new\_double2text}(std::string name, \textcolor{keywordtype}{double} a);
+00039 \textcolor{keywordtype}{void} \hyperlink{functions_8h_ad1e19649d167234a1357071888353496}{new\_double2textWithTime}(std::string name, \textcolor{keywordtype}{int} frame, \textcolor{keywordtype}{double} time, \textcolor{keywordtype}{double} value)
+      ;
+00041 \textcolor{keywordtype}{void} \hyperlink{functions_8h_a9c39148b76d7691ea87e7f2f88b02295}{fe\_vtuWrite}(std::string output, \textcolor{keywordtype}{int} time\_step, \hyperlink{class_mesh}{Mesh} mesh1);
+00043 \textcolor{keywordtype}{void} \hyperlink{functions_8h_aedbf95dc6f02a506b606328037cd58e1}{fe\_pvdNew}(std::string output, \textcolor{keywordtype}{int} time\_step, \textcolor{keywordtype}{double} time);
+00045 \textcolor{keywordtype}{void} \hyperlink{functions_8h_ab350b9dfb65474874d79a92f712078a0}{fe\_pvdAppend}(std::string output, \textcolor{keywordtype}{int} time\_step, \textcolor{keywordtype}{double} time);
+00047 \textcolor{keywordtype}{void} \hyperlink{functions_8h_a8a64e915e17f876fe72bedd820e87c33}{fe\_mainRead}(std::string file);
+00048 
+00049 \textcolor{comment}{/* =================================================================== */}
+00050 \textcolor{comment}{/* Elements */}
+00051 \textcolor{comment}{/* =================================================================== */}
+00052 
+00054 VectorXd \hyperlink{functions_8h_ab77a3a6d6f6b436d7e8c600bb0869927}{fe\_shapes\_8}(\textcolor{keywordtype}{double} rvalue, \textcolor{keywordtype}{double} svalue, \textcolor{keywordtype}{double} tvalue);
+00056 VectorXd \hyperlink{functions_8h_afc547bef246c057db6cbd04bf7f866a9}{fe\_dndr\_8}(\textcolor{keywordtype}{double} rvalue, \textcolor{keywordtype}{double} svalue, \textcolor{keywordtype}{double} tvalue);
+00058 VectorXd \hyperlink{functions_8h_ac0b5524525e1f2e89bb064c15ab8e664}{fe\_dnds\_8}(\textcolor{keywordtype}{double} rvalue, \textcolor{keywordtype}{double} svalue, \textcolor{keywordtype}{double} tvalue);
+00060 VectorXd \hyperlink{functions_8h_a57e8e5c9f740c98e4767f29c121c2d0a}{fe\_dndt\_8}(\textcolor{keywordtype}{double} rvalue, \textcolor{keywordtype}{double} svalue, \textcolor{keywordtype}{double} tvalue);
+00062 VectorXd \hyperlink{functions_8h_aa6ab8c3298fa10734e299fe8266aed35}{guass\_points}(\textcolor{keywordtype}{int} n);
+00064 VectorXd \hyperlink{functions_8h_a84dcc9575e861bdb2872c10ba6238ee4}{guass\_weights}(\textcolor{keywordtype}{int} n);
+00066 MatrixXd \hyperlink{functions_8h_a502e3469e1cc253deb142f46c0789a78}{guass\_points\_3d}(\textcolor{keywordtype}{int} nx, \textcolor{keywordtype}{int} ny, \textcolor{keywordtype}{int} nz);
+00068 MatrixXd \hyperlink{functions_8h_ad99b08ce65ae353e91486d7685c22024}{guass\_weights\_3d}(\textcolor{keywordtype}{int} \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}, \textcolor{keywordtype}{int} nx, \textcolor{keywordtype}{int} ny, \textcolor{keywordtype}{int} nz);
+00070 MatrixXd \hyperlink{functions_8h_a5ae3771e65b4a0d177097041a4349c28}{fe\_calJacobian}(\textcolor{keywordtype}{int} dim, \textcolor{keywordtype}{int} nnel, VectorXd dndr, VectorXd dnds, VectorXd dndt, 
+      VectorXd xcoord, VectorXd ycoord, VectorXd zcoord);
+00072 VectorXd \hyperlink{functions_8h_afc6be1a5667e68156cb099e8da71170f}{fe\_dndx\_8}(\textcolor{keywordtype}{int} nnel, VectorXd dndr, VectorXd dnds, VectorXd dndt, MatrixXd invJacobian);
+00074 VectorXd \hyperlink{functions_8h_a0572d7818e085c67f7fbb84eef8ecfb4}{fe\_dndy\_8}(\textcolor{keywordtype}{int} nnel, VectorXd dndr, VectorXd dnds, VectorXd dndt, MatrixXd invJacobian);
+00076 VectorXd \hyperlink{functions_8h_aaf75db8433433807839c6ea17f2cf72c}{fe\_dndz\_8}(\textcolor{keywordtype}{int} nnel, VectorXd dndr, VectorXd dnds, VectorXd dndt, MatrixXd invJacobian);
+00078 MatrixXd \hyperlink{functions_8h_a4b49d2df4f86e7d0755971ab4bfa48b2}{fe\_strDispMatrix}(\textcolor{keywordtype}{int} edof, \textcolor{keywordtype}{int} nnel, VectorXd dndx, VectorXd dndy, VectorXd dndz);
+00080 MatrixXd \hyperlink{functions_8h_a98fae74dde5fe33a7062e7457a2d3227}{fe\_shapeMatrix}(\textcolor{keywordtype}{int} edof, \textcolor{keywordtype}{int} nnel, VectorXd shapes);
+00082 MatrixXd \hyperlink{functions_8h_a0405e1196584e6fa36f29a2614a49f00}{fe\_mass\_hex}(MatrixXd nodes, VectorXi elements\_row);
+00084 MatrixXd \hyperlink{functions_8h_a350d27ea0f1de929495d659b26f428d2}{fe\_mass\_truss}(\textcolor{keywordtype}{double} rho,\textcolor{keywordtype}{double} A\_truss,\textcolor{keywordtype}{int} edof,MatrixXd nodes,MatrixXd elements);
+00086 MatrixXd \hyperlink{functions_8h_ab747d046148af042245ed13ca720c5ec}{fe\_transformMass}(MatrixXd m, \textcolor{keywordtype}{int} opt);
+00088 MatrixXd \hyperlink{functions_8h_aa41c40dffea4251a07a8a3f5062f47ae}{fe\_calTransformation}(MatrixXd truss\_nodes, \textcolor{keywordtype}{int} choice);
+00089 MatrixXd \hyperlink{functions_8h_ae2eeba997bf4f0bc4749b92130de7ba3}{fe\_calSimpTransformation}(MatrixXd truss\_nodes);
+00091 \textcolor{keywordtype}{double} \hyperlink{functions_8h_a6b04cfa4d2533eed9667ae14f361baa6}{fe\_minElementLength}(VectorXd xcoord, VectorXd ycoord, VectorXd zcoord);
+00093 \textcolor{keywordtype}{double} \hyperlink{functions_8h_aa11bdbf370d88d267313624c85c28e70}{fe\_maxElementLength}(VectorXd xcoord, VectorXd ycoord, VectorXd zcoord);
+00095 MatrixXd \hyperlink{functions_8h_a8c9fd519c93c847cdf52de947964eb67}{fe\_strDispMatrix\_totalLagrangian}(\textcolor{keywordtype}{int} edof, \textcolor{keywordtype}{int} nnel, VectorXd dndx
+      , VectorXd dndy, VectorXd dndz, VectorXd u);
+00097 MatrixXd \hyperlink{functions_8h_ae50379f74802347e04dbc022897f9cb0}{fe\_calDefGrad}(VectorXd dndx, VectorXd dndy, VectorXd dndz, VectorXd u);
+00099 VectorXd \hyperlink{functions_8h_a73c4523ec7068af2af9e8431021f5fdf}{fe\_tensor2voigt}(MatrixXd A);
+00101 MatrixXd \hyperlink{functions_8h_a721a169d6a3d34b5584817ccd1c48cd7}{fe\_voigt2tensor}(VectorXd B);
+00102 
+00103 
+00104 \textcolor{comment}{/* =================================================================== */}
+00105 \textcolor{comment}{/* Materials */}
+00106 \textcolor{comment}{/* =================================================================== */}
+00107 
+00109 MatrixXd \hyperlink{functions_8h_abbc5cafd6bb8048b69b3bd6f26ceb5f8}{fe\_calculate\_matlmat}(\textcolor{keywordtype}{int} n, \textcolor{keywordtype}{double} E, \textcolor{keywordtype}{double} nu);
+00111 VectorXd \hyperlink{functions_8h_a7d0fd8cfef8b891901eb6f0f780fd9f2}{fe\_stressUpdate}(VectorXd dndx, VectorXd dndy, VectorXd dndz, MatrixXd disp\_mat, 
+      VectorXd u, \textcolor{keywordtype}{int} opt, \textcolor{keywordtype}{int} return\_opt);
+00113 VectorXd \hyperlink{functions_8h_a94c1b672863e28bc2c70d08726939929}{fe\_stressUpdate\_1d}(VectorXd dndx, VectorXd dndy, VectorXd dndz, VectorXd u\_e, \textcolor{keywordtype}{
+      int} opt, MatrixXd nodes);
+00115 \textcolor{keywordtype}{double} \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(\textcolor{keywordtype}{int} matl\_code, \textcolor{keywordtype}{int} obj\_interest);
+00117 std::string \hyperlink{functions_8h_a34d6fb85943d945b7e8600d2ef4220d0}{fe\_get\_model}(\textcolor{keywordtype}{int} matl\_code);
+00119 VectorXd \hyperlink{functions_8h_a66b469439c736421744f6aef9e05a485}{fe\_mooneyrivlin\_hyperelastic}(VectorXd dndx, VectorXd dndy, VectorXd 
+      dndz, VectorXd u, \textcolor{keywordtype}{int} opt, \textcolor{keywordtype}{int} return\_opt);
+00121 VectorXd \hyperlink{functions_8h_ab27ecb703db33cb21a8a6d2fbfbf125f}{fe\_ogden\_hyperelastic}(VectorXd dndx, VectorXd dndy, VectorXd dndz, VectorXd u
+      , \textcolor{keywordtype}{int} opt, \textcolor{keywordtype}{int} return\_opt);
+00123 VectorXd \hyperlink{functions_8h_ab0911abb05a0ca06eb4f330890ee0641}{fe\_simple\_elastic}(VectorXd dndx, VectorXd dndy, VectorXd dndz, MatrixXd disp\_mat,
+       VectorXd u, \textcolor{keywordtype}{int} opt, \textcolor{keywordtype}{int} return\_opt);
+00125 VectorXd \hyperlink{functions_8h_af2a970e883d0c4a7ad750547c07c5f24}{fe\_saintvenant\_elastic}(VectorXd dndx, VectorXd dndy, VectorXd dndz, VectorXd
+       u, \textcolor{keywordtype}{int} opt, \textcolor{keywordtype}{int} return\_opt);
+00126 
+00127 
+00128 \textcolor{comment}{/* =================================================================== */}
+00129 \textcolor{comment}{/* Math */}
+00130 \textcolor{comment}{/* =================================================================== */}
+00132 \textcolor{keywordtype}{double} \hyperlink{functions_8h_ac1306a43db522f3da30471d2a6c48686}{fe\_calArea\_4}(\textcolor{keywordtype}{double} a1, \textcolor{keywordtype}{double} a2, \textcolor{keywordtype}{double} a3, \textcolor{keywordtype}{double} a4, \textcolor{keywordtype}{double} b1, \textcolor{keywordtype}{double} b2, \textcolor{keywordtype}{double} b3
+      , \textcolor{keywordtype}{double} b4, \textcolor{keywordtype}{double} c1, \textcolor{keywordtype}{double} c2, \textcolor{keywordtype}{double} c3, \textcolor{keywordtype}{double} c4);
+00134 \textcolor{keywordtype}{double} \hyperlink{functions_8h_a00f586c9a4bc56ec486776402fc26605}{fe\_calVolume}(VectorXd xcoord, VectorXd ycoord, VectorXd zcoord);
+00136 \textcolor{keywordtype}{int} \hyperlink{functions_8h_a983304137f9a961469a558437d5d2d59}{fe\_find}(VectorXd A, \textcolor{keywordtype}{double} a);
+00138 \textcolor{keywordtype}{int} \hyperlink{functions_8h_a983304137f9a961469a558437d5d2d59}{fe\_find}(VectorXd A, \textcolor{keywordtype}{int} a);
+00140 VectorXd \hyperlink{functions_8h_acdc9c3b5b3aecd9972c84d0cbb669978}{fe\_newtonRhapson}(VectorXd nat\_coord, VectorXd xcoord, VectorXd ycoord, VectorXd 
+      zcoord);
+00142 \textcolor{keywordtype}{double} \hyperlink{functions_8h_a5ce8a3cf9dcc8b599ac40f7f3a48f196}{fe\_function}(\textcolor{keywordtype}{double} a, std::string b, \textcolor{keywordtype}{double} time);
+00144 \textcolor{keywordtype}{double} \hyperlink{functions_8h_aa587b020c768e2a11948bfd939829b6e}{fe\_function\_derivative}(\textcolor{keywordtype}{double} a, std::string b, \textcolor{keywordtype}{double} time);
+00146 \textcolor{keywordtype}{double} \hyperlink{functions_8h_afb02d53011656285452b16427dcd08dd}{fe\_function\_d\_derivative}(\textcolor{keywordtype}{double} a, std::string b, \textcolor{keywordtype}{double} time);
+00148 MatrixXd \hyperlink{functions_8h_ac2d90cb6719488bc8551e6f9437f4f76}{fe\_concatenate\_vector2matrix}(MatrixXd A, VectorXd B,\textcolor{keywordtype}{int} opt);
+00150 MatrixXd \hyperlink{functions_8h_a94d7770f842e44e01a47ae5624bd7749}{fe\_insert\_vector2matrix}(MatrixXd A, VectorXd B, \textcolor{keywordtype}{int} num, \textcolor{keywordtype}{int} opt);
+00151 
+00152 \textcolor{comment}{/* =================================================================== */}
+00153 \textcolor{comment}{/* FEM */}
+00154 \textcolor{comment}{/* =================================================================== */}
+00156 VectorXd \hyperlink{functions_8h_a6696827a8591495e5ea710b112fad5ef}{fe\_getforce}(MatrixXd nodes, MatrixXi elements, \textcolor{keywordtype}{int} \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}, VectorXd u, VectorXd v, 
+      VectorXd fext, \textcolor{keywordtype}{int} size\_counter, MatrixXd nodes\_truss, MatrixXi elements\_truss);
+00158 VectorXi \hyperlink{functions_8h_ae4dbe24b761cafa3577afab76726b382}{fe\_find\_index}(VectorXi node\_list);
+00160 \textcolor{keywordtype}{void} \hyperlink{functions_8h_ab2f8704631ca6c23a453d1905efbb162}{fe\_mainEXPLICIT}();
+00162 VectorXd \hyperlink{functions_8h_af42938e5b32edb33ef4a35866949eba6}{fe\_apply\_bc\_displacement}(VectorXd U,\textcolor{keywordtype}{double} time);
+00164 VectorXd \hyperlink{functions_8h_a4627586ca0e6b9e3904cdbc7bb561e9e}{fe\_apply\_bc\_velocity}(VectorXd V,\textcolor{keywordtype}{double} time);
+00166 VectorXd \hyperlink{functions_8h_ac0ffd5f19ac286c91d431a4ec72dbab4}{fe\_apply\_bc\_acceleration}(VectorXd A,\textcolor{keywordtype}{double} time);
+00168 VectorXd \hyperlink{functions_8h_aba32cc24bd74a4965c560fa62c5b213e}{fe\_apply\_bc\_load}(VectorXd fe,\textcolor{keywordtype}{double} time);
+00170 MatrixXd \hyperlink{functions_8h_a04f569c566ca4fbea3b3a2a13cdd0af5}{fe\_assemble\_mass}(MatrixXd mm, MatrixXd m, VectorXi node\_list, \textcolor{keywordtype}{int} sdof);
+00172 VectorXd \hyperlink{functions_8h_ab5053cb12ac67971a7836346e2839725}{fe\_gather}(VectorXd global\_vec, VectorXd local\_vec, VectorXi node\_list, \textcolor{keywordtype}{int} sdof);
+00174 VectorXd \hyperlink{functions_8h_a6b8344e12f9005795f93f60ddda26c5c}{fe\_scatter}(VectorXd global\_vec, VectorXd local\_vec, VectorXi node\_list, \textcolor{keywordtype}{int} sdof);
+00176 MatrixXd \hyperlink{functions_8h_a81ce693c4400df82b8753f25cc2dcabc}{fe\_updateNodes}(MatrixXd nodes,VectorXd displacements);
+00177 
+00178 VectorXd \hyperlink{functions_8h_a0600721e5cf84d84408ce9605b004610}{fe\_embed\_preprocessing\_mapping}(\hyperlink{class_mesh}{Mesh} host, 
+      \hyperlink{class_mesh}{Mesh} embed);
+00179 VectorXd \hyperlink{functions_8h_a840ddc7df1916f6b5dfbb141adac32d3}{fe\_embed\_preprocessing}(\hyperlink{class_mesh}{Mesh} host,\hyperlink{class_mesh}{Mesh} embed);
+00180 \textcolor{keywordtype}{void} \hyperlink{functions_8h_a50e8d7839525058d40e3a53f9d5de77c}{fe\_embed\_preprocessing\_length}(\hyperlink{class_mesh}{Mesh} host, 
+      \hyperlink{class_mesh}{Mesh} embed);
+00181 \textcolor{keywordtype}{int} \hyperlink{functions_8h_a453ba6bc1e7d5a63db9d56beb6077a27}{fe\_compute\_host}(VectorXd A, MatrixXd nodes\_host, MatrixXd elements\_host\_tmp);
+00182 MatrixXd \hyperlink{functions_8h_a150d77644eb280d58564e3ff4885e73c}{fe\_create\_bbox}(VectorXd A, MatrixXd nodes\_host, MatrixXd elements\_host, \textcolor{keywordtype}{double} 
+      length);
+00183 
+00184 \textcolor{comment}{/* =================================================================== */}
+00185 \textcolor{comment}{/* TimeStep */}
+00186 \textcolor{comment}{/* =================================================================== */}
+00188 \textcolor{keywordtype}{double} \hyperlink{functions_8h_a20aed1a2d3d8b470592491a96e60be87}{fe\_calWaveSpeed}(\textcolor{keywordtype}{int} material\_id);
+00190 \textcolor{keywordtype}{double} \hyperlink{functions_8h_a537640b537f4b485607b062f2c25d974}{fe\_getTimeStep}(MatrixXd nodes, MatrixXi elements, \textcolor{keywordtype}{int} \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}, VectorXd u, VectorXd v
+      , VectorXd fext);
+00192 \textcolor{keywordtype}{double} \hyperlink{functions_8h_a295b08cc71d5af080f0450614a01a4e6}{fe\_calTimeStep}(VectorXd xcoord, VectorXd ycoord, VectorXd zcoord, \textcolor{keywordtype}{int} material\_id);
+00193 
+00194 
+00195 \textcolor{comment}{/* =================================================================== */}
+00196 \textcolor{comment}{/* To be Removed */}
+00197 \textcolor{comment}{/* =================================================================== */}
+00198 
+00200 \textcolor{keywordtype}{void} \hyperlink{functions_8h_ae02497eb9e23d26212b7a1301fc5b04b}{fe\_vtkWrite\_host}(std::string output,\textcolor{keywordtype}{int} format\_choice,\textcolor{keywordtype}{int} mesh\_choice,\textcolor{keywordtype}{int} time\_step,
+      MatrixXd nodes, MatrixXi elements);
+00202 \textcolor{keywordtype}{void} \hyperlink{functions_8h_a35bde18dc6d9d842ff0bec995327d441}{fe\_vtkWrite\_truss}(std::string output,\textcolor{keywordtype}{int} format\_choice,\textcolor{keywordtype}{int} mesh\_choice,\textcolor{keywordtype}{int} time\_step,
+      MatrixXd nodes, MatrixXi elements);
+00203 
+00205 \textcolor{keywordtype}{void} \hyperlink{functions_8h_ab3e39c6d01b6fd10c9e264731cef75dc}{fe\_display\_vector}(VectorXd A);
+00207 \textcolor{keywordtype}{void} \hyperlink{functions_8h_a5110a192d089c6b26744b9e9d67a7c2d}{fe\_display\_matrix}(MatrixXd A);
+00208 
+00209 MatrixXd \hyperlink{functions_8h_a3c73fda948017ac96aeb19889cfc1cba}{fe\_apply\_bc\_stiffness}(MatrixXd kk, VectorXi bcdof, VectorXd bcval);
+00210 
+00212 MatrixXd \hyperlink{functions_8h_a9378d4fc517465015411134456235a76}{fe\_stiffness\_hex}(\textcolor{keywordtype}{double} E, \textcolor{keywordtype}{double} nu, \textcolor{keywordtype}{int} \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}, \textcolor{keywordtype}{int} nnel, \textcolor{keywordtype}{int} edof, \textcolor{keywordtype}{double} 
+      xcoord[], \textcolor{keywordtype}{double} ycoord[], \textcolor{keywordtype}{double} zcoord[]);
+00213 
+00215 MatrixXd \hyperlink{functions_8h_ab3798340a27f0972299b3820aab0ccba}{fe\_stiffness\_embed\_truss}(MatrixXd nodes\_truss, MatrixXd elements\_truss, \textcolor{keywordtype}{
+      double} E\_truss, \textcolor{keywordtype}{double} A\_truss, \textcolor{keywordtype}{int} \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}, \textcolor{keywordtype}{int} nnel, \textcolor{keywordtype}{int} edof, \textcolor{keywordtype}{double} xcoord[], \textcolor{keywordtype}{double} ycoord[], \textcolor{keywordtype}{double} 
+      zcoord[]);
+00216 
+00217 \textcolor{keywordtype}{void} \hyperlink{functions_8h_a9dec90c41460e15aa1d8dce787683406}{fe\_writeElementStress}(MatrixXd sigma\_all, \textcolor{keywordtype}{double} time);
+00218 
+00219 \textcolor{comment}{/* =================================================================== */}
+00220 \textcolor{comment}{/* New Changes */}
+00221 \textcolor{comment}{/* =================================================================== */}
+00222 VectorXd \hyperlink{functions_8h_abeed10bd80ae1f3c95d79c4aed512d8f}{fe\_calculateMass}(VectorXd mm, std::string type);
+00223 VectorXd \hyperlink{functions_8h_aca6d101baf8887cf61064067985cbd62}{fe\_calculateMassDirectLumped}(VectorXd mm);
+00224 VectorXd \hyperlink{functions_8h_aa34a87447bf9fa851463ce99101a7054}{fe\_massLumped}(MatrixXd nodes, VectorXi elements\_row);
+00225 
+00226 VectorXd \hyperlink{functions_8h_a049ed85fefb5b5e80e42432fdcc640fa}{fe\_calculateAccln}(VectorXd mm, VectorXd F\_net);
+00227 
+00228 \textcolor{keywordtype}{double} \hyperlink{functions_8h_afb8a8298008daf8f2e705a9acb72b984}{fe\_calculateKE}(VectorXd mm, VectorXd V);
+00229 \textcolor{keywordtype}{double} \hyperlink{functions_8h_afb8a8298008daf8f2e705a9acb72b984}{fe\_calculateKE}(MatrixXd mm, VectorXd V);
+00230 
+00231 VectorXd \hyperlink{functions_8h_a708d7eae199de06b3c6627cc90bf569e}{text2vector}(std::string name);
+00232 
+00233 \textcolor{preprocessor}{#endif}
+\end{DoxyCode}

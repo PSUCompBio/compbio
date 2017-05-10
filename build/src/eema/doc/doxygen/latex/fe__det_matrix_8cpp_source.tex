@@ -1,0 +1,51 @@
+\hypertarget{fe__det_matrix_8cpp_source}{}\section{fe\+\_\+det\+Matrix.\+cpp}
+\label{fe__det_matrix_8cpp_source}\index{src/eema/src/\+Math/\+General\+Math/fe\+\_\+det\+Matrix.\+cpp@{src/eema/src/\+Math/\+General\+Math/fe\+\_\+det\+Matrix.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00002 
+00003 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00004 
+00005 \textcolor{keyword}{using namespace }\hyperlink{namespacestd}{std};
+00006 
+\Hypertarget{fe__det_matrix_8cpp_source_l00007}\hyperlink{fe__det_matrix_8cpp_ad4d11f46a1909b55cc804ca942ce6ea4}{00007} \textcolor{keyword}{typedef} vector<double> \hyperlink{fe__det_matrix_8cpp_ad4d11f46a1909b55cc804ca942ce6ea4}{Vec};
+\Hypertarget{fe__det_matrix_8cpp_source_l00008}\hyperlink{fe__det_matrix_8cpp_a1356201aa606214a43dbef76118a8c20}{00008} \textcolor{keyword}{typedef} vector<Vec> \hyperlink{fe__det_matrix_8cpp_a1356201aa606214a43dbef76118a8c20}{Mat};
+00009 
+\Hypertarget{fe__det_matrix_8cpp_source_l00010}\hyperlink{fe__det_matrix_8cpp_a873684cefeb665f3d5e6b495de57fc0d}{00010} \textcolor{keywordtype}{double} \hyperlink{fe__det_matrix_8cpp_a873684cefeb665f3d5e6b495de57fc0d}{d} = 0;
+00011 
+\Hypertarget{fe__det_matrix_8cpp_source_l00012}\hyperlink{fe__det_matrix_8cpp_a715b940baf396c94255779d0573d9957}{00012} \textcolor{keywordtype}{double} \hyperlink{fe__det_matrix_8cpp_a715b940baf396c94255779d0573d9957}{fe\_detMatrix}(\hyperlink{fe__det_matrix_8cpp_a1356201aa606214a43dbef76118a8c20}{Mat} matrix)\{
+00013 
+00014     \textcolor{keywordtype}{int} rows = matrix.size();
+00015 
+00016     \textcolor{keywordflow}{if}(rows==2)\{
+00017         \textcolor{keywordflow}{return} ((matrix[0][0]*matrix[1][1])-(matrix[0][1]*matrix[1][0]));
+00018     \}
+00019     \textcolor{keywordflow}{else}
+00020     \{
+00021         \hyperlink{fe__det_matrix_8cpp_a1356201aa606214a43dbef76118a8c20}{Mat} submat;
+00022         \hyperlink{fe__det_matrix_8cpp_ad4d11f46a1909b55cc804ca942ce6ea4}{Vec} Row(rows-1);
+00023         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<rows;i++)\{
+00024             \textcolor{keywordtype}{int} subi = 0;
+00025             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=1;j<rows;j++)\{
+00026                 \textcolor{keywordtype}{int} subj = 0;
+00027                 \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} k=0;k<rows;k++)\{
+00028                     \textcolor{keywordflow}{if}(k==i)\{\textcolor{keywordflow}{continue};\}
+00029                     Row[subj] = matrix[j][k];
+00030                     subj++;
+00031                 \}
+00032             submat.push\_back(Row);
+00033             subi++;
+00034             \}
+00035         \hyperlink{fe__det_matrix_8cpp_a873684cefeb665f3d5e6b495de57fc0d}{d} = \hyperlink{fe__det_matrix_8cpp_a873684cefeb665f3d5e6b495de57fc0d}{d} + (pow(-1,i)*matrix[0][i]*\hyperlink{fe__det_matrix_8cpp_a715b940baf396c94255779d0573d9957}{fe\_detMatrix}(submat));
+00036         \textcolor{comment}{//cout<<"submat size and d are: "<<submat.size()<<"\(\backslash\)t"<<d<<endl;}
+00037         \hyperlink{fe__det_matrix_8cpp_a1356201aa606214a43dbef76118a8c20}{Mat} empty;
+00038         submat.swap(empty);
+00039         \textcolor{comment}{//cout<<"i is: "<<i<<endl;}
+00040         \textcolor{comment}{//cout<<"submat size is: "<<submat.size()<<endl;}
+00041         \}
+00042     \}
+00043     
+00044     \textcolor{keywordflow}{return} \hyperlink{fe__det_matrix_8cpp_a873684cefeb665f3d5e6b495de57fc0d}{d};
+00045 
+00046 \}
+\end{DoxyCode}

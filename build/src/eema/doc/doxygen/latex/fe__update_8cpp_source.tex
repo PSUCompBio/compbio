@@ -1,0 +1,30 @@
+\hypertarget{fe__update_8cpp_source}{}\section{fe\+\_\+update.\+cpp}
+\label{fe__update_8cpp_source}\index{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+update.\+cpp@{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+update.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+00005 \textcolor{comment}{/*}
+00006 \textcolor{comment}{ * This function update the nodal coordinates based on the displacements.}
+00007 \textcolor{comment}{ */}
+00008 
+\Hypertarget{fe__update_8cpp_source_l00009}\hyperlink{fe__update_8cpp_a81ce693c4400df82b8753f25cc2dcabc}{00009} MatrixXd \hyperlink{fe__update_8cpp_a81ce693c4400df82b8753f25cc2dcabc}{fe\_updateNodes}(MatrixXd nodes,VectorXd displacements)\{
+00010     MatrixXd updated\_nodes = MatrixXd::Zero(nodes.rows(),nodes.cols());
+00011     \textcolor{keywordtype}{int} size\_counter = 0;
+00012 
+00013     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nodes.rows();i++)\{
+00014             updated\_nodes(i,0) = nodes(i,0);
+00015             updated\_nodes(i,1) = nodes(i,1) + displacements(size\_counter);
+00016             updated\_nodes(i,2) = nodes(i,2) + displacements(size\_counter+1);
+00017             updated\_nodes(i,3) = nodes(i,3) + displacements(size\_counter+2);
+00018             size\_counter = size\_counter+3;
+00019     \}
+00020 
+00021     \textcolor{keywordflow}{return} updated\_nodes;
+00022 \}
+00023 
+00024 
+00025 
+\end{DoxyCode}

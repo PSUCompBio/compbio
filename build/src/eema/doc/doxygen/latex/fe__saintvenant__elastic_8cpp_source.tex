@@ -1,0 +1,39 @@
+\hypertarget{fe__saintvenant__elastic_8cpp_source}{}\section{fe\+\_\+saintvenant\+\_\+elastic.\+cpp}
+\label{fe__saintvenant__elastic_8cpp_source}\index{src/eema/src/\+Materials/\+Saint-\/\+Venant/fe\+\_\+saintvenant\+\_\+elastic.\+cpp@{src/eema/src/\+Materials/\+Saint-\/\+Venant/fe\+\_\+saintvenant\+\_\+elastic.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__saintvenant__elastic_8cpp_source_l00005}\hyperlink{fe__saintvenant__elastic_8cpp_af2a970e883d0c4a7ad750547c07c5f24}{00005} VectorXd \hyperlink{fe__saintvenant__elastic_8cpp_af2a970e883d0c4a7ad750547c07c5f24}{fe\_saintvenant\_elastic}(VectorXd dndx, VectorXd dndy, VectorXd dndz, VectorXd
+       u, \textcolor{keywordtype}{int} opt, \textcolor{keywordtype}{int} return\_opt)\{
+00006     
+00007     VectorXd sigma\_local = VectorXd::Zero(6);
+00008 
+00009     \textcolor{keywordtype}{double} E = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(opt,1);
+00010     \textcolor{keywordtype}{double} nu = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(opt,2);
+00011     \textcolor{keywordtype}{double} mu = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(opt,3);
+00012     \textcolor{keywordtype}{double} lambda = ((E*nu)/((1+nu)*(1-(2*nu))));
+00013 
+00014     MatrixXd F = MatrixXd::Zero(3,3); \textcolor{comment}{// deformation gradient}
+00015     F = \hyperlink{functions_8h_ae50379f74802347e04dbc022897f9cb0}{fe\_calDefGrad}(dndx,dndy,dndz,u);
+00016     \textcolor{keywordtype}{double} defJacobian = F.determinant();
+00017     MatrixXd I = MatrixXd::Identity(3,3);
+00018 
+00019     MatrixXd GE = ((F.transpose()*F)-I)*(0.5);
+00020     MatrixXd cauchy\_sigma = MatrixXd::Zero(3,3);
+00021     cauchy\_sigma = ((2*mu*(GE)) + (lambda*(GE.trace())*I));
+00022 
+00023     MatrixXd pk\_S = MatrixXd::Zero(3,3);
+00024     MatrixXd F\_inv = F.inverse();
+00025     pk\_S = defJacobian*F\_inv*cauchy\_sigma*F\_inv.transpose();
+00026 
+00027     sigma\_local = \hyperlink{functions_8h_a73c4523ec7068af2af9e8431021f5fdf}{fe\_tensor2voigt}(pk\_S); 
+00029     \textcolor{keywordflow}{if}(return\_opt==1)\{
+00030         sigma\_local = \hyperlink{functions_8h_a73c4523ec7068af2af9e8431021f5fdf}{fe\_tensor2voigt}(cauchy\_sigma); 
+00031     \}
+00032 
+00033     \textcolor{keywordflow}{return} sigma\_local;
+00034 \}
+\end{DoxyCode}

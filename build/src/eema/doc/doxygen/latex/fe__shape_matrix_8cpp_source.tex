@@ -1,0 +1,32 @@
+\hypertarget{fe__shape_matrix_8cpp_source}{}\section{fe\+\_\+shape\+Matrix.\+cpp}
+\label{fe__shape_matrix_8cpp_source}\index{src/eema/src/\+Elements/\+Shape\+Functions/fe\+\_\+shape\+Matrix.\+cpp@{src/eema/src/\+Elements/\+Shape\+Functions/fe\+\_\+shape\+Matrix.\+cpp}}
+
+\begin{DoxyCode}
+00001 
+00002 
+00003 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00004 
+00005 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00006 
+\Hypertarget{fe__shape_matrix_8cpp_source_l00007}\hyperlink{fe__shape_matrix_8cpp_a98fae74dde5fe33a7062e7457a2d3227}{00007} MatrixXd \hyperlink{fe__shape_matrix_8cpp_a98fae74dde5fe33a7062e7457a2d3227}{fe\_shapeMatrix}(\textcolor{keywordtype}{int} edof, \textcolor{keywordtype}{int} nnel, VectorXd shapes)\{
+00008     
+00009     MatrixXd shape\_mat(3,edof);
+00010     shape\_mat = MatrixXd::Zero(3,edof);
+00011     \textcolor{keywordtype}{int} i1,i2,i3;
+00012 
+00013     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nnel;i++)\{
+00014         
+00015         i1 = 0 + i*3;
+00016         i2 = i1 + 1;
+00017         i3 = i2 + 1;
+00018         
+00019         \textcolor{comment}{// Shape Matrix for Constructing Mass Matrix}
+00020         shape\_mat(0,i1) = shapes(i);
+00021         shape\_mat(1,i2) = shapes(i);
+00022         shape\_mat(2,i3) = shapes(i);
+00023 
+00024     \}
+00025     \textcolor{comment}{//std::cout<<"Exiting Shape Function Matrix Generator\(\backslash\)n";}
+00026     \textcolor{keywordflow}{return} shape\_mat;
+00027 \}
+\end{DoxyCode}

@@ -1,0 +1,71 @@
+\hypertarget{fe__vector2text_8cpp_source}{}\section{fe\+\_\+vector2text.\+cpp}
+\label{fe__vector2text_8cpp_source}\index{src/eema/src/\+Input-\/\+Output/\+Output/fe\+\_\+vector2text.\+cpp@{src/eema/src/\+Input-\/\+Output/\+Output/fe\+\_\+vector2text.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include<iomanip>}
+00002 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__vector2text_8cpp_source_l00005}\hyperlink{fe__vector2text_8cpp_a62d4a4906ace3f822fcebf7605c33c2b}{00005} \textcolor{keywordtype}{void} \hyperlink{fe__vector2text_8cpp_a62d4a4906ace3f822fcebf7605c33c2b}{new\_vector2text}(std::string name, VectorXd vector, \textcolor{keywordtype}{int} width)\{
+00006     \textcolor{keywordflow}{if}(width==0)\{
+00007             width=3;
+00008         \}
+00009     std::ofstream myfile(name.c\_str());
+00010 
+00011     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<vector.size();i++)\{
+00012         myfile << std::setw(width) << vector(i) << \textcolor{stringliteral}{"\(\backslash\)n"};
+00013     \}
+00014     myfile.close();
+00015 \}
+00016 
+\Hypertarget{fe__vector2text_8cpp_source_l00017}\hyperlink{fe__vector2text_8cpp_aab8577bce9169902e0f328ddbc334cdc}{00017} \textcolor{keywordtype}{void} \hyperlink{fe__vector2text_8cpp_aab8577bce9169902e0f328ddbc334cdc}{append\_double2text}(std::string name, \textcolor{keywordtype}{double} a)\{
+00018     std::ofstream myfile(name.c\_str(),std::ios\_base::app);
+00019     \textcolor{keywordflow}{if}(myfile.is\_open())\{
+00020         myfile << std::setw(5)<<std::scientific<<std::setprecision(5) << a << \textcolor{stringliteral}{"\(\backslash\)n"};
+00021     \}
+00022     \textcolor{keywordflow}{else}\{
+00023         std::cout << \textcolor{stringliteral}{"No Such Text File With This Name Exists - "} << name << \textcolor{stringliteral}{"\(\backslash\)n"};
+00024         std::exit(-1);
+00025     \}
+00026 \}
+00027 
+\Hypertarget{fe__vector2text_8cpp_source_l00028}\hyperlink{fe__vector2text_8cpp_a6908d3739a96b475c5f4c1623fad9316}{00028} \textcolor{keywordtype}{void} \hyperlink{fe__vector2text_8cpp_a6908d3739a96b475c5f4c1623fad9316}{append\_double2textWithTime}(std::string name, \textcolor{keywordtype}{int} frame, \textcolor{keywordtype}{double} time, \textcolor{keywordtype}{double} 
+      value)\{
+00029     std::ofstream myfile(name.c\_str(),std::ios\_base::app);
+00030     \textcolor{keywordflow}{if}(myfile.is\_open())\{
+00031         
+00032         myfile << std::setw(5) << frame << \textcolor{stringliteral}{"\(\backslash\)t"};
+00033         myfile << std::setw(5) << std::scientific << std::setprecision(5) << time << \textcolor{stringliteral}{"\(\backslash\)t"};
+00034         myfile << value << std::endl;
+00035     \}
+00036     \textcolor{keywordflow}{else}\{
+00037         std::cout << \textcolor{stringliteral}{"No Such Text File With This Name Exists - "} << name << \textcolor{stringliteral}{"\(\backslash\)n"};
+00038         std::exit(-1);
+00039     \}
+00040 \}
+00041 
+\Hypertarget{fe__vector2text_8cpp_source_l00042}\hyperlink{fe__vector2text_8cpp_ac861444df7684273e6c70504541eb892}{00042} \textcolor{keywordtype}{void} \hyperlink{fe__vector2text_8cpp_ac861444df7684273e6c70504541eb892}{new\_double2text}(std::string name, \textcolor{keywordtype}{double} a)\{
+00043     std::ofstream myfile(name.c\_str());
+00044     \textcolor{keywordflow}{if}(myfile.is\_open())\{
+00045         myfile << std::setw(5)<<std::scientific<<std::setprecision(5) << a << \textcolor{stringliteral}{"\(\backslash\)n"};
+00046     \}
+00047     \textcolor{keywordflow}{else}\{
+00048         std::cout << \textcolor{stringliteral}{"No Such Text File Is Created - "} << name << \textcolor{stringliteral}{"\(\backslash\)n"};
+00049         std::exit(-1);
+00050     \}
+00051 \}
+00052 
+\Hypertarget{fe__vector2text_8cpp_source_l00053}\hyperlink{fe__vector2text_8cpp_ad1e19649d167234a1357071888353496}{00053} \textcolor{keywordtype}{void} \hyperlink{fe__vector2text_8cpp_ad1e19649d167234a1357071888353496}{new\_double2textWithTime}(std::string name, \textcolor{keywordtype}{int} frame, \textcolor{keywordtype}{double} time, \textcolor{keywordtype}{double} value)
+      \{
+00054     std::ofstream myfile(name.c\_str());
+00055     \textcolor{keywordflow}{if}(myfile.is\_open())\{
+00056         myfile << std::setw(5) << frame << \textcolor{stringliteral}{"\(\backslash\)t"};
+00057         myfile << std::setw(5) << std::scientific << std::setprecision(5) << time << \textcolor{stringliteral}{"\(\backslash\)t"};
+00058         myfile << value << std::endl;
+00059     \}
+00060     \textcolor{keywordflow}{else}\{
+00061         std::cout << \textcolor{stringliteral}{"No Such Text File Is Created - "} << name << \textcolor{stringliteral}{"\(\backslash\)n"};
+00062         std::exit(-1);
+00063     \}
+00064 \}
+\end{DoxyCode}

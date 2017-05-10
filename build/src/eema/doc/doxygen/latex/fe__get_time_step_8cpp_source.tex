@@ -1,0 +1,66 @@
+\hypertarget{fe__get_time_step_8cpp_source}{}\section{fe\+\_\+get\+Time\+Step.\+cpp}
+\label{fe__get_time_step_8cpp_source}\index{src/eema/src/\+Time\+Step/fe\+\_\+get\+Time\+Step.\+cpp@{src/eema/src/\+Time\+Step/fe\+\_\+get\+Time\+Step.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__get_time_step_8cpp_source_l00006}\hyperlink{fe__get_time_step_8cpp_a537640b537f4b485607b062f2c25d974}{00006} \textcolor{keywordtype}{double} \hyperlink{fe__get_time_step_8cpp_a537640b537f4b485607b062f2c25d974}{fe\_getTimeStep}(MatrixXd nodes, MatrixXi elements, \textcolor{keywordtype}{int} \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof}, VectorXd u, VectorXd v
+      , VectorXd fext)\{
+00007 
+00008     \textcolor{keywordtype}{double} deltaT\_crit = 0;
+00009 
+00010     \textcolor{keywordtype}{int} nel = elements.rows();
+00011     \textcolor{keywordtype}{int} nnel = (elements.cols()-2);
+00012     \textcolor{keywordtype}{int} nnode = nodes.rows();
+00013     \textcolor{keywordtype}{int} sdof = nnode * \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof};
+00014     \textcolor{keywordtype}{int} edof = nnel * \hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof};
+00015     VectorXd xcoord = VectorXd::Zero(nnel);
+00016     VectorXd ycoord = VectorXd::Zero(nnel);
+00017     VectorXd zcoord = VectorXd::Zero(nnel);
+00018 
+00019     VectorXd deltaT\_element = VectorXd::Zero(nel);
+00020 
+00021     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<nel;i++)\{
+00022 
+00023 
+00024         VectorXi nodes\_local = VectorXi::Zero(nnel);
+00025 
+00026         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<nnel;j++)\{
+00027             \textcolor{keywordtype}{int} g = -1;
+00028             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} f=0;f<nnode;f++)\{
+00029                 \textcolor{keywordflow}{if}(elements(i,j+2)==nodes(f,0))\{
+00030                     g = f;
+00031                     \textcolor{keywordflow}{break};
+00032                 \}
+00033             \}
+00034             nodes\_local(j) = elements(i,j+2);
+00035             xcoord(j) = nodes(g,1);
+00036             ycoord(j) = nodes(g,2);
+00037             zcoord(j) = nodes(g,3);
+00038         \}
+00039 
+00040         VectorXd u\_e(edof);
+00041         u\_e = \hyperlink{functions_8h_ab5053cb12ac67971a7836346e2839725}{fe\_gather}(u,u\_e,nodes\_local,sdof);
+00042 
+00043         MatrixXd nodes\_new(elements.rows(),\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof});
+00044 
+00045         \textcolor{keywordtype}{int} counter;
+00046 
+00047         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<nnel;j++)\{
+00048             counter = j*3;
+00049             xcoord(j) = xcoord(j)+u\_e(counter);
+00050             ycoord(j) = ycoord(j)+u\_e(counter+1);
+00051             zcoord(j) = zcoord(j)+u\_e(counter+2);
+00052         \}
+00053 
+00054         deltaT\_element(i) = \hyperlink{functions_8h_a295b08cc71d5af080f0450614a01a4e6}{fe\_calTimeStep}(xcoord,ycoord,zcoord,elements(i,1)); \textcolor{comment}{// reduction
+       factor for time step added.}
+00055     \}
+00056 
+00057     deltaT\_crit = deltaT\_element.minCoeff();
+00058 
+00059     \textcolor{keywordflow}{return} deltaT\_crit;
+00060 \}
+\end{DoxyCode}

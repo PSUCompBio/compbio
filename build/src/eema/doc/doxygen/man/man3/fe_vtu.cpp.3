@@ -1,0 +1,75 @@
+.TH "src/eema/src/Input-Output/Output/fe_vtu.cpp" 3 "Wed May 10 2017" "Embedded Element Method Algorithms (EMMA)" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+src/eema/src/Input-Output/Output/fe_vtu.cpp
+.SH SYNOPSIS
+.br
+.PP
+\fC#include 'functions\&.h'\fP
+.br
+
+.SS "Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBfe_vtuWrite\fP (std::string output, int time_step, \fBMesh\fP mesh1)"
+.br
+.ti -1c
+.RI "void \fBfe_pvdNew\fP (std::string output, int time_step, double time)"
+.br
+.ti -1c
+.RI "void \fBfe_pvdAppend\fP (std::string output, int time_step, double time)"
+.br
+.in -1c
+.SH "Function Documentation"
+.PP 
+.SS "void fe_pvdAppend (std::string output, int time_step, double time)"
+Function appends PVD file in the VTU folder Output File Name
+.PP
+Append New Line of Data
+.PP
+Write Footer 
+.PP
+Definition at line 173 of file fe_vtu\&.cpp\&.
+.SS "void fe_pvdNew (std::string output, int time_step, double time)"
+Function creates new PVD file in the VTU folder Output File Name
+.PP
+Write Header
+.PP
+Write First Line of Data 
+.PP
+Definition at line 149 of file fe_vtu\&.cpp\&.
+.SS "void fe_vtuWrite (std::string output, int time_step, \fBMesh\fP mesh1)"
+Function writes the results into the VTU folder Points Info
+.PP
+Cells Info
+.PP
+Point Data - Displacements
+.PP
+Points Data - Velocities
+.PP
+Points Data - Accelerations
+.PP
+\fBMesh\fP Data - Stresses
+.PP
+\fBMesh\fP Data - Strains
+.PP
+Output File Name
+.PP
+Points Data
+.PP
+Cell Data
+.PP
+Point Vector Data - Displacements
+.PP
+Point Vector Data - Velocities
+.PP
+Point Vector Data - Accelerations
+.PP
+Cell Data - Stresses and Strains 
+.PP
+Definition at line 5 of file fe_vtu\&.cpp\&.
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Embedded Element Method Algorithms (EMMA) from the source code\&.

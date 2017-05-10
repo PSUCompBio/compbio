@@ -1,0 +1,46 @@
+\hypertarget{fe__getforce_8cpp}{}\section{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+getforce.cpp File Reference}
+\label{fe__getforce_8cpp}\index{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+getforce.\+cpp@{src/eema/src/\+F\+E\+M/\+Solid\+Mechanics/fe\+\_\+getforce.\+cpp}}
+{\ttfamily \#include \char`\"{}functions.\+h\char`\"{}}\newline
+Include dependency graph for fe\+\_\+getforce.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fe__getforce_8cpp__incl}
+\end{center}
+\end{figure}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Vector\+Xd \hyperlink{fe__getforce_8cpp_a6696827a8591495e5ea710b112fad5ef}{fe\+\_\+getforce} (Matrix\+Xd nodes, Matrix\+Xi elements, int \hyperlink{fe__main_read_8cpp_aa789fe4d8a13fd0990b630909430d5d0}{ndof}, Vector\+Xd u, Vector\+Xd v, Vector\+Xd fext, int size\+\_\+counter, Matrix\+Xd nodes\+\_\+truss, Matrix\+Xi elements\+\_\+truss)
+\begin{DoxyCompactList}\small\item\em Calculates the resultant nodal force after each time step. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{fe__getforce_8cpp_a6696827a8591495e5ea710b112fad5ef}\label{fe__getforce_8cpp_a6696827a8591495e5ea710b112fad5ef}} 
+\index{fe\+\_\+getforce.\+cpp@{fe\+\_\+getforce.\+cpp}!fe\+\_\+getforce@{fe\+\_\+getforce}}
+\index{fe\+\_\+getforce@{fe\+\_\+getforce}!fe\+\_\+getforce.\+cpp@{fe\+\_\+getforce.\+cpp}}
+\subsubsection{\texorpdfstring{fe\+\_\+getforce()}{fe\_getforce()}}
+{\footnotesize\ttfamily Vector\+Xd fe\+\_\+getforce (\begin{DoxyParamCaption}\item[{Matrix\+Xd}]{nodes,  }\item[{Matrix\+Xi}]{elements,  }\item[{int}]{ndof,  }\item[{Vector\+Xd}]{u,  }\item[{Vector\+Xd}]{v,  }\item[{Vector\+Xd}]{fext,  }\item[{int}]{size\+\_\+counter,  }\item[{Matrix\+Xd}]{nodes\+\_\+truss,  }\item[{Matrix\+Xi}]{elements\+\_\+truss }\end{DoxyParamCaption})}
+
+
+
+Calculates the resultant nodal force after each time step. 
+
+This function represents the \textquotesingle{}getforce\textquotesingle{} step in Belytschko (Box 6.\+1 -\/ Explicit F\+EM Algorithm). For each hex element, this function calculates the internal nodal force vector and the resultant nodal force vector. Once, this is calculated for each element, the resultant vectors are scattered into global vectors. 
+
+Definition at line \hyperlink{fe__getforce_8cpp_source_l00013}{13} of file \hyperlink{fe__getforce_8cpp_source}{fe\+\_\+getforce.\+cpp}.
+
+Here is the call graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fe__getforce_8cpp_a6696827a8591495e5ea710b112fad5ef_cgraph}
+\end{center}
+\end{figure}
+Here is the caller graph for this function\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{fe__getforce_8cpp_a6696827a8591495e5ea710b112fad5ef_icgraph}
+\end{center}
+\end{figure}

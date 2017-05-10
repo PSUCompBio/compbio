@@ -1,0 +1,38 @@
+\hypertarget{fe__guass__points__3d_8cpp_source}{}\section{fe\+\_\+guass\+\_\+points\+\_\+3d.\+cpp}
+\label{fe__guass__points__3d_8cpp_source}\index{src/eema/src/\+Elements/\+Quadrature/fe\+\_\+guass\+\_\+points\+\_\+3d.\+cpp@{src/eema/src/\+Elements/\+Quadrature/fe\+\_\+guass\+\_\+points\+\_\+3d.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00002 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00003 
+\Hypertarget{fe__guass__points__3d_8cpp_source_l00004}\hyperlink{fe__guass__points__3d_8cpp_a502e3469e1cc253deb142f46c0789a78}{00004} MatrixXd \hyperlink{fe__guass__points__3d_8cpp_a502e3469e1cc253deb142f46c0789a78}{guass\_points\_3d}(\textcolor{keywordtype}{int} nx,\textcolor{keywordtype}{int} ny,\textcolor{keywordtype}{int} nz)\{
+00005     \textcolor{keywordtype}{int} n; \textcolor{comment}{// n is the highest value of nx,ny and nz.}
+00006     \textcolor{keywordflow}{if}(nx>=ny)\{
+00007         \textcolor{keywordflow}{if}(nx>=nz)\{
+00008             n = nx;
+00009         \}
+00010         \textcolor{keywordflow}{else}\{
+00011             n = nz;
+00012         \}
+00013     \}
+00014     \textcolor{keywordflow}{else}\{
+00015         \textcolor{keywordflow}{if}(ny>=nz)\{
+00016             n = ny;
+00017         \}
+00018         \textcolor{keywordflow}{else}\{
+00019         n = nz;
+00020         \}
+00021     \}
+00022     MatrixXd points\_3d(3,2);
+00023     \textcolor{keywordtype}{double} tmp;
+00024     \textcolor{keywordflow}{if}(n==2)\{
+00025         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<3;i++)\{
+00026             tmp = -1/sqrt(3);
+00027             points\_3d(i,0) = tmp;
+00028             tmp = -tmp;
+00029             points\_3d(i,1) = tmp;
+00030         \}
+00031     \}
+00032     \textcolor{keywordflow}{return} points\_3d;
+00033 \}
+\end{DoxyCode}

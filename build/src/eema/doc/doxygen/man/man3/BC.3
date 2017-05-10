@@ -1,0 +1,113 @@
+.TH "BC" 3 "Wed May 10 2017" "Embedded Element Method Algorithms (EMMA)" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+BC
+.SH SYNOPSIS
+.br
+.PP
+.PP
+\fC#include <src/eema/include/BC\&.h>\fP
+.SS "Public Member Functions"
+
+.in +1c
+.ti -1c
+.RI "void \fBreadBC\fP (std::string type_user, double input_amp_user, int num_dof_user, VectorXi dof_user, std::string time_curve_user)"
+.br
+.ti -1c
+.RI "std::string \fBgetType\fP ()"
+.br
+.ti -1c
+.RI "double \fBgetAmplitude\fP ()"
+.br
+.ti -1c
+.RI "int \fBgetNumDOF\fP ()"
+.br
+.ti -1c
+.RI "VectorXi \fBgetDOF\fP ()"
+.br
+.ti -1c
+.RI "std::string \fBgetTimeBehavior\fP ()"
+.br
+.ti -1c
+.RI "void \fBprintBCInfo\fP ()"
+.br
+.in -1c
+.SS "Private Attributes"
+
+.in +1c
+.ti -1c
+.RI "std::string \fBtype\fP"
+.br
+.ti -1c
+.RI "double \fBamplitude\fP"
+.br
+.ti -1c
+.RI "int \fBnum_dof\fP"
+.br
+.ti -1c
+.RI "VectorXi \fBdof\fP"
+.br
+.ti -1c
+.RI "std::string \fBtime_curve\fP"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+Definition at line 16 of file BC\&.h\&.
+.SH "Member Function Documentation"
+.PP 
+.SS "double BC::getAmplitude ()"
+
+.PP
+Definition at line 18 of file BC\&.cpp\&.
+.SS "VectorXi BC::getDOF ()"
+
+.PP
+Definition at line 26 of file BC\&.cpp\&.
+.SS "int BC::getNumDOF ()"
+
+.PP
+Definition at line 22 of file BC\&.cpp\&.
+.SS "std::string BC::getTimeBehavior ()"
+
+.PP
+Definition at line 30 of file BC\&.cpp\&.
+.SS "std::string BC::getType ()"
+
+.PP
+Definition at line 14 of file BC\&.cpp\&.
+.SS "void BC::printBCInfo ()"
+
+.PP
+Definition at line 34 of file BC\&.cpp\&.
+.SS "void BC::readBC (std::string type_user, double input_amp_user, int num_dof_user, VectorXi dof_user, std::string time_curve_user)"
+
+.PP
+Definition at line 6 of file BC\&.cpp\&.
+.SH "Member Data Documentation"
+.PP 
+.SS "double BC::amplitude\fC [private]\fP"
+
+.PP
+Definition at line 19 of file BC\&.h\&.
+.SS "VectorXi BC::dof\fC [private]\fP"
+
+.PP
+Definition at line 21 of file BC\&.h\&.
+.SS "int BC::num_dof\fC [private]\fP"
+
+.PP
+Definition at line 20 of file BC\&.h\&.
+.SS "std::string BC::time_curve\fC [private]\fP"
+
+.PP
+Definition at line 22 of file BC\&.h\&.
+.SS "std::string BC::type\fC [private]\fP"
+
+.PP
+Definition at line 18 of file BC\&.h\&.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for Embedded Element Method Algorithms (EMMA) from the source code\&.

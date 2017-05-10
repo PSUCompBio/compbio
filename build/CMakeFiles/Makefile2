@@ -60,6 +60,725 @@ CMAKE_SOURCE_DIR = /Users/rhk12/code/compbio
 CMAKE_BINARY_DIR = /Users/rhk12/code/compbio/build
 
 #=============================================================================
+# Directory level rules for directory src
+
+# Convenience name for "all" pass in the directory.
+src/all: src/eema/all
+
+.PHONY : src/all
+
+# Convenience name for "clean" pass in the directory.
+src/clean: src/eema/clean
+
+.PHONY : src/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/preinstall: src/eema/preinstall
+
+.PHONY : src/preinstall
+
+#=============================================================================
+# Directory level rules for directory src/eema
+
+# Convenience name for "all" pass in the directory.
+src/eema/all: src/eema/src/all
+src/eema/all: src/eema/examples/all
+src/eema/all: src/eema/doc/all
+src/eema/all: src/eema/gui/all
+
+.PHONY : src/eema/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/clean: src/eema/src/clean
+src/eema/clean: src/eema/examples/clean
+src/eema/clean: src/eema/doc/clean
+src/eema/clean: src/eema/gui/clean
+
+.PHONY : src/eema/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/preinstall: src/eema/src/preinstall
+src/eema/preinstall: src/eema/examples/preinstall
+src/eema/preinstall: src/eema/doc/preinstall
+src/eema/preinstall: src/eema/gui/preinstall
+
+.PHONY : src/eema/preinstall
+
+#=============================================================================
+# Directory level rules for directory src/eema/src
+
+# Convenience name for "all" pass in the directory.
+src/eema/src/all: src/eema/src/CMakeFiles/eema.dir/all
+src/eema/src/all: src/eema/src/TimeStep/all
+src/eema/src/all: src/eema/src/Math/all
+src/eema/src/all: src/eema/src/Materials/all
+src/eema/src/all: src/eema/src/Input-Output/all
+src/eema/src/all: src/eema/src/Elements/all
+src/eema/src/all: src/eema/src/FEM/all
+
+.PHONY : src/eema/src/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/src/clean: src/eema/src/CMakeFiles/eema.dir/clean
+src/eema/src/clean: src/eema/src/TimeStep/clean
+src/eema/src/clean: src/eema/src/Math/clean
+src/eema/src/clean: src/eema/src/Materials/clean
+src/eema/src/clean: src/eema/src/Input-Output/clean
+src/eema/src/clean: src/eema/src/Elements/clean
+src/eema/src/clean: src/eema/src/FEM/clean
+
+.PHONY : src/eema/src/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/src/preinstall: src/eema/src/TimeStep/preinstall
+src/eema/src/preinstall: src/eema/src/Math/preinstall
+src/eema/src/preinstall: src/eema/src/Materials/preinstall
+src/eema/src/preinstall: src/eema/src/Input-Output/preinstall
+src/eema/src/preinstall: src/eema/src/Elements/preinstall
+src/eema/src/preinstall: src/eema/src/FEM/preinstall
+
+.PHONY : src/eema/src/preinstall
+
+#=============================================================================
+# Target rules for target src/eema/src/CMakeFiles/eema.dir
+
+# All Build rule for target.
+src/eema/src/CMakeFiles/eema.dir/all: src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/all
+src/eema/src/CMakeFiles/eema.dir/all: src/eema/src/Math/CMakeFiles/Math.dir/all
+src/eema/src/CMakeFiles/eema.dir/all: src/eema/src/Materials/CMakeFiles/Materials.dir/all
+src/eema/src/CMakeFiles/eema.dir/all: src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/all
+src/eema/src/CMakeFiles/eema.dir/all: src/eema/src/Elements/CMakeFiles/Elements.dir/all
+src/eema/src/CMakeFiles/eema.dir/all: src/eema/src/FEM/CMakeFiles/FEM.dir/all
+	$(MAKE) -f src/eema/src/CMakeFiles/eema.dir/build.make src/eema/src/CMakeFiles/eema.dir/depend
+	$(MAKE) -f src/eema/src/CMakeFiles/eema.dir/build.make src/eema/src/CMakeFiles/eema.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=63 "Built target eema"
+.PHONY : src/eema/src/CMakeFiles/eema.dir/all
+
+# Include target in all.
+all: src/eema/src/CMakeFiles/eema.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/eema/src/CMakeFiles/eema.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 63
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/src/CMakeFiles/eema.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/src/CMakeFiles/eema.dir/rule
+
+# Convenience name for target.
+eema: src/eema/src/CMakeFiles/eema.dir/rule
+
+.PHONY : eema
+
+# clean rule for target.
+src/eema/src/CMakeFiles/eema.dir/clean:
+	$(MAKE) -f src/eema/src/CMakeFiles/eema.dir/build.make src/eema/src/CMakeFiles/eema.dir/clean
+.PHONY : src/eema/src/CMakeFiles/eema.dir/clean
+
+# clean rule for target.
+clean: src/eema/src/CMakeFiles/eema.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory src/eema/src/TimeStep
+
+# Convenience name for "all" pass in the directory.
+src/eema/src/TimeStep/all: src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/all
+
+.PHONY : src/eema/src/TimeStep/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/src/TimeStep/clean: src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/clean
+
+.PHONY : src/eema/src/TimeStep/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/src/TimeStep/preinstall:
+
+.PHONY : src/eema/src/TimeStep/preinstall
+
+#=============================================================================
+# Target rules for target src/eema/src/TimeStep/CMakeFiles/TimeStep.dir
+
+# All Build rule for target.
+src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/all:
+	$(MAKE) -f src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/build.make src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/depend
+	$(MAKE) -f src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/build.make src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=60,61,62 "Built target TimeStep"
+.PHONY : src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/all
+
+# Include target in all.
+all: src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 3
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/rule
+
+# Convenience name for target.
+TimeStep: src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/rule
+
+.PHONY : TimeStep
+
+# clean rule for target.
+src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/clean:
+	$(MAKE) -f src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/build.make src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/clean
+.PHONY : src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/clean
+
+# clean rule for target.
+clean: src/eema/src/TimeStep/CMakeFiles/TimeStep.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory src/eema/src/Math
+
+# Convenience name for "all" pass in the directory.
+src/eema/src/Math/all: src/eema/src/Math/CMakeFiles/Math.dir/all
+
+.PHONY : src/eema/src/Math/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/src/Math/clean: src/eema/src/Math/CMakeFiles/Math.dir/clean
+
+.PHONY : src/eema/src/Math/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/src/Math/preinstall:
+
+.PHONY : src/eema/src/Math/preinstall
+
+#=============================================================================
+# Target rules for target src/eema/src/Math/CMakeFiles/Math.dir
+
+# All Build rule for target.
+src/eema/src/Math/CMakeFiles/Math.dir/all:
+	$(MAKE) -f src/eema/src/Math/CMakeFiles/Math.dir/build.make src/eema/src/Math/CMakeFiles/Math.dir/depend
+	$(MAKE) -f src/eema/src/Math/CMakeFiles/Math.dir/build.make src/eema/src/Math/CMakeFiles/Math.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=52,53,54,55,56,57,58,59 "Built target Math"
+.PHONY : src/eema/src/Math/CMakeFiles/Math.dir/all
+
+# Include target in all.
+all: src/eema/src/Math/CMakeFiles/Math.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/eema/src/Math/CMakeFiles/Math.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 8
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/src/Math/CMakeFiles/Math.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/src/Math/CMakeFiles/Math.dir/rule
+
+# Convenience name for target.
+Math: src/eema/src/Math/CMakeFiles/Math.dir/rule
+
+.PHONY : Math
+
+# clean rule for target.
+src/eema/src/Math/CMakeFiles/Math.dir/clean:
+	$(MAKE) -f src/eema/src/Math/CMakeFiles/Math.dir/build.make src/eema/src/Math/CMakeFiles/Math.dir/clean
+.PHONY : src/eema/src/Math/CMakeFiles/Math.dir/clean
+
+# clean rule for target.
+clean: src/eema/src/Math/CMakeFiles/Math.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory src/eema/src/Materials
+
+# Convenience name for "all" pass in the directory.
+src/eema/src/Materials/all: src/eema/src/Materials/CMakeFiles/Materials.dir/all
+
+.PHONY : src/eema/src/Materials/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/src/Materials/clean: src/eema/src/Materials/CMakeFiles/Materials.dir/clean
+
+.PHONY : src/eema/src/Materials/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/src/Materials/preinstall:
+
+.PHONY : src/eema/src/Materials/preinstall
+
+#=============================================================================
+# Target rules for target src/eema/src/Materials/CMakeFiles/Materials.dir
+
+# All Build rule for target.
+src/eema/src/Materials/CMakeFiles/Materials.dir/all:
+	$(MAKE) -f src/eema/src/Materials/CMakeFiles/Materials.dir/build.make src/eema/src/Materials/CMakeFiles/Materials.dir/depend
+	$(MAKE) -f src/eema/src/Materials/CMakeFiles/Materials.dir/build.make src/eema/src/Materials/CMakeFiles/Materials.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=44,45,46,47,48,49,50,51 "Built target Materials"
+.PHONY : src/eema/src/Materials/CMakeFiles/Materials.dir/all
+
+# Include target in all.
+all: src/eema/src/Materials/CMakeFiles/Materials.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/eema/src/Materials/CMakeFiles/Materials.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 8
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/src/Materials/CMakeFiles/Materials.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/src/Materials/CMakeFiles/Materials.dir/rule
+
+# Convenience name for target.
+Materials: src/eema/src/Materials/CMakeFiles/Materials.dir/rule
+
+.PHONY : Materials
+
+# clean rule for target.
+src/eema/src/Materials/CMakeFiles/Materials.dir/clean:
+	$(MAKE) -f src/eema/src/Materials/CMakeFiles/Materials.dir/build.make src/eema/src/Materials/CMakeFiles/Materials.dir/clean
+.PHONY : src/eema/src/Materials/CMakeFiles/Materials.dir/clean
+
+# clean rule for target.
+clean: src/eema/src/Materials/CMakeFiles/Materials.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory src/eema/src/Input-Output
+
+# Convenience name for "all" pass in the directory.
+src/eema/src/Input-Output/all: src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/all
+
+.PHONY : src/eema/src/Input-Output/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/src/Input-Output/clean: src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/clean
+
+.PHONY : src/eema/src/Input-Output/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/src/Input-Output/preinstall:
+
+.PHONY : src/eema/src/Input-Output/preinstall
+
+#=============================================================================
+# Target rules for target src/eema/src/Input-Output/CMakeFiles/Input-Output.dir
+
+# All Build rule for target.
+src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/all:
+	$(MAKE) -f src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/build.make src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/depend
+	$(MAKE) -f src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/build.make src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=33,34,35,36,37,38,39,40,41,42,43 "Built target Input-Output"
+.PHONY : src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/all
+
+# Include target in all.
+all: src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 11
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/rule
+
+# Convenience name for target.
+Input-Output: src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/rule
+
+.PHONY : Input-Output
+
+# clean rule for target.
+src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/clean:
+	$(MAKE) -f src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/build.make src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/clean
+.PHONY : src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/clean
+
+# clean rule for target.
+clean: src/eema/src/Input-Output/CMakeFiles/Input-Output.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory src/eema/src/Elements
+
+# Convenience name for "all" pass in the directory.
+src/eema/src/Elements/all: src/eema/src/Elements/CMakeFiles/Elements.dir/all
+
+.PHONY : src/eema/src/Elements/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/src/Elements/clean: src/eema/src/Elements/CMakeFiles/Elements.dir/clean
+
+.PHONY : src/eema/src/Elements/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/src/Elements/preinstall:
+
+.PHONY : src/eema/src/Elements/preinstall
+
+#=============================================================================
+# Target rules for target src/eema/src/Elements/CMakeFiles/Elements.dir
+
+# All Build rule for target.
+src/eema/src/Elements/CMakeFiles/Elements.dir/all:
+	$(MAKE) -f src/eema/src/Elements/CMakeFiles/Elements.dir/build.make src/eema/src/Elements/CMakeFiles/Elements.dir/depend
+	$(MAKE) -f src/eema/src/Elements/CMakeFiles/Elements.dir/build.make src/eema/src/Elements/CMakeFiles/Elements.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20 "Built target Elements"
+.PHONY : src/eema/src/Elements/CMakeFiles/Elements.dir/all
+
+# Include target in all.
+all: src/eema/src/Elements/CMakeFiles/Elements.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/eema/src/Elements/CMakeFiles/Elements.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 20
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/src/Elements/CMakeFiles/Elements.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/src/Elements/CMakeFiles/Elements.dir/rule
+
+# Convenience name for target.
+Elements: src/eema/src/Elements/CMakeFiles/Elements.dir/rule
+
+.PHONY : Elements
+
+# clean rule for target.
+src/eema/src/Elements/CMakeFiles/Elements.dir/clean:
+	$(MAKE) -f src/eema/src/Elements/CMakeFiles/Elements.dir/build.make src/eema/src/Elements/CMakeFiles/Elements.dir/clean
+.PHONY : src/eema/src/Elements/CMakeFiles/Elements.dir/clean
+
+# clean rule for target.
+clean: src/eema/src/Elements/CMakeFiles/Elements.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory src/eema/src/FEM
+
+# Convenience name for "all" pass in the directory.
+src/eema/src/FEM/all: src/eema/src/FEM/CMakeFiles/FEM.dir/all
+
+.PHONY : src/eema/src/FEM/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/src/FEM/clean: src/eema/src/FEM/CMakeFiles/FEM.dir/clean
+
+.PHONY : src/eema/src/FEM/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/src/FEM/preinstall:
+
+.PHONY : src/eema/src/FEM/preinstall
+
+#=============================================================================
+# Target rules for target src/eema/src/FEM/CMakeFiles/FEM.dir
+
+# All Build rule for target.
+src/eema/src/FEM/CMakeFiles/FEM.dir/all:
+	$(MAKE) -f src/eema/src/FEM/CMakeFiles/FEM.dir/build.make src/eema/src/FEM/CMakeFiles/FEM.dir/depend
+	$(MAKE) -f src/eema/src/FEM/CMakeFiles/FEM.dir/build.make src/eema/src/FEM/CMakeFiles/FEM.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=21,22,23,24,25,26,27,28,29,30,31,32 "Built target FEM"
+.PHONY : src/eema/src/FEM/CMakeFiles/FEM.dir/all
+
+# Include target in all.
+all: src/eema/src/FEM/CMakeFiles/FEM.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/eema/src/FEM/CMakeFiles/FEM.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 12
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/src/FEM/CMakeFiles/FEM.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/src/FEM/CMakeFiles/FEM.dir/rule
+
+# Convenience name for target.
+FEM: src/eema/src/FEM/CMakeFiles/FEM.dir/rule
+
+.PHONY : FEM
+
+# clean rule for target.
+src/eema/src/FEM/CMakeFiles/FEM.dir/clean:
+	$(MAKE) -f src/eema/src/FEM/CMakeFiles/FEM.dir/build.make src/eema/src/FEM/CMakeFiles/FEM.dir/clean
+.PHONY : src/eema/src/FEM/CMakeFiles/FEM.dir/clean
+
+# clean rule for target.
+clean: src/eema/src/FEM/CMakeFiles/FEM.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory src/eema/examples
+
+# Convenience name for "all" pass in the directory.
+src/eema/examples/all: src/eema/examples/example-1/all
+
+.PHONY : src/eema/examples/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/examples/clean: src/eema/examples/example-1/clean
+
+.PHONY : src/eema/examples/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/examples/preinstall: src/eema/examples/example-1/preinstall
+
+.PHONY : src/eema/examples/preinstall
+
+#=============================================================================
+# Directory level rules for directory src/eema/examples/example-1
+
+# Convenience name for "all" pass in the directory.
+src/eema/examples/example-1/all: src/eema/examples/example-1/CMakeFiles/eema_example1.dir/all
+
+.PHONY : src/eema/examples/example-1/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/examples/example-1/clean: src/eema/examples/example-1/CMakeFiles/eema_example1.dir/clean
+
+.PHONY : src/eema/examples/example-1/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/examples/example-1/preinstall:
+
+.PHONY : src/eema/examples/example-1/preinstall
+
+#=============================================================================
+# Target rules for target src/eema/examples/example-1/CMakeFiles/eema_example1.dir
+
+# All Build rule for target.
+src/eema/examples/example-1/CMakeFiles/eema_example1.dir/all: src/eema/src/CMakeFiles/eema.dir/all
+	$(MAKE) -f src/eema/examples/example-1/CMakeFiles/eema_example1.dir/build.make src/eema/examples/example-1/CMakeFiles/eema_example1.dir/depend
+	$(MAKE) -f src/eema/examples/example-1/CMakeFiles/eema_example1.dir/build.make src/eema/examples/example-1/CMakeFiles/eema_example1.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=65,66 "Built target eema_example1"
+.PHONY : src/eema/examples/example-1/CMakeFiles/eema_example1.dir/all
+
+# Include target in all.
+all: src/eema/examples/example-1/CMakeFiles/eema_example1.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/eema/examples/example-1/CMakeFiles/eema_example1.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 65
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/examples/example-1/CMakeFiles/eema_example1.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/examples/example-1/CMakeFiles/eema_example1.dir/rule
+
+# Convenience name for target.
+eema_example1: src/eema/examples/example-1/CMakeFiles/eema_example1.dir/rule
+
+.PHONY : eema_example1
+
+# clean rule for target.
+src/eema/examples/example-1/CMakeFiles/eema_example1.dir/clean:
+	$(MAKE) -f src/eema/examples/example-1/CMakeFiles/eema_example1.dir/build.make src/eema/examples/example-1/CMakeFiles/eema_example1.dir/clean
+.PHONY : src/eema/examples/example-1/CMakeFiles/eema_example1.dir/clean
+
+# clean rule for target.
+clean: src/eema/examples/example-1/CMakeFiles/eema_example1.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory src/eema/doc
+
+# Convenience name for "all" pass in the directory.
+src/eema/doc/all: src/eema/doc/doxygen/all
+
+.PHONY : src/eema/doc/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/doc/clean: src/eema/doc/doxygen/clean
+
+.PHONY : src/eema/doc/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/doc/preinstall: src/eema/doc/doxygen/preinstall
+
+.PHONY : src/eema/doc/preinstall
+
+#=============================================================================
+# Directory level rules for directory src/eema/doc/doxygen
+
+# Convenience name for "all" pass in the directory.
+src/eema/doc/doxygen/all: src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/all
+
+.PHONY : src/eema/doc/doxygen/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/doc/doxygen/clean: src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/clean
+src/eema/doc/doxygen/clean: src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/clean
+
+.PHONY : src/eema/doc/doxygen/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/doc/doxygen/preinstall:
+
+.PHONY : src/eema/doc/doxygen/preinstall
+
+#=============================================================================
+# Target rules for target src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir
+
+# All Build rule for target.
+src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/all:
+	$(MAKE) -f src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/build.make src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/depend
+	$(MAKE) -f src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/build.make src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num= "Built target eema-doc-forced"
+.PHONY : src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/all
+
+# Build rule for subdir invocation for target.
+src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/rule
+
+# Convenience name for target.
+eema-doc-forced: src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/rule
+
+.PHONY : eema-doc-forced
+
+# clean rule for target.
+src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/clean:
+	$(MAKE) -f src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/build.make src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/clean
+.PHONY : src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/clean
+
+# clean rule for target.
+clean: src/eema/doc/doxygen/CMakeFiles/eema-doc-forced.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target src/eema/doc/doxygen/CMakeFiles/eema-doc.dir
+
+# All Build rule for target.
+src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/all:
+	$(MAKE) -f src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/build.make src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/depend
+	$(MAKE) -f src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/build.make src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=64 "Built target eema-doc"
+.PHONY : src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/all
+
+# Include target in all.
+all: src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/rule
+
+# Convenience name for target.
+eema-doc: src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/rule
+
+.PHONY : eema-doc
+
+# clean rule for target.
+src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/clean:
+	$(MAKE) -f src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/build.make src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/clean
+.PHONY : src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/clean
+
+# clean rule for target.
+clean: src/eema/doc/doxygen/CMakeFiles/eema-doc.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Directory level rules for directory src/eema/gui
+
+# Convenience name for "all" pass in the directory.
+src/eema/gui/all: src/eema/gui/CMakeFiles/eema_gui.dir/all
+
+.PHONY : src/eema/gui/all
+
+# Convenience name for "clean" pass in the directory.
+src/eema/gui/clean: src/eema/gui/CMakeFiles/eema_gui.dir/clean
+src/eema/gui/clean: src/eema/gui/CMakeFiles/eema_gui_autogen.dir/clean
+
+.PHONY : src/eema/gui/clean
+
+# Convenience name for "preinstall" pass in the directory.
+src/eema/gui/preinstall:
+
+.PHONY : src/eema/gui/preinstall
+
+#=============================================================================
+# Target rules for target src/eema/gui/CMakeFiles/eema_gui.dir
+
+# All Build rule for target.
+src/eema/gui/CMakeFiles/eema_gui.dir/all: src/eema/gui/CMakeFiles/eema_gui_autogen.dir/all
+	$(MAKE) -f src/eema/gui/CMakeFiles/eema_gui.dir/build.make src/eema/gui/CMakeFiles/eema_gui.dir/depend
+	$(MAKE) -f src/eema/gui/CMakeFiles/eema_gui.dir/build.make src/eema/gui/CMakeFiles/eema_gui.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=67,68,69,70,71,72,73 "Built target eema_gui"
+.PHONY : src/eema/gui/CMakeFiles/eema_gui.dir/all
+
+# Include target in all.
+all: src/eema/gui/CMakeFiles/eema_gui.dir/all
+
+.PHONY : all
+
+# Build rule for subdir invocation for target.
+src/eema/gui/CMakeFiles/eema_gui.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 8
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/gui/CMakeFiles/eema_gui.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/gui/CMakeFiles/eema_gui.dir/rule
+
+# Convenience name for target.
+eema_gui: src/eema/gui/CMakeFiles/eema_gui.dir/rule
+
+.PHONY : eema_gui
+
+# clean rule for target.
+src/eema/gui/CMakeFiles/eema_gui.dir/clean:
+	$(MAKE) -f src/eema/gui/CMakeFiles/eema_gui.dir/build.make src/eema/gui/CMakeFiles/eema_gui.dir/clean
+.PHONY : src/eema/gui/CMakeFiles/eema_gui.dir/clean
+
+# clean rule for target.
+clean: src/eema/gui/CMakeFiles/eema_gui.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
+# Target rules for target src/eema/gui/CMakeFiles/eema_gui_autogen.dir
+
+# All Build rule for target.
+src/eema/gui/CMakeFiles/eema_gui_autogen.dir/all:
+	$(MAKE) -f src/eema/gui/CMakeFiles/eema_gui_autogen.dir/build.make src/eema/gui/CMakeFiles/eema_gui_autogen.dir/depend
+	$(MAKE) -f src/eema/gui/CMakeFiles/eema_gui_autogen.dir/build.make src/eema/gui/CMakeFiles/eema_gui_autogen.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/rhk12/code/compbio/build/CMakeFiles --progress-num=74 "Built target eema_gui_autogen"
+.PHONY : src/eema/gui/CMakeFiles/eema_gui_autogen.dir/all
+
+# Build rule for subdir invocation for target.
+src/eema/gui/CMakeFiles/eema_gui_autogen.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 1
+	$(MAKE) -f CMakeFiles/Makefile2 src/eema/gui/CMakeFiles/eema_gui_autogen.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/rhk12/code/compbio/build/CMakeFiles 0
+.PHONY : src/eema/gui/CMakeFiles/eema_gui_autogen.dir/rule
+
+# Convenience name for target.
+eema_gui_autogen: src/eema/gui/CMakeFiles/eema_gui_autogen.dir/rule
+
+.PHONY : eema_gui_autogen
+
+# clean rule for target.
+src/eema/gui/CMakeFiles/eema_gui_autogen.dir/clean:
+	$(MAKE) -f src/eema/gui/CMakeFiles/eema_gui_autogen.dir/build.make src/eema/gui/CMakeFiles/eema_gui_autogen.dir/clean
+.PHONY : src/eema/gui/CMakeFiles/eema_gui_autogen.dir/clean
+
+# clean rule for target.
+clean: src/eema/gui/CMakeFiles/eema_gui_autogen.dir/clean
+
+.PHONY : clean
+
+#=============================================================================
 # Special targets to cleanup operation of make.
 
 # Special rule to run CMake to check the build system integrity.

@@ -1,0 +1,136 @@
+\hypertarget{fe__apply__bc_8cpp_source}{}\section{fe\+\_\+apply\+\_\+bc.\+cpp}
+\label{fe__apply__bc_8cpp_source}\index{src/eema/src/\+F\+E\+M/\+Boundary\+Conditions/fe\+\_\+apply\+\_\+bc.\+cpp@{src/eema/src/\+F\+E\+M/\+Boundary\+Conditions/fe\+\_\+apply\+\_\+bc.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include"\hyperlink{functions_8h}{functions.h}"}
+00002 
+00003 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00004 
+\Hypertarget{fe__apply__bc_8cpp_source_l00005}\hyperlink{fe__apply__bc_8cpp_af42938e5b32edb33ef4a35866949eba6}{00005} VectorXd \hyperlink{fe__apply__bc_8cpp_af42938e5b32edb33ef4a35866949eba6}{fe\_apply\_bc\_displacement}(VectorXd U,\textcolor{keywordtype}{double} time)\{
+00006 
+00007  \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<\hyperlink{_global_variables_8h_aad28f3904552ac6aa1642c44f0bc04e7}{bc\_types};i++)\{
+00008         std::string type = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_aa6afb3d4586f395578bef89c77e60449}{getType}();
+00009         \textcolor{keywordflow}{if}(type==\textcolor{stringliteral}{"displacement"})\{
+00010             \textcolor{keywordtype}{double} input\_disp\_amp = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_ad648545e6ee046075350cd9b3c88e610}{getAmplitude}();
+00011             std::string disp\_curve = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a3590d0a29a9261d99f21ee75340e5722}{getTimeBehavior}();
+00012             \textcolor{keywordtype}{int} number\_of\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a6e42c3db5c67435bf2616768959866e9}{getNumDOF}();
+00013             VectorXi local\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a0bc8eb90956a082ada5e4daa5e32c9fc}{getDOF}();
+00014             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<number\_of\_dof;j++)\{
+00015                 \textcolor{keywordtype}{int} c = local\_dof(j);
+00016                 U(c) = \hyperlink{functions_8h_a5ce8a3cf9dcc8b599ac40f7f3a48f196}{fe\_function}(input\_disp\_amp,disp\_curve,time);
+00017             \}
+00018         \}
+00019     \}
+00020 
+00021     \textcolor{keywordflow}{return} U;
+00022 \}
+00023 
+\Hypertarget{fe__apply__bc_8cpp_source_l00024}\hyperlink{fe__apply__bc_8cpp_a4627586ca0e6b9e3904cdbc7bb561e9e}{00024} VectorXd \hyperlink{fe__apply__bc_8cpp_a4627586ca0e6b9e3904cdbc7bb561e9e}{fe\_apply\_bc\_velocity}(VectorXd V,\textcolor{keywordtype}{double} time)\{
+00025 
+00026  \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<\hyperlink{_global_variables_8h_aad28f3904552ac6aa1642c44f0bc04e7}{bc\_types};i++)\{
+00027         std::string type = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_aa6afb3d4586f395578bef89c77e60449}{getType}();
+00028 
+00029         \textcolor{keywordflow}{if}(type==\textcolor{stringliteral}{"displacement"})\{
+00030             \textcolor{keywordtype}{double} input\_disp\_amp = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_ad648545e6ee046075350cd9b3c88e610}{getAmplitude}();
+00031             std::string disp\_curve = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a3590d0a29a9261d99f21ee75340e5722}{getTimeBehavior}();
+00032             \textcolor{keywordtype}{int} number\_of\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a6e42c3db5c67435bf2616768959866e9}{getNumDOF}();
+00033             VectorXi local\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a0bc8eb90956a082ada5e4daa5e32c9fc}{getDOF}();
+00034             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<number\_of\_dof;j++)\{
+00035                 \textcolor{keywordtype}{int} c = local\_dof(j);
+00036                 V(c) = \hyperlink{functions_8h_aa587b020c768e2a11948bfd939829b6e}{fe\_function\_derivative}(input\_disp\_amp,disp\_curve,time);
+00037             \}
+00038         \}
+00039 
+00040         \textcolor{keywordflow}{if}(type==\textcolor{stringliteral}{"velocity"})\{
+00041             \textcolor{keywordtype}{double} input\_vel\_amp = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_ad648545e6ee046075350cd9b3c88e610}{getAmplitude}();
+00042             std::string vel\_curve = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a3590d0a29a9261d99f21ee75340e5722}{getTimeBehavior}();
+00043             \textcolor{keywordtype}{int} number\_of\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a6e42c3db5c67435bf2616768959866e9}{getNumDOF}();
+00044             VectorXi local\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a0bc8eb90956a082ada5e4daa5e32c9fc}{getDOF}();
+00045             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<number\_of\_dof;j++)\{
+00046                 \textcolor{keywordtype}{int} c = local\_dof(j);
+00047                 V(c) = \hyperlink{functions_8h_a5ce8a3cf9dcc8b599ac40f7f3a48f196}{fe\_function}(input\_vel\_amp,vel\_curve,time);
+00048             \}
+00049         \}
+00050 
+00051     \}
+00052 
+00053     \textcolor{keywordflow}{return} V;
+00054 \}
+00055 
+\Hypertarget{fe__apply__bc_8cpp_source_l00056}\hyperlink{fe__apply__bc_8cpp_ac0ffd5f19ac286c91d431a4ec72dbab4}{00056} VectorXd \hyperlink{fe__apply__bc_8cpp_ac0ffd5f19ac286c91d431a4ec72dbab4}{fe\_apply\_bc\_acceleration}(VectorXd A,\textcolor{keywordtype}{double} time)\{
+00057 
+00058  \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<\hyperlink{_global_variables_8h_aad28f3904552ac6aa1642c44f0bc04e7}{bc\_types};i++)\{
+00059         std::string type = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_aa6afb3d4586f395578bef89c77e60449}{getType}();
+00060 
+00061         \textcolor{keywordflow}{if}(type==\textcolor{stringliteral}{"displacement"})\{
+00062             \textcolor{keywordtype}{double} input\_disp\_amp = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_ad648545e6ee046075350cd9b3c88e610}{getAmplitude}();
+00063             std::string disp\_curve = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a3590d0a29a9261d99f21ee75340e5722}{getTimeBehavior}();
+00064             \textcolor{keywordtype}{int} number\_of\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a6e42c3db5c67435bf2616768959866e9}{getNumDOF}();
+00065             VectorXi local\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a0bc8eb90956a082ada5e4daa5e32c9fc}{getDOF}();
+00066             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<number\_of\_dof;j++)\{
+00067                 \textcolor{keywordtype}{int} c = local\_dof(j);
+00068                 A(c) = \hyperlink{functions_8h_afb02d53011656285452b16427dcd08dd}{fe\_function\_d\_derivative}(input\_disp\_amp,disp\_curve,time);
+00069             \}
+00070         \}
+00071 
+00072         \textcolor{keywordflow}{if}(type==\textcolor{stringliteral}{"velocity"})\{
+00073             \textcolor{keywordtype}{double} input\_vel\_amp = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_ad648545e6ee046075350cd9b3c88e610}{getAmplitude}();
+00074             std::string vel\_curve = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a3590d0a29a9261d99f21ee75340e5722}{getTimeBehavior}();
+00075             \textcolor{keywordtype}{int} number\_of\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a6e42c3db5c67435bf2616768959866e9}{getNumDOF}();
+00076             VectorXi local\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a0bc8eb90956a082ada5e4daa5e32c9fc}{getDOF}();
+00077             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<number\_of\_dof;j++)\{
+00078                 \textcolor{keywordtype}{int} c = local\_dof(j);
+00079                 A(c) = \hyperlink{functions_8h_aa587b020c768e2a11948bfd939829b6e}{fe\_function\_derivative}(input\_vel\_amp,vel\_curve,time);
+00080             \}
+00081         \}
+00082 
+00083         \textcolor{keywordflow}{if}(type==\textcolor{stringliteral}{"acceleration"})\{
+00084             \textcolor{keywordtype}{double} input\_acc\_amp = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_ad648545e6ee046075350cd9b3c88e610}{getAmplitude}();
+00085             std::string acc\_curve = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a3590d0a29a9261d99f21ee75340e5722}{getTimeBehavior}();
+00086             \textcolor{keywordtype}{int} number\_of\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a6e42c3db5c67435bf2616768959866e9}{getNumDOF}();
+00087             VectorXi local\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a0bc8eb90956a082ada5e4daa5e32c9fc}{getDOF}();
+00088             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<number\_of\_dof;j++)\{
+00089                 \textcolor{keywordtype}{int} c = local\_dof(j);
+00090                 A(c) = \hyperlink{functions_8h_a5ce8a3cf9dcc8b599ac40f7f3a48f196}{fe\_function}(input\_acc\_amp,acc\_curve,time);
+00091             \}
+00092         \}
+00093 
+00094     \}
+00095 
+00096     \textcolor{keywordflow}{return} A;
+00097 \}
+00098 
+\Hypertarget{fe__apply__bc_8cpp_source_l00099}\hyperlink{fe__apply__bc_8cpp_aba32cc24bd74a4965c560fa62c5b213e}{00099} VectorXd \hyperlink{fe__apply__bc_8cpp_aba32cc24bd74a4965c560fa62c5b213e}{fe\_apply\_bc\_load}(VectorXd fe,\textcolor{keywordtype}{double} time)\{
+00100 
+00101     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<\hyperlink{_global_variables_8h_aad28f3904552ac6aa1642c44f0bc04e7}{bc\_types};i++)\{
+00102         std::string type = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_aa6afb3d4586f395578bef89c77e60449}{getType}();
+00103         \textcolor{keywordflow}{if}(type==\textcolor{stringliteral}{"load"})\{
+00104             \textcolor{keywordtype}{double} input\_load\_amp = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_ad648545e6ee046075350cd9b3c88e610}{getAmplitude}();
+00105             std::string load\_curve = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a3590d0a29a9261d99f21ee75340e5722}{getTimeBehavior}();
+00106             \textcolor{keywordtype}{int} number\_of\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a6e42c3db5c67435bf2616768959866e9}{getNumDOF}();
+00107             VectorXi local\_dof = \hyperlink{_global_variables_8h_a20bdb84bef6e8184528b6f4394cf4f7a}{bc}[i].\hyperlink{class_b_c_a0bc8eb90956a082ada5e4daa5e32c9fc}{getDOF}();
+00108             \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<number\_of\_dof;j++)\{
+00109                 \textcolor{keywordtype}{int} c = local\_dof(j);
+00110                 fe(c) = \hyperlink{functions_8h_a5ce8a3cf9dcc8b599ac40f7f3a48f196}{fe\_function}(input\_load\_amp,load\_curve,time);
+00111             \}
+00112         \}
+00113     \}
+00114 
+00115     \textcolor{keywordflow}{return} fe;
+00116 \}
+00117 
+\Hypertarget{fe__apply__bc_8cpp_source_l00118}\hyperlink{fe__apply__bc_8cpp_a3c73fda948017ac96aeb19889cfc1cba}{00118} MatrixXd \hyperlink{fe__apply__bc_8cpp_a3c73fda948017ac96aeb19889cfc1cba}{fe\_apply\_bc\_stiffness}(MatrixXd kk,VectorXi bcdof,VectorXd bcval)\{
+00119 
+00120     \textcolor{keywordtype}{int} n = bcdof.size();
+00121     \textcolor{keywordtype}{int} sdof = kk.rows();
+00122 
+00123     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i=0;i<n;i++)\{
+00124         \textcolor{keywordtype}{int} c = bcdof(i);
+00125         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<sdof;j++)\{
+00126             kk(c,j) = 0;
+00127         \}
+00128         kk(c,c) = 1;
+00129     \}
+00130     \textcolor{keywordflow}{return} kk;
+00131 \}
+\end{DoxyCode}

@@ -12,3 +12,7 @@ include_directories(${EIGEN_INCLUDE_DIR})
 
 #Bring the headers, such as *.h into the project, should be renamed to include
 include_directories(include)
+
+# All the source code we care about
+add_subdirectory(src)
+

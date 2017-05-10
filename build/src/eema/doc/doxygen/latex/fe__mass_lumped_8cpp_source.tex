@@ -1,0 +1,59 @@
+\hypertarget{fe__mass_lumped_8cpp_source}{}\section{fe\+\_\+mass\+Lumped.\+cpp}
+\label{fe__mass_lumped_8cpp_source}\index{src/eema/src/\+Elements/\+Mass/fe\+\_\+mass\+Lumped.\+cpp@{src/eema/src/\+Elements/\+Mass/fe\+\_\+mass\+Lumped.\+cpp}}
+
+\begin{DoxyCode}
+00001 \textcolor{preprocessor}{#include "\hyperlink{functions_8h}{functions.h}"}
+00002 \textcolor{keyword}{using namespace }\hyperlink{namespace_eigen}{Eigen};
+00003 
+\Hypertarget{fe__mass_lumped_8cpp_source_l00004}\hyperlink{fe__mass_lumped_8cpp_aa34a87447bf9fa851463ce99101a7054}{00004} VectorXd \hyperlink{fe__mass_lumped_8cpp_aa34a87447bf9fa851463ce99101a7054}{fe\_massLumped}(MatrixXd nodes, VectorXi elements\_row)\{
+00005 
+00006     \textcolor{keywordtype}{double} mass = 0;
+00007     \textcolor{keywordtype}{int} nnel = elements\_row.size()-2;
+00008     \textcolor{keywordtype}{int} nnode = nodes.rows();
+00009     \textcolor{keywordtype}{int} edof = nnel*\hyperlink{_global_variables_8h_aa789fe4d8a13fd0990b630909430d5d0}{ndof};
+00010     VectorXd m\_element = VectorXd::Zero(edof);
+00011 
+00012     VectorXi nodes\_local = VectorXi::Zero(nnel);
+00013     VectorXd xcoord = VectorXd::Zero(nnel);
+00014     VectorXd ycoord = VectorXd::Zero(nnel);
+00015     VectorXd zcoord = VectorXd::Zero(nnel);
+00016 
+00017     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} j=0;j<nnel;j++)\{
+00018       \textcolor{keywordtype}{int} g = -1;
+00019       \textcolor{comment}{/*for(int f=0;f<nnode;f++)\{}
+00020 \textcolor{comment}{        if(elements\_row(j+2)==nodes(f,0))\{}
+00021 \textcolor{comment}{          g = f;}
+00022 \textcolor{comment}{          break;}
+00023 \textcolor{comment}{        \}}
+00024 \textcolor{comment}{      \}*/}
+00025       nodes\_local(j) = elements\_row(j+2);
+00026       g = nodes\_local(j);
+00027       xcoord(j) = nodes(g,1);
+00028       ycoord(j) = nodes(g,2);
+00029       zcoord(j) = nodes(g,3);
+00030     \}
+00031 
+00032     \textcolor{keywordtype}{double} rho = \hyperlink{functions_8h_af7ffbad6dfcc99fc88b130c1a7b1720a}{fe\_get\_mats}(elements\_row(1),0); \textcolor{comment}{// material density}
+00033     \textcolor{keywordtype}{double} volume\_element = \hyperlink{functions_8h_a00f586c9a4bc56ec486776402fc26605}{fe\_calVolume}(xcoord,ycoord,zcoord);
+00034     \textcolor{comment}{// The above function fe\_calVolume gives volume for a 3d element, area for a 2d element and length for
+       a 1d element.}
+00035 
+00036     \textcolor{keywordflow}{if}(xcoord.size()==2)\{
+00037       volume\_element = volume\_element * 0.5;
+00038       \textcolor{comment}{// 0.5 is area of the single 1D element cross-section}
+00039     \}
+00040 
+00041     \textcolor{keywordflow}{if}(xcoord.size()==4)\{
+00042       volume\_element = volume\_element * 1;
+00043       \textcolor{comment}{// volume\_element = volume\_element * thickness;}
+00044     \}
+00045 
+00046     mass = rho * volume\_element;
+00047 
+00048     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i\_1 = 0; i\_1 < m\_element.size(); i\_1++)\{
+00049       m\_element(i\_1) = (mass/(nnel));
+00050     \}
+00051 
+00052   \textcolor{keywordflow}{return} m\_element;
+00053 \}
+\end{DoxyCode}

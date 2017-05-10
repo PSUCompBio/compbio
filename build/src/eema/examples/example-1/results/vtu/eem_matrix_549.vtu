@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" version="0.1" byte_order="LittleEndian">
+	<UnstructuredGrid>
+		<Piece NumberOfPoints="8" NumberOfCells="1">
+			<Points>
+				<DataArray type="Float32" NumberOfComponents="3" format="ascii">
+					0.00000000e+00 0.00000000e+00 0.00000000e+00
+					5.00000000e-03 0.00000000e+00 0.00000000e+00
+					5.00000000e-03 5.00000000e-03 0.00000000e+00
+					0.00000000e+00 5.00000000e-03 0.00000000e+00
+					0.00000000e+00 0.00000000e+00 5.00000000e-03
+					5.00000000e-03 0.00000000e+00 5.00000000e-03
+					5.00000000e-03 5.00000000e-03 5.00000000e-03
+					0.00000000e+00 5.00000000e-03 5.00000000e-03
+				</DataArray>
+			</Points>
+			<Cells>
+				<DataArray type="Int32" Name="connectivity" format="ascii">
+					0	1	2	3	4	5	6	7	
+
+				</DataArray>
+				<DataArray type="Int32" Name="offsets" format="ascii">
+					8
+				</DataArray>
+				<DataArray type="UInt8" Name="types" format="ascii">
+					12
+				</DataArray>
+			</Cells>
+			<PointData>
+				<DataArray type="Float32" Name="Displacement" NumberOfComponents="3" ComponentName0="X" ComponentName1="Y" ComponentName2="Z" format="ascii">
+					0.0000000000e+00 0.0000000000e+00 0.0000000000e+00 
+					-5.2636544391e-04 0.0000000000e+00 0.0000000000e+00 
+					-5.2636544391e-04 -5.2636544391e-04 0.0000000000e+00 
+					0.0000000000e+00 -5.2636544391e-04 0.0000000000e+00 
+					0.0000000000e+00 0.0000000000e+00 1.2601203225e-03 
+					-5.2636544391e-04 0.0000000000e+00 1.2601203225e-03 
+					-5.2636544391e-04 -5.2636544391e-04 1.2601203225e-03 
+					0.0000000000e+00 -5.2636544391e-04 1.2601203225e-03 
+				</DataArray>
+				<DataArray type="Float32" Name="Velocity" NumberOfComponents="3" ComponentName0="X" ComponentName1="Y" ComponentName2="Z" format="ascii">
+					0.0000000000e+00 0.0000000000e+00 0.0000000000e+00 
+					-2.0039690642e-02 0.0000000000e+00 0.0000000000e+00 
+					-2.0039690642e-02 -2.0039690642e-02 0.0000000000e+00 
+					0.0000000000e+00 -2.0039690642e-02 0.0000000000e+00 
+					0.0000000000e+00 0.0000000000e+00 5.6555979613e-02 
+					-2.0039690642e-02 0.0000000000e+00 5.6555979613e-02 
+					-2.0039690642e-02 -2.0039690642e-02 5.6555979613e-02 
+					0.0000000000e+00 -2.0039690642e-02 5.6555979613e-02 
+				</DataArray>
+				<DataArray type="Float32" Name="Acceleration" NumberOfComponents="3" ComponentName0="X" ComponentName1="Y" ComponentName2="Z" format="ascii">
+					0.0000000000e+00 0.0000000000e+00 0.0000000000e+00 
+					2.9065072378e-01 0.0000000000e+00 0.0000000000e+00 
+					2.9065072364e-01 2.9065072376e-01 0.0000000000e+00 
+					0.0000000000e+00 2.9065072366e-01 0.0000000000e+00 
+					0.0000000000e+00 0.0000000000e+00 4.5062183661e+00 
+					2.9065072371e-01 0.0000000000e+00 4.5062183662e+00 
+					2.9065072359e-01 2.9065072371e-01 4.5062183661e+00 
+					0.0000000000e+00 2.9065072360e-01 4.5062183660e+00 
+				</DataArray>
+			</PointData>
+			<CellData>
+				<DataArray type="Float32" Name="Stress (Cauchy)" NumberOfComponents="9" ComponentName0="XX" ComponentName1="XY" ComponentName2="XZ" ComponentName3="YX" ComponentName4="YY" ComponentName5="YZ" ComponentName6="ZX" ComponentName7="ZY" ComponentName8="ZZ" format="ascii">
+					-3.2432337091e-01 3.9662640786e-13 -2.5386003937e-13
+					3.9662640786e-13 -3.2432337091e-01 1.0881565529e-12
+					-2.5386003937e-13 1.0881565529e-12 2.7494215193e+03
+				</DataArray>
+				<DataArray type="Float32" Name="Strain (Logarithmic)" NumberOfComponents="9" ComponentName0="XX" ComponentName1="XY" ComponentName2="XZ" ComponentName3="YX" ComponentName4="YY" ComponentName5="YZ" ComponentName6="ZX" ComponentName7="ZY" ComponentName8="ZZ" format="ascii">
+					-1.1123673440e-01 0.0000000000e+00 0.0000000000e+00
+					0.0000000000e+00 -1.1123673440e-01 0.0000000000e+00
+					0.0000000000e+00 0.0000000000e+00 2.2476149333e-01
+				</DataArray>
+			</CellData>
+		</Piece>
+	</UnstructuredGrid>
+</VTKFile>
