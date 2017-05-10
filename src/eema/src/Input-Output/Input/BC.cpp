@@ -31,7 +31,7 @@ std::string BC::getTimeBehavior(){
   return time_curve;
 }
 
-void BC::printBCInfo(){
+void BC::printInfo(){
   std::cout << "Type of Boundary Condition: " << type << "\n";
   std::cout << "Amplitude: " << amplitude << "\n";
   std::cout << "Number of DOF's of interest: " << num_dof << '\n';

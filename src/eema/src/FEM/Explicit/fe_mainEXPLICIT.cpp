@@ -2,217 +2,178 @@
 using namespace Eigen;
 
 double eps_energy = 0.01;
+double area_truss = 5e-6;
+double failure_time_step = 1e-8;
 
 /*! \brief
  * This function carries out the explicit dynamic analysis of the FEM problem.
  */
 
-void fe_mainEXPLICIT(){
+void
+fe_mainEXPLICIT()
+{
 
-	for(int i=0;i<num_meshes;i++){
-		mesh[i].preprocessMesh();
-	}
+    if (num_meshes == 0) {
+        std::cout << "No meshes included - Simulation is not possible !! " << "\n";
+        std::exit(-1);
+    }
 
-	MatrixXd nodes = mesh[0].getNewNodes();
-	MatrixXi elements = mesh[0].getNewElements();
-	MatrixXd nodes_truss = mesh[1].getNewNodes();
-	MatrixXi elements_truss = mesh[1].getNewElements();
+    for (int i = 0; i < num_meshes; i++) {
+        mesh[i].preprocessMesh();
+    }
 
-	// Following variables - Only for Hex Element
-	int nel = elements.rows(); /*! number of elements */
-	int nnel = (elements.cols()-2); // number of nodes per element
-	int nnode = nodes.rows(); // number of nodes
-	int sdof = nnode * ndof; // system degrees of freedom
-	int edof = nnel * ndof; // element degrees of freedom
+    // Following variables - Only for Hex Element
+    int nnode = mesh[0].getNumNodes();          // number of nodes
+    int sdof  = nnode * ndof;          // system degrees of freedom
 
-	// Updated Nodes and Elements
-	MatrixXd updated_nodes = nodes;
+    // Initialization
+    double dT             = dt_initial;
+    double t              = t_start;
+    int time_step_counter = 0; // time step count
+    int plot_state_counter = 1;
+    double output_temp_1  = ((double) (t_end / output_frequency));
+    VectorXd A            = VectorXd::Zero(sdof); // Acceleration Vector
+    VectorXd V            = VectorXd::Zero(sdof); // Velocity Vector
+    VectorXd V_half       = VectorXd::Zero(sdof); // Velocity Vector at n+1/2
+    VectorXd U            = VectorXd::Zero(sdof); // Displacement Vector
+    VectorXd F_net        = VectorXd::Zero(sdof); // Total Nodal force vector
+    VectorXd fe           = VectorXd::Zero(sdof); // External Nodal force vector
+    VectorXd fe_prev      = VectorXd::Zero(sdof);
 
-	// Writing the Read Mesh
-	//fe_vtkWrite_host("eem_matrix",1,5,0,updated_nodes,elements);
-	//return;
+    VectorXd fr_prev      = VectorXd::Zero(sdof);
+    VectorXd fr_curr      = VectorXd::Zero(sdof);
+    VectorXd fi_prev      = VectorXd::Zero(sdof); // Internal nodal force vector at previous timestep
+    VectorXd fi_curr      = VectorXd::Zero(sdof); // Internal Nodal force vector at current timestep
+    VectorXd U_prev       = VectorXd::Zero(sdof);
 
-	// Initialization
-	double dT = dt_initial;
-	double t_half = 0; // t(n + 1/2)
-	double t=t_start;
-	int size_counter = 0; // time step count
-	int time_temp_1 = 1;
-	double output_temp_1 = ((double)(t_end/output_frequency));
-	VectorXd A = VectorXd::Zero(sdof); // Acceleration Vector
-	VectorXd V = VectorXd::Zero(sdof); // Velocity Vector
-	VectorXd V_half = VectorXd::Zero(sdof); // Velocity Vector at n+1/2
-	VectorXd U = VectorXd::Zero(sdof); // Displacement Vector
-	VectorXd F_net = VectorXd::Zero(sdof); // Total Nodal force vector
-	VectorXd fe = VectorXd::Zero(sdof); // External Nodal force vector
-	VectorXd fe_prev = VectorXd::Zero(sdof);
-	VectorXd fe_curr = VectorXd::Zero(sdof);
-	VectorXd fi_prev = VectorXd::Zero(sdof); // Internal nodal force vector at previous timestep
-	VectorXd fi_curr = VectorXd::Zero(sdof); // Internal Nodal force vector at current timestep
-	VectorXd U_prev = VectorXd::Zero(sdof); // Nodal displacements at previous time
-	VectorXd U_curr = VectorXd::Zero(sdof); // Nodal displacements at current time
-	double energy_int_old = 0;
-	double energy_int_new = 0;
-	double energy_ext_old = 0;
-	double energy_ext_new = 0;
-	double energy_kin = 0;
-	double energy_total = 0;
-	double energy_max = 0;
+    double energy_int_old = 0;
+    double energy_int_new = 0;
+    double energy_ext_old = 0;
+    double energy_ext_new = 0;
+    double energy_kin     = 0;
+    double energy_total   = 0;
+    double energy_max     = 0;
 
-	std::string internal_energy = home_path + "/" + "results/internal_energy_system.txt";
-	new_double2textWithTime(internal_energy,time_temp_1 - 1,t,energy_int_new);
-	std::string external_energy = home_path + "/" +"results/external_energy_system.txt";
-	new_double2textWithTime(external_energy,time_temp_1 - 1,t,energy_ext_new);
-	std::string kinetic_energy = home_path + "/" + "results/kinetic_energy_system.txt";
-	new_double2textWithTime(kinetic_energy,time_temp_1 - 1,t,energy_kin);
-	std::string total_energy = home_path + "/" +"results/total_energy_system.txt";
-	new_double2textWithTime(total_energy,time_temp_1 - 1,t,energy_total);
+    std::string internal_energy = home_path + "/" + "results/internal_energy_system.txt";
+    std::string external_energy = home_path + "/" + "results/external_energy_system.txt";
+    std::string kinetic_energy = home_path + "/" + "results/kinetic_energy_system.txt";
+    std::string total_energy = home_path + "/" + "results/total_energy_system.txt";
+    fe_energyWrite_new(internal_energy, external_energy, kinetic_energy, total_energy, plot_state_counter, t, energy_int_new, energy_ext_new, energy_kin, energy_total);
 
+    // Loading Conditions
+    fe_apply_bc_load(fe, t_start);
 
-	// Loading Conditions
-	fe = fe_apply_bc_load(fe,0);
+    // ----------------------------------------------------------------------------
+    // Step-1: Calculate the mass matrix similar to that of belytschko.
+    VectorXd m_system = VectorXd::Zero(sdof);
+    fe_calculateMass(m_system, "direct_lumped");
 
-	// ----------------------------------------------------------------------------
-	//Step-1: Calculate the mass matrix similar to that of belytschko.
+    std::string mass = home_path + "/" + "results/system_mass.txt";
+    new_vector2text(mass.c_str(), m_system, m_system.cols());
 
-	VectorXd mm = VectorXd::Zero(sdof);
-	mm = fe_calculateMass(mm,"direct_lumped");
+    // ----------------------------------------------------------------------------
+    // Step-2: getforce step from Belytschko
+    fe_getforce(F_net, ndof, U, fe, time_step_counter);
 
-	std::string mass = home_path+"/"+"results/system_mass.txt";
-	new_vector2text(mass.c_str(),mm,mm.cols());
+    mesh[0].readNodalKinematics(U, V, A);
 
-	// ----------------------------------------------------------------------------
- //Step-2: getforce step from Belytschko
-	F_net = fe_getforce(nodes,elements,ndof,U,V,fe,size_counter,nodes_truss,elements_truss);
+    for (int i = 0; i < num_meshes; i++) {
+        fe_vtuWrite(plot_state_counter - 1, t, mesh[i]);
+    }
 
-	mesh[0].readNodalKinematics(U,V,A);
-	fe_vtuWrite("eem_matrix",size_counter,mesh[0]);
-	fe_pvdNew("eem_matrix",size_counter,t);
+    dT = fe_getTimeStep();
 
-	dT = reduction * fe_getTimeStep(nodes,elements,ndof,U,V,fe);
-	if(dT>dt_min){
-		dT = dt_min;
-	}
+    // ----------------------------------------------------------------------------
+    // Step-3: Calculate accelerations
+    fe_calculateAccln(A, m_system, F_net);
+    U_prev = U;
 
-	// ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // Step-4: Time loop starts....
+    time_step_counter = time_step_counter + 1;
+    clock_t s, s_prev, ds;
+    s = clock();
 
-	//Step-3: Calculate accelerations
-	A  = fe_calculateAccln(mm,F_net);
-	U_prev = U;
-
-	// ----------------------------------------------------------------------------
-
-	//Step-4: Time loop starts....
-	size_counter = size_counter+1;
-	clock_t s,s_prev,ds;
-	s = clock();
-
-	   while(t<=t_end){
-
-				/** Apply Loading Conditions - time dependent loading conditions */
-				fe = fe_apply_bc_load(fe,t);
-
-				/** Calculate the time at half time step */
-				t_half = 0.5*(t+t+dT);
-
-				/** Update the time by adding full time step */
-				t = t+dT;
-
-				/** Partially Update Nodal Velocities */
-				V_half = V + (t_half - (t-dT))*A;
-
-				/** Enforce Velocity Boundary Conditions */
-				//V_half = fe_apply_bc_velocity(V_half,t_half);
-				//std::cout << "V_half: \n" << V_half << '\n';
-
-				/** Update Nodal Displacements */
-				U = U + dT*(V_half);
-				U = fe_apply_bc_displacement(U,t);
-
-				F_net = fe_getforce(nodes,elements,ndof,U,V,fe,size_counter,nodes_truss,elements_truss); // Calculating the force term.
-
-				dT = reduction * fe_getTimeStep(nodes, elements, ndof, U, V, fe);
-				if(dT>dt_min){
-					dT = dt_min;
-				}
-				if( ((t+dT) > t_end) && (t!=t_end)){
-					dT = t_end-t;
-				}
-
-				/** Calculate Accelerations */
-				A = fe_calculateAccln(mm,F_net); // Calculating the new accelerations from total nodal forces.
-				A = fe_apply_bc_acceleration(A,t);
-
-				/** Completely Update the nodal velocities */
-				V = V_half + (t - t_half)*A; // Calculating the new velocities.
-				V = fe_apply_bc_velocity(V,t);
-
-				/* Calculating the internal energy terms */
-				U_curr = U;
-				VectorXd del_U = U_curr - U_prev;
-				fi_curr = fe - F_net;
-				energy_int_new = energy_int_old + 0.5*(del_U.dot(fi_prev + fi_curr));
-				fi_prev = fi_curr;
-				fi_curr = VectorXd::Zero(sdof);
-				U_prev = U_curr;
-				energy_int_old = energy_int_new;
+    while (t < t_end) {
 
 
-				/* Calculating the external energy terms */
-				fe_curr = fe ;
-				energy_ext_new = energy_ext_old + 0.5*(del_U.dot(fe_prev + fe_curr));
-				fe_prev = fe_curr;
-				energy_ext_old = energy_ext_new;
+        if (((t + dT) >= t_end) && (t != t_end)) {
+            dT = t_end - t;
+            if (dT <= 0) {
+                break;
+            }
+        }
 
-				/* Calculating the kinetic energy */
-				energy_kin = fe_calculateKE(mm,V);
 
-				/* Calculating the total energy of the system */
-				energy_total = std::abs(energy_kin + energy_int_new - energy_ext_new);
-				energy_max = std::max(std::max(energy_kin,energy_int_new),energy_ext_new);
+        /** Update Loading Conditions - time dependent loading conditions */
+        fe_apply_bc_load(fe, t);
 
-				if(energy_total > (eps_energy*(energy_max))){
-					std::cout << "**********************************************" << std::endl;
-					std::cout << "ALERT: INSTABILITIES IN THE SYSTEM DETECTED \n BASED ON THE ENERGY BALANCE CHECK \n";
-					std::cout << "**********************************************" << std::endl;
-				}
+        /** Steps - 4,5,6 and 7 from Belytschko Box 6.1 - Update time, velocity and displacements */
+        fe_timeUpdate(U, V, V_half, A, t, dT, "newmark-beta-central-difference");
 
-				/** Projection of displacements to the embedded mesh is needed */
-				/* */
-				/* */
+        /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
+        fe_getforce(F_net, ndof, U, fe, time_step_counter); // Calculating the force term.
 
-				if(t >= (time_temp_1 * (output_temp_1))){
 
-					mesh[0].readNodalKinematics(U,V,A);
 
-					fe_vtuWrite("eem_matrix",size_counter,mesh[0]);
-					fe_pvdAppend("eem_matrix",size_counter,t);
+        /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
+        fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.
+        fe_apply_bc_acceleration(A, t);
 
-					time_temp_1 = time_temp_1 + 1;
-					//fe_vtkWrite_host("eem_matrix",1,5,size_counter,nodes,elements);
-					//fe_vtkWrite_truss("eem_truss",1,5,size_counter,nodes_truss,elements_truss);
-	        std::cout <<"Timestep Value = "<<std::setw(5)<<std::scientific<<std::setprecision(1)<<dT
-					  								<<"  Current Time = "<<std::setw(5)<<std::setprecision(1)<< t
-					  								<<"  Timestep Number = "<<(size_counter)
-					  								<<"  CPU Time = " <<std::setw(5)<<std::setprecision(1)
-														<< ((float)ds/CLOCKS_PER_SEC) << "s \n";
-					//std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Current Precise Time: " << t << "\n";
-					//std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Z Displacement: " << U(20) << "\n";
-					//std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Internal Energy: " << energy_int_new << "\n";
-					//std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"External Work: " << energy_ext_new << "\n";
-					//std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Kinetic Energy: " << energy_kin << "\n";
+        /** Step- 10 from Belytschko Box 6.1 - Second Partial Update of Nodal Velocities */
+        fe_timeUpdate_velocity(V, V_half, A, t, dT, "newmark-beta-central-difference");
 
-					/*print current frame, current time, and energy to individual .txt files*/
-					append_double2textWithTime(internal_energy,time_temp_1 -1,t,energy_int_new);
-					append_double2textWithTime(external_energy,time_temp_1 - 1,t,energy_ext_new);
-					append_double2textWithTime(kinetic_energy,time_temp_1 - 1,t,energy_kin);
-					append_double2textWithTime(total_energy,time_temp_1 - 1,t,energy_total);
-			}
 
-			s_prev = s;
-			s = clock();
-			ds = s - s_prev;
-			size_counter = size_counter+1;
-		}
+        fi_curr = fe - F_net;
+        fe_calculateFR(fr_curr, sdof, fi_curr, m_system, A);
 
-}
+        //std::cout << "****************************************************\n";
+        //std::cout << "current time = " << t << std::endl;
+        //std::cout << "RF3 node #4 = " << fr_curr[14] << std::endl;
+        //std::cout << "RF3 node #5 = " << fr_curr[17] << std::endl;
+        //std::cout << "RF3 node #6 = " << fr_curr[20] << std::endl;
+        //std::cout << "RF3 node #7 = " << fr_curr[23] << std::endl;
+        //std::cout << "****************************************************\n";
+
+
+
+        /** Step - 11 from Belytschko Box 6.1 - Calculating energies and Checking Energy Balance */
+        fe_checkEnergies(U_prev, U, fi_prev, fi_curr, fe_prev, fe, fr_prev, fr_curr, m_system, V, energy_int_old, energy_int_new, energy_ext_old, energy_ext_new, energy_kin, energy_total, energy_max);
+
+        mesh[0].readNodalKinematics(U, V, A);
+
+        if (t >= (plot_state_counter * (output_temp_1))) {
+
+            for (int i = 0; i < num_meshes; i++) {
+                fe_vtuWrite(plot_state_counter, t, mesh[i]);
+            }
+
+            plot_state_counter = plot_state_counter + 1;
+
+            std::cout << "-----------------------------------" << "\n";
+            std::cout << " Timestep Value = " << std::setw(5) << std::scientific << std::setprecision(1) << dT
+                      << "\n Current Time = " << std::setw(5) << std::setprecision(1) << t
+                      << "\n Timestep Number = " << (time_step_counter)
+                      << "\n Plot State = " << (plot_state_counter - 1)
+                      << "\n CPU Time = " << std::setw(5) << std::setprecision(1)
+                      << ((float) ds / CLOCKS_PER_SEC) << "s \n";
+            std::cout << std::setw(5) << std::scientific << std::setprecision(5) << "Z Displacement: " << U(20) << "\n";
+            // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Current Precise Time: " << t << "\n";
+            // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Internal Energy: " << energy_int_new << "\n";
+            // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"External Work: " << energy_ext_new << "\n";
+            // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Kinetic Energy: " << energy_kin << "\n";
+
+            /*print current frame, current time, and energy to individual .txt files*/
+            fe_energyWrite_append(internal_energy, external_energy, kinetic_energy, total_energy, plot_state_counter, t, energy_int_new, energy_ext_new, energy_kin, energy_total);
+        }
+
+        s_prev = s;
+        s      = clock();
+        ds     = s - s_prev;
+        time_step_counter = time_step_counter + 1;
+
+        dT = fe_getTimeStep();
+
+
+    }
+} // fe_mainEXPLICIT

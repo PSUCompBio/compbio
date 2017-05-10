@@ -4,7 +4,15 @@ SET(FEM_src
     SolidMechanics/fe_calculateMass.cpp
     SolidMechanics/fe_calculateAccln.cpp
     SolidMechanics/fe_calculateKE.cpp
+    SolidMechanics/fe_getForce_3d_normal.cpp
+    SolidMechanics/fe_getForce_3d_embed.cpp
+    SolidMechanics/fe_findIntgPoints_1d.cpp
+    SolidMechanics/fe_calculateFR.cpp
+    SolidMechanics/fe_calculateIE.cpp
+    SolidMechanics/fe_calculateEW.cpp
+    SolidMechanics/fe_checkEnergies.cpp
     Explicit/fe_mainEXPLICIT.cpp
+    Explicit/fe_timeUpdate.cpp
     Electromechanics/fe_electromechanics.cpp
     BoundaryConditions/fe_apply_bc.cpp
     Assembly-Global-Local/fe_scatter.cpp

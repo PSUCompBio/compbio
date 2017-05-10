@@ -29,7 +29,7 @@ public:
     VectorXi getDOF();
     std::string getTimeBehavior();
 
-    void printBCInfo();
+    void printInfo();
 };
 
 #endif /* HEADERS_BC_H_ */

@@ -3,117 +3,110 @@
 
 using namespace Eigen;
 
-VectorXd fe_dndr_8(double rvalue,double svalue,double tvalue){
+void fe_dniso_8(VectorXd& dndr, VectorXd& dnds, VectorXd& dndt, double& rvalue, double& svalue, double& tvalue) {
 
-	VectorXd dndr(8);
+	// Calculating dndr
+
 	int i = 0;
-	double tmp = 0.125*(-1)*(1-svalue)*(1-tvalue);
-	dndr(i)=tmp;
+	double tmp = 0.125 * (-1) * (1 - svalue) * (1 - tvalue);
+	dndr(i) = tmp;
 
-	i = i+1;
-	tmp = 0.125*(1)*(1-svalue)*(1-tvalue);
-	dndr(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (1) * (1 - svalue) * (1 - tvalue);
+	dndr(i) = tmp;
 
-	i = i+1;
-        tmp = 0.125*(1)*(1+svalue)*(1-tvalue);
-	dndr(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (1) * (1 + svalue) * (1 - tvalue);
+	dndr(i) = tmp;
 
-	i = i+1;
-        tmp = 0.125*(-1)*(1+svalue)*(1-tvalue);
-	dndr(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (-1) * (1 + svalue) * (1 - tvalue);
+	dndr(i) = tmp;
 
-	i = i+1;
-        tmp = 0.125*(-1)*(1-svalue)*(1+tvalue);
-	dndr(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (-1) * (1 - svalue) * (1 + tvalue);
+	dndr(i) = tmp;
 
-	i = i+1;
-        tmp = 0.125*(+1)*(1-svalue)*(1+tvalue);
-	dndr(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (+1) * (1 - svalue) * (1 + tvalue);
+	dndr(i) = tmp;
 
-	i = i+1;
-        tmp = 0.125*(+1)*(1+svalue)*(1+tvalue);
-	dndr(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (+1) * (1 + svalue) * (1 + tvalue);
+	dndr(i) = tmp;
 
-	i = i+1;
-        tmp = 0.125*(-1)*(1+svalue)*(1+tvalue);
-	dndr(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (-1) * (1 + svalue) * (1 + tvalue);
+	dndr(i) = tmp;
 
-	return dndr;
-}
+	// Calculating dnds
 
-VectorXd fe_dnds_8(double rvalue,double svalue,double tvalue){
+	i = 0;
+	tmp = 0.125 * (1 - rvalue) * (-1) * (1 - tvalue);
+	dnds(i) = tmp;
 
-	VectorXd dnds(8);
-	int i = 0;
-	double tmp = 0.125*(1-rvalue)*(-1)*(1-tvalue);
-	dnds(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 + rvalue) * (-1) * (1 - tvalue);
+	dnds(i) = tmp;
 
-	i = i+1;
-	 tmp = 0.125*(1+rvalue)*(-1)*(1-tvalue);
-        dnds(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 + rvalue) * (+1) * (1 - tvalue);
+	dnds(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1+rvalue)*(+1)*(1-tvalue);
-        dnds(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 - rvalue) * (+1) * (1 - tvalue);
+	dnds(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1-rvalue)*(+1)*(1-tvalue);
-	dnds(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 - rvalue) * (-1) * (1 + tvalue);
+	dnds(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1-rvalue)*(-1)*(1+tvalue);
-        dnds(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 + rvalue) * (-1) * (1 + tvalue);
+	dnds(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1+rvalue)*(-1)*(1+tvalue);
-        dnds(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 + rvalue) * (+1) * (1 + tvalue);
+	dnds(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1+rvalue)*(+1)*(1+tvalue);
-        dnds(i)=tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 - rvalue) * (+1) * (1 + tvalue);
+	dnds(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1-rvalue)*(+1)*(1+tvalue);
-        dnds(i)=tmp;
+	// Calculating dndt
 
-	return dnds;
-}
-
-VectorXd fe_dndt_8(double rvalue,double svalue,double tvalue){
-
-	VectorXd dndt(8);
-	int i = 0;
-	double tmp = 0.125*(1-rvalue)*(1-svalue)*(-1);
+	i = 0;
+	tmp = 0.125 * (1 - rvalue) * (1 - svalue) * (-1);
 	dndt(i) = tmp;
 
-	i = i+1;
-	 tmp = 0.125*(1+rvalue)*(1-svalue)*(-1);
-        dndt(i) = tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 + rvalue) * (1 - svalue) * (-1);
+	dndt(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1+rvalue)*(1+svalue)*(-1);
-        dndt(i) = tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 + rvalue) * (1 + svalue) * (-1);
+	dndt(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1-rvalue)*(1+svalue)*(-1);
-        dndt(i) = tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 - rvalue) * (1 + svalue) * (-1);
+	dndt(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1-rvalue)*(1-svalue)*(+1);
-        dndt(i) = tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 - rvalue) * (1 - svalue) * (+1);
+	dndt(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1+rvalue)*(1-svalue)*(+1);
-        dndt(i) = tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 + rvalue) * (1 - svalue) * (+1);
+	dndt(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1+rvalue)*(1+svalue)*(+1);
-        dndt(i) = tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 + rvalue) * (1 + svalue) * (+1);
+	dndt(i) = tmp;
 
-	i = i+1;
-         tmp = 0.125*(1-rvalue)*(1+svalue)*(+1);
-        dndt(i) = tmp;
+	i = i + 1;
+	tmp = 0.125 * (1 - rvalue) * (1 + svalue) * (+1);
+	dndt(i) = tmp;
 
-	return dndt;
 }
+
 

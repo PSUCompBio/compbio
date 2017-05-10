@@ -31,7 +31,7 @@ private:
 	friend std::string fe_get_model(int matl_code);
 public:
 	void readMats(int a, std::string b, VectorXd c);
-	void printMats();
+	void printInfo();
 };
 
 #endif /* HEADERS_MATERIALS_H_ */

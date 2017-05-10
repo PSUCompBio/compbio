@@ -12,7 +12,7 @@ void Materials::readMats(int a, std::string b, VectorXd c){
 	mat_properties = c;
 }
 
-void Materials::printMats(){
+void Materials::printInfo(){
 	std::cout<<"Material ID is: "<<mat_id<<"\n";
 	std::cout<<"Material model is: "<<mat_model<<"\n";
 	std::cout<<"Material Properties are: "<<mat_properties<<std::endl;

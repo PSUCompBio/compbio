@@ -3,218 +3,355 @@
 
 using namespace Eigen;
 
-void Mesh::readMesh(MatrixXd n, MatrixXi e){
-	nodes = n;
-	elements = e;
+void Mesh::readMesh(std::string name, MatrixXd& n, MatrixXi& e)
+{
+    mesh_name = name;
+    nodes = n;
+    elements = e;
 }
 
-MatrixXd Mesh::getNodes(void){
-	return nodes;
+MatrixXd Mesh::getNodes(void)
+{
+    return nodes;
 }
 
-MatrixXi Mesh::getElements(void){
-	return elements;
+MatrixXi Mesh::getElements(void)
+{
+    return elements;
 }
 
-MatrixXd Mesh::getNewNodes(void){
-	return nodes_new;
+MatrixXd Mesh::getNewNodes(void)
+{
+    return nodes_new;
 }
 
-MatrixXi Mesh::getNewElements(void){
-	return elements_new;
+MatrixXi Mesh::getNewElements(void)
+{
+    return elements_new;
 }
 
-void Mesh::readNodalKinematics(VectorXd Usystem, VectorXd Vsystem, VectorXd Asystem){
-	U = Usystem;
-	V = Vsystem;
-	A = Asystem;
+MatrixXd* Mesh::getNewNodesPointer(void) {
+    return nodes_new_pointer;
 }
 
-VectorXd Mesh::getNodalDisp(void){
-	return U;
+MatrixXi* Mesh::getNewElementsPointer(void) {
+    return elements_new_pointer;
 }
 
-VectorXd Mesh::getNodalVel(void){
-	return V;
+int Mesh::getNumElements()
+{
+    return elements_new.rows();
 }
 
-VectorXd Mesh::getNodalAcc(void){
-	return A;
+int Mesh::getNumNodes()
+{
+    return nodes_new.rows();
 }
 
-void Mesh::readStressStrain(MatrixXd stress_tmp, MatrixXd strain_tmp){
-	stress = stress_tmp;
-	strain = strain_tmp;
+int Mesh::getNumNodesPerElement() {
+    return (elements_new.cols() - 2) ;
 }
 
-MatrixXd Mesh::getCellStress(){
-	return stress;
+std::string Mesh::getName(void)
+{
+    return mesh_name;
 }
 
-MatrixXd Mesh::getCellStrain(){
-	return strain;
+void Mesh::readNodalKinematics(VectorXd& Usystem, VectorXd& Vsystem, VectorXd& Asystem)
+{
+    U = Usystem;
+    V = Vsystem;
+    A = Asystem;
 }
 
-void Mesh::preprocessMesh(void){
-
-	nodes_new = nodes;
-	elements_new = elements;
-	/** Nodes Preprocessing - Putting the numbering in order */
-	/* for(int i=0;i<nodes.rows();i++){
-		nodes_new(i,0) = i;
-	} */
-	/** Elements Preprocessing - Correcting the element definitions */
-	/* for(int i=0;i<elements.rows();i++){
-		elements_new(i,0) = i;
-		elements_new(i,1) = elements(i,1);
-		for(int j=2;j<elements.cols();j++){
-			elements_new(i,j) = fe_find(nodes.col(0),elements(i,j));
-		}
-	}*/
+VectorXd Mesh::getNodalDisp(void)
+{
+    return U;
 }
 
-void Mesh::replaceNodes(MatrixXd new_nodes, std::string choice){
-	if(choice=="old"){
-		nodes = new_nodes;
-	}
-	else
-	{
-		nodes_new = new_nodes;
-	}
+VectorXd* Mesh::getNodalDispPointer(void) {
+    return U_pointer;
 }
 
-void Mesh::replaceElements(MatrixXi new_elements, std::string choice){
-	if(choice=="old"){
-		elements = new_elements;
-	}
-	else
-	{
-		elements_new = new_elements;
-	}
+VectorXd Mesh::getNodalVel(void)
+{
+    return V;
+}
+
+VectorXd* Mesh::getNodalVelPointer(void) {
+    return V_pointer;
+}
+
+VectorXd Mesh::getNodalAcc(void)
+{
+    return A;
+}
+
+VectorXd* Mesh::getNodalAccPointer(void) {
+    return A_pointer;
+}
+
+void Mesh::readNodalStressStrain(VectorXd& stress_tmp, VectorXd& strain_tmp)
+{
+    nodal_stress = stress_tmp;
+    nodal_strain = strain_tmp;
+}
+
+void Mesh::readElementStressStrain(VectorXd& stress_tmp, VectorXd& strain_tmp)
+{
+    element_stress = stress_tmp;
+    element_strain = strain_tmp;
+}
+
+VectorXd Mesh::getCellStress()
+{
+    return element_stress;
+}
+
+VectorXd* Mesh::getCellStressPointer() {
+    return element_stress_pointer;
+}
+
+VectorXd Mesh::getCellStrain()
+{
+    return element_strain;
+}
+
+VectorXd* Mesh::getCellStrainPointer() {
+    return element_strain_pointer;
+}
+
+VectorXd Mesh::getNodalStress()
+{
+    return nodal_stress;
+}
+
+VectorXd Mesh::getNodalStrain()
+{
+    return nodal_strain;
+}
+
+void Mesh::preprocessMesh(void)
+{
+
+    nodes_new = nodes;
+    elements_new = elements;
+
+    /** Nodes Preprocessing - Putting the numbering in order */
+    /* for(int i=0;i<nodes.rows();i++){
+        nodes_new(i,0) = i;
+    } */
+    /** Elements Preprocessing - Correcting the element definitions */
+    /* for(int i=0;i<elements.rows();i++){
+        elements_new(i,0) = i;
+        elements_new(i,1) = elements(i,1);
+        for(int j=2;j<elements.cols();j++){
+            elements_new(i,j) = fe_find(nodes.col(0),elements(i,j));
+        }
+    }*/
+
+    calculateElementCharateristic();
+
+    nodes_new_pointer = &nodes_new;
+    elements_new_pointer = &elements_new;
+    U_pointer = &U;
+    V_pointer = &V;
+    A_pointer = &A;
+    element_stress_pointer = &element_stress;
+    element_strain_pointer = &element_strain;
+    element_charateristic_pointer = &element_charateristic;
+}
+
+void Mesh::calculateElementCharateristic() {
+
+    element_charateristic = VectorXd::Zero(elements_new.rows());
+
+    VectorXd xcoord = VectorXd::Zero(elements_new.cols() - 2);
+    VectorXd ycoord = VectorXd::Zero(elements_new.cols() - 2);
+    VectorXd zcoord = VectorXd::Zero(elements_new.cols() - 2);
+    double volume;
+
+    for (int i = 0; i < elements_new.rows(); i++) {
+        for (int j = 0; j < elements_new.cols() - 2; j++) {
+            xcoord(j) = nodes_new(elements_new(i, j + 2), 1);
+            ycoord(j) = nodes_new(elements_new(i, j + 2), 2);
+            zcoord(j) = nodes_new(elements_new(i, j + 2), 3);
+        }
+        element_charateristic(i) = fe_calVolume(xcoord, ycoord, zcoord);
+    }
+
+}
+
+VectorXd* Mesh::getElementCharacteristicPointer() {
+    return element_charateristic_pointer;
+}
+
+void Mesh::replaceNodes(MatrixXd new_nodes, std::string choice)
+{
+    if (choice == "old")
+    {
+        nodes = new_nodes;
+    }
+    else
+    {
+        nodes_new = new_nodes;
+    }
+}
+
+void Mesh::replaceElements(MatrixXi new_elements, std::string choice)
+{
+    if (choice == "old")
+    {
+        elements = new_elements;
+    }
+    else
+    {
+        elements_new = new_elements;
+    }
 }
 
 /** \brief Calculates the minimum charateristic length of the mesh */
-VectorXd Mesh::getMinCharLength(std::string choice){
+VectorXd Mesh::getMinCharLength(std::string choice)
+{
 
-	VectorXd min_details;
+    VectorXd min_details;
 
-	MatrixXd nodes_local;
-	MatrixXi elements_local;
+    MatrixXd nodes_local;
+    MatrixXi elements_local;
 
-	if(choice=="old"){
-		nodes_local = nodes;
-		elements_local = elements;
-	}
-	else
-	{
-		nodes_local = nodes_new;
-		elements_local = elements_new;
-	}
+    if (choice == "old")
+    {
+        nodes_local = nodes;
+        elements_local = elements;
+    }
+    else
+    {
+        nodes_local = nodes_new;
+        elements_local = elements_new;
+    }
 
-	VectorXd xcoord;
+    VectorXd xcoord;
     VectorXd ycoord;
     VectorXd zcoord;
     double min_length = 10000000;
-	double id = 0;
+    double id = 0;
     double lc;
 
-    xcoord = VectorXd::Zero(elements_local.cols()-2);
-    ycoord = VectorXd::Zero(elements_local.cols()-2);
-    zcoord = VectorXd::Zero(elements_local.cols()-2);
-    for(int i=0;i<elements_local.rows();i++){
-        for(int j=0;j<(elements_local.cols()-2);j++){
-			int g = -1;
-			for(int f=0;f<nodes_local.rows();f++){
-				if(elements_local(i,j+2)==nodes_local(f,0)){
-					g = f;
-					break;
-				}
-			}
-			xcoord[j] = nodes_local(g,1);
-			ycoord[j] = nodes_local(g,2);
-			zcoord[j] = nodes_local(g,3);
-		}
-
-        lc = fe_minElementLength(xcoord,ycoord,zcoord);
-
-        if(lc<min_length){
-            min_length = lc;
-			id = i;
+    xcoord = VectorXd::Zero(elements_local.cols() - 2);
+    ycoord = VectorXd::Zero(elements_local.cols() - 2);
+    zcoord = VectorXd::Zero(elements_local.cols() - 2);
+    for (int i = 0; i < elements_local.rows(); i++)
+    {
+        for (int j = 0; j < (elements_local.cols() - 2); j++)
+        {
+            int g = -1;
+            for (int f = 0; f < nodes_local.rows(); f++)
+            {
+                if (elements_local(i, j + 2) == nodes_local(f, 0))
+                {
+                    g = f;
+                    break;
+                }
+            }
+            xcoord[j] = nodes_local(g, 1);
+            ycoord[j] = nodes_local(g, 2);
+            zcoord[j] = nodes_local(g, 3);
         }
 
+        lc = fe_minElementLength(xcoord, ycoord, zcoord);
+
+        if (lc < min_length)
+        {
+            min_length = lc;
+            id = i;
+        }
     }
 
-	min_details << min_length,id;
+    min_details << min_length, id;
 
-	return min_details;
+    return min_details;
 }
 
 /** \brief Calculates the maximum charateristic length of the mesh */
-VectorXd Mesh::getMaxCharLength(std::string choice){
+VectorXd Mesh::getMaxCharLength(std::string choice)
+{
 
-	VectorXd max_details;
-	double id;
+    VectorXd max_details;
+    double id;
 
-	MatrixXd nodes_local;
-	MatrixXi elements_local;
+    MatrixXd nodes_local;
+    MatrixXi elements_local;
 
-	if(choice=="old"){
-		nodes_local = nodes;
-		elements_local = elements;
-	}
-	else
-	{
-		nodes_local = nodes_new;
-		elements_local = elements_new;
-	}
+    if (choice == "old")
+    {
+        nodes_local = nodes;
+        elements_local = elements;
+    }
+    else
+    {
+        nodes_local = nodes_new;
+        elements_local = elements_new;
+    }
 
-	VectorXd xcoord;
+    VectorXd xcoord;
     VectorXd ycoord;
     VectorXd zcoord;
     double max_length = 0.0;
     double lc;
 
-    xcoord = VectorXd::Zero(elements_local.cols()-2);
-    ycoord = VectorXd::Zero(elements_local.cols()-2);
-    zcoord = VectorXd::Zero(elements_local.cols()-2);
-    for(int i=0;i<elements_local.rows();i++){
-        for(int j=0;j<(elements_local.cols()-2);j++){
-			int g = -1;
-			for(int f=0;f<nodes_local.rows();f++){
-				if(elements_local(i,j+2)==nodes_local(f,0)){
-					g = f;
-					break;
-				}
-			}
-			xcoord[j] = nodes_local(g,1);
-			ycoord[j] = nodes_local(g,2);
-			zcoord[j] = nodes_local(g,3);
-		}
-
-        lc = fe_maxElementLength(xcoord,ycoord,zcoord);
-
-        if(lc>max_length){
-            max_length = lc;
-			id = i;
+    xcoord = VectorXd::Zero(elements_local.cols() - 2);
+    ycoord = VectorXd::Zero(elements_local.cols() - 2);
+    zcoord = VectorXd::Zero(elements_local.cols() - 2);
+    for (int i = 0; i < elements_local.rows(); i++)
+    {
+        for (int j = 0; j < (elements_local.cols() - 2); j++)
+        {
+            int g = -1;
+            for (int f = 0; f < nodes_local.rows(); f++)
+            {
+                if (elements_local(i, j + 2) == nodes_local(f, 0))
+                {
+                    g = f;
+                    break;
+                }
+            }
+            xcoord[j] = nodes_local(g, 1);
+            ycoord[j] = nodes_local(g, 2);
+            zcoord[j] = nodes_local(g, 3);
         }
 
+        lc = fe_maxElementLength(xcoord, ycoord, zcoord);
+
+        if (lc > max_length)
+        {
+            max_length = lc;
+            id = i;
+        }
     }
 
-	max_details << max_length, id;
-	return max_details;
+    max_details << max_length, id;
+    return max_details;
 }
 
 /** \brief Check the mesh for zero charateristic lengths */
-void Mesh::checkMesh(){
-	VectorXd lc;
+void Mesh::checkMesh()
+{
+    VectorXd lc;
 
-	lc = getMinCharLength("new");
+    lc = getMinCharLength("new");
 
-	if(lc(0) == 0){
-    	std::cout << "**********************************************" << std::endl;
-    	std::cout << "ZERO LENGTH ELEMENT IN THE SYSTEM \n FIBER LENGTH PREPROCESSING NOT POSSIBLE" << std::endl;
+    if (lc(0) == 0)
+    {
+        std::cout << "**********************************************" << std::endl;
+        std::cout << "ZERO LENGTH ELEMENT IN THE SYSTEM \n FIBER LENGTH PREPROCESSING NOT POSSIBLE" << std::endl;
         std::cout << "**********************************************" << std::endl;
         std::exit(-1);
     }
+}
 
+void Mesh::printInfo()
+{
+    std::cout << "Mesh: " << mesh_name << "\n";
+    std::cout << "Number of elements: " << elements.rows() << "\n";
+    std::cout << "Number of nodes: " << nodes.rows() << "\n";
 }

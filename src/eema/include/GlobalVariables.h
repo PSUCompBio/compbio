@@ -49,6 +49,7 @@
 #include "Mesh.h"
 #include "Materials.h"
 #include "BC.h"
+#include "Constraint.h"
 
 using namespace Eigen;
 
@@ -89,6 +90,8 @@ extern double dt_min;
 /** Reduction Factor for the Time Step */
 extern double reduction;
 
+extern double failure_time_step;
+
 /** Number of different material types in the simulation */
 extern int material_types;
 
@@ -100,6 +103,13 @@ extern int bc_types;
 
 /** Pointer to the Boundary Condition Data */
 extern BC *bc;
+
+/** Number of constraints */
+extern int num_constraints;
+extern Constraint *cons;
+extern bool embedded_constraint;
+extern double area_truss;
+extern bool correct_volume_redundancy;
 
 /** Convergence Criteria for Newton Rhapson Method */
 extern double eps_nr;

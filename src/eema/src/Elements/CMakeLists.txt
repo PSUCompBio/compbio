@@ -19,5 +19,6 @@ SET(Elements_src
     ElementCalculations/fe_calSimpTransformation.cpp
     ElementCalculations/fe_calJacobian.cpp
     ElementCalculations/fe_calDefGrad.cpp
+    ElementCalculations/fe_calCentroid.cpp
      )
 ADD_LIBRARY(Elements OBJECT ${Elements_src})
