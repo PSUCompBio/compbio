@@ -6,9 +6,9 @@ VectorXd fe_saintvenant_elastic(VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, 
 
 	VectorXd sigma_local = VectorXd::Zero(6);
 
-	double E = fe_get_mats(opt, 1);
-	double nu = fe_get_mats(opt, 2);
-	double mu = fe_get_mats(opt, 3);
+	double E = fe_get_mats(opt, 1, "mechanical");
+	double nu = fe_get_mats(opt, 2, "mechanical");
+	double mu = fe_get_mats(opt, 3, "mechanical");
 	double lambda = ((E * nu) / ((1 + nu) * (1 - (2 * nu))));
 
 	MatrixXd F = MatrixXd::Zero(3, 3); // deformation gradient
@@ -38,9 +38,9 @@ void fe_saintvenant_elastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd&
 
 	sigma_local = VectorXd::Zero(6);
 
-	double E = fe_get_mats(opt, 1);
-	double nu = fe_get_mats(opt, 2);
-	double mu = fe_get_mats(opt, 3);
+	double E = fe_get_mats(opt, 1, "mechanical");
+	double nu = fe_get_mats(opt, 2, "mechanical");
+	double mu = fe_get_mats(opt, 3, "mechanical");
 	double lambda = ((E * nu) / ((1 + nu) * (1 - (2 * nu))));
 
 	MatrixXd F = MatrixXd::Zero(3, 3); // deformation gradient

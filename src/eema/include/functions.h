@@ -161,11 +161,11 @@ VectorXd
 fe_stressUpdate_1d(int material_id, VectorXd u_embed, VectorXd xcoord_embed, VectorXd ycoord_embed,
                    VectorXd zcoord_embed, double length_old, VectorXd dndx, VectorXd dndy, VectorXd dndz, VectorXd u_e, int choice);
 /** Extracts the material parameter values based on the material id */
-double
-fe_get_mats(int matl_code, int obj_interest);
+double fe_get_mats(int matl_code, int obj_interest, std::string type);
+
 /** Extracts the material model name */
-std::string
-fe_get_model(int matl_code);
+std::string fe_get_model(int matl_code, std::string type);
+
 /** Function calculates the stress vector for a mooney-rivlin material */
 VectorXd fe_mooneyrivlin_hyperelastic(VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, int opt, int return_opt);
 void fe_mooneyrivlin_hyperelastic_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, int opt, int return_opt);

@@ -2,19 +2,34 @@
 
 using namespace Eigen;
 
-double fe_get_mats(int matl_code, int obj_interest){
-	double mat_param = 0;
-	int num_pointer=0;
+double fe_get_mats(int matl_code, int obj_interest, std::string type) {
 
-	for(int i=0;i<material_types;i++){
-			if(matl_code == mat[i].mat_id){
+	double mat_param = 0;
+
+	if (type == "mechanical") {
+
+		int num_pointer = 0;
+		for (int i = 0; i < material_types; i++) {
+			if (matl_code == mat[i].mat_id) {
 				num_pointer = i;
 				break;
 			}
+		}
+		VectorXd m_1 = mat[num_pointer].mechanical_mat_properties;
+		mat_param = m_1(obj_interest);
 	}
 
-	VectorXd m_1 = mat[num_pointer].mat_properties;
-	mat_param = m_1(obj_interest);
+	if (type == "electrical") {
+		int num_pointer = 0;
+		for (int i = 0; i < material_types; i++) {
+			if (matl_code == mat[i].mat_id) {
+				num_pointer = i;
+				break;
+			}
+		}
+		VectorXd m_1 = mat[num_pointer].electrical_mat_properties;
+		mat_param = m_1(obj_interest);
+	}
 
 	return mat_param;
 }

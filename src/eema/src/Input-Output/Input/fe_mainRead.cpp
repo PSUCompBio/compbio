@@ -134,19 +134,42 @@ void fe_mainRead(std::string file) {
 
       if (line == "*MATERIAL") {
         int mat_id;
-        std::string mat_model;
-        VectorXd mat_properties = VectorXd::Zero(100);
+        std::string mat_model, mech_mat_model, elec_mat_model;
+        VectorXd mech_mat_properties;
+        VectorXd elec_mat_properties;
+        int tmp1, tmp2;
+
         myfile1 >> mat_id;
         myfile1 >> mat_model;
-        int i = 0;
-        std::getline(myfile1, line);
+
         while (line != "*END_MATERIAL") {
-          myfile1.seekg(-(line.length()), std::ios::cur);
-          myfile1 >> mat_properties(i);
+          if (mat_model == "mechanical") {
+            myfile1 >> mech_mat_model;
+            myfile1 >> tmp1;
+            mech_mat_properties = VectorXd::Zero(tmp1);
+            for (int nm = 0; nm < tmp1; nm++) {
+              myfile1 >> mech_mat_properties(nm);
+            }
+          }
+          if (mat_model == "electrical") {
+            myfile1 >> elec_mat_model;
+            myfile1 >> tmp2;
+            elec_mat_properties = VectorXd::Zero(tmp2);
+            for (int nm = 0; nm < tmp2; nm++) {
+              myfile1 >> elec_mat_properties(nm);
+            }
+          }
           myfile1 >> line;
-          i = i + 1;
+          mat_model = line;
         }
-        mat[material_types_counter].readMats(mat_id, mat_model, mat_properties);
+
+        mat[material_types_counter].readMatId(mat_id);
+        if (mech_mat_properties.size() != 0) {
+          mat[material_types_counter].readMats(mech_mat_model, mech_mat_properties, "mechanical");
+        }
+        if (elec_mat_properties.size() != 0) {
+          mat[material_types_counter].readMats(elec_mat_model, elec_mat_properties, "electrical");
+        }
         material_types_counter = material_types_counter + 1;
       }
 
@@ -202,13 +225,9 @@ void fe_mainRead(std::string file) {
           if (type == "embedded")
           {
             embedded_constraint = true;
-
             myfile1 >> master;
-
             myfile1 >> slave;
-
             myfile1 >> address_vr;
-
           }
           myfile1 >> line;
         }
@@ -228,13 +247,15 @@ void fe_mainRead(std::string file) {
   std::cout << "Mesh Details: \n";
   for (int i = 0; i < num_meshes; i++) {
     mesh[i].printInfo();
-  }
-  std::cout << "*************************" << '\n';
+  }*/
+
+  /*std::cout << "*************************" << '\n';
   std::cout << "Material Details: " << '\n';
   for (int i = 0; i < material_types; i++) {
-    mat[i].printInfo();
-  }
-  std::cout << "*************************" << '\n';
+    mat[i].printInfo("all");
+  }*/
+
+  /* std::cout << "*************************" << '\n';
   std::cout << "Boundary Condition Details: " << '\n';
   for (int i = 0; i < bc_types; i++) {
     bc[i].printInfo();

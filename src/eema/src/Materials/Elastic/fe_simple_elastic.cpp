@@ -9,8 +9,8 @@ VectorXd fe_simple_elastic(VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, Matri
 	VectorXd sigma_local = VectorXd::Zero(6);
 
 	MatrixXd matl_mat = MatrixXd::Zero(6, 6);
-	double E = fe_get_mats(opt, 1);
-	double nu = fe_get_mats(opt, 2);
+	double E = fe_get_mats(opt, 1, "mechanical");
+	double nu = fe_get_mats(opt, 2, "mechanical");
 	matl_mat = fe_calculate_matlmat(4, E, nu);
 	sigma_local = matl_mat * disp_mat * u;
 
@@ -22,8 +22,8 @@ void fe_simple_elastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& dndy
 	sigma_local = VectorXd::Zero(6);
 
 	MatrixXd matl_mat = MatrixXd::Zero(6, 6);
-	double E = fe_get_mats(opt, 1);
-	double nu = fe_get_mats(opt, 2);
+	double E = fe_get_mats(opt, 1, "mechanical");
+	double nu = fe_get_mats(opt, 2, "mechanical");
 	fe_calculate_matlmat_pbr(matl_mat, 4, E, nu);
 	sigma_local = matl_mat * disp_mat * u;
 }

@@ -36,9 +36,9 @@ VectorXd fe_mooneyrivlin_hyperelastic(VectorXd& dndx, VectorXd& dndy, VectorXd& 
     MatrixXd cauchy_sigma = MatrixXd::Zero(ndof, ndof);
     MatrixXd pk_S  = MatrixXd::Zero(ndof, ndof);
 
-    double c1 = fe_get_mats(opt, 3);
-    double c2 = fe_get_mats(opt, 4);
-    double D  = fe_get_mats(opt, 1) / 2;
+    double c1 = fe_get_mats(opt, 3, "mechanical");
+    double c2 = fe_get_mats(opt, 4, "mechanical");
+    double D  = fe_get_mats(opt, 1, "mechanical") / 2;
 
     double p = -2 * D * (defJacobian - 1);
 
@@ -92,9 +92,9 @@ void fe_mooneyrivlin_hyperelastic_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd&
     MatrixXd cauchy_sigma = MatrixXd::Zero(ndof, ndof);
     MatrixXd pk_S  = MatrixXd::Zero(ndof, ndof);
 
-    double c1 = fe_get_mats(opt, 3);
-    double c2 = fe_get_mats(opt, 4);
-    double D  = fe_get_mats(opt, 1) / 2;
+    double c1 = fe_get_mats(opt, 3, "mechanical");
+    double c2 = fe_get_mats(opt, 4, "mechanical");
+    double D  = fe_get_mats(opt, 1, "mechanical") / 2;
 
     double p = -2 * D * (defJacobian - 1);
 

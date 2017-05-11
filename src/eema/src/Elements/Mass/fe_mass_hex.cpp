@@ -12,7 +12,7 @@ MatrixXd fe_mass_hex(MatrixXd nodes, VectorXi elements_row) {
 	VectorXd ycoord = VectorXd::Zero(nnel);
 	VectorXd zcoord = VectorXd::Zero(nnel);
 
-	double rho = fe_get_mats(elements_row(1), 0); // material density
+	double rho = fe_get_mats(elements_row(1), 0, "mechanical"); // material density
 
 	for (int j = 0; j < nnel; j++) {
 		int g = -1;

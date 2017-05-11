@@ -20,18 +20,21 @@
 
 using namespace Eigen;
 
-class Materials{
+class Materials {
 private:
 	int mat_id;
-	std::string mat_model;
-	VectorXd mat_properties;
-	//VectorXd mat_properties = VectorXd::Zero(100);
+	std::string mechanical_mat_model;
+	std::string electrical_mat_model;
+	VectorXd mechanical_mat_properties;
+	VectorXd electrical_mat_properties;
+
 	double data;
-	friend double fe_get_mats(int matl_code, int obj_interest);
-	friend std::string fe_get_model(int matl_code);
+	friend double fe_get_mats(int matl_code, int obj_interest, std::string type);
+	friend std::string fe_get_model(int matl_code, std::string type);
 public:
-	void readMats(int a, std::string b, VectorXd c);
-	void printInfo();
+	void readMatId(int a);
+	void readMats(std::string b, VectorXd c, std::string type);
+	void printInfo(std::string type);
 };
 
 #endif /* HEADERS_MATERIALS_H_ */
