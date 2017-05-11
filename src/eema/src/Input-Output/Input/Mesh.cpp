@@ -131,6 +131,18 @@ VectorXd Mesh::getNodalStrain()
     return nodal_strain;
 }
 
+void Mesh::readNodalElectroPhysics(VectorXd& VP) {
+    nodal_electric_potential = VP;
+}
+
+VectorXd Mesh::getNodalEPotential() {
+    return nodal_electric_potential;
+}
+
+VectorXd* Mesh::getNodalEPotentialPointer() {
+    return nodal_electric_potential_pointer;
+}
+
 void Mesh::preprocessMesh(void)
 {
 
@@ -160,6 +172,7 @@ void Mesh::preprocessMesh(void)
     element_stress_pointer = &element_stress;
     element_strain_pointer = &element_strain;
     element_charateristic_pointer = &element_charateristic;
+    nodal_electric_potential_pointer = &nodal_electric_potential;
 }
 
 void Mesh::calculateElementCharateristic() {

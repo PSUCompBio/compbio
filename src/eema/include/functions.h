@@ -45,7 +45,7 @@ new_double2text(std::string name, double a);
 void
 new_double2textWithTime(std::string name, int frame, double time, double value);
 /** Function writes the results into the VTU folder */
-void fe_vtuWrite(int time_step, double time, Mesh mesh1);
+void fe_vtuWrite(int time_step, double time, Mesh& mesh1);
 
 /** Function creates new PVD file in the VTU folder */
 void
@@ -301,9 +301,6 @@ fe_display_vector(VectorXd A);
 void
 fe_display_matrix(MatrixXd A);
 
-MatrixXd
-fe_apply_bc_stiffness(MatrixXd kk, VectorXi bcdof, VectorXd bcval);
-
 /** Internal nodal force vector for a hexahedral element */
 MatrixXd
 fe_stiffness_hex(double E, double nu, int ndof, int nnel, int edof, double xcoord[], double ycoord[], double zcoord[]);
@@ -376,5 +373,18 @@ void fe_checkEnergies(VectorXd& U_prev, VectorXd& U, VectorXd& fi_prev, VectorXd
 void fe_energyWrite_new(std::string& internal_energy, std::string& external_energy, std::string& kinetic_energy, std::string& total_energy, int plot_state_counter, double& t, double& energy_int_new, double& energy_ext_new, double& energy_kin, double& energy_total);
 
 void fe_energyWrite_append(std::string& internal_energy, std::string& external_energy, std::string& kinetic_energy, std::string& total_energy, int plot_state_counter, double& t, double& energy_int_new, double& energy_ext_new, double& energy_kin, double& energy_total);
+
+/* =================================================================== */
+/* BioElectroPhysics */
+/* =================================================================== */
+
+void fe_electrical_shapeMatrix(MatrixXd& electrical_shape_mat, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz);
+void fe_apply_bc_current(VectorXd& I, double &time);
+void fe_bioelectrophysics();
+void fe_electroStatics_normal(double time);
+void fe_assemble_electricStiffness(MatrixXd& global, MatrixXd& local, VectorXi node_list);
+void fe_scatter_electricalForce(VectorXd& global_vec, VectorXd& local_vec, VectorXi node_list);
+void fe_apply_bc_potential(VectorXd& VP, double &time);
+void fe_apply_bc_potential(MatrixXd& kk, VectorXd& ff, double time);
 
 #endif // ifndef FUNCTIONS_H_

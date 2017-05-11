@@ -21,22 +21,38 @@
 #include "functions.h"
 using namespace Eigen;
 
-MatrixXd fe_assemble_mass(MatrixXd mm, MatrixXd m, VectorXi node_list, int sdof){
+MatrixXd fe_assemble_mass(MatrixXd mm, MatrixXd m, VectorXi node_list, int sdof) {
 
-	int edof = (node_list.size())*ndof;
+	int edof = (node_list.size()) * ndof;
 	VectorXi index = fe_find_index(node_list);
 
 	int ii = 0;
 	int jj = 0;
 
-	for (int i=0; i<edof; i++){
+	for (int i = 0; i < edof; i++) {
 		ii = index(i);
-		for (int j=0; j<edof; j++){
+		for (int j = 0; j < edof; j++) {
 			jj = index(j);
-			mm(ii,jj) = mm(ii,jj) + m(i,j) ;
+			mm(ii, jj) = mm(ii, jj) + m(i, j) ;
 		}
 	}
 
 	return mm;
+
+}
+
+void fe_assemble_electricStiffness(MatrixXd& global, MatrixXd& local, VectorXi node_list) {
+	int edof = node_list.size();
+
+	int ii = 0;
+	int jj = 0;
+
+	for (int i = 0; i < edof; i++) {
+		ii = node_list(i);
+		for (int j = 0; j < edof; j++) {
+			jj = node_list(j);
+			global(ii, jj) = global(ii, jj) + local(i, j);
+		}
+	}
 
 }

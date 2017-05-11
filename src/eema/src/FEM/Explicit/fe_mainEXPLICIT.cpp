@@ -18,9 +18,13 @@ fe_mainEXPLICIT()
         std::exit(-1);
     }
 
+    std::cout << "Debugging Here: 1" << "\n";
+
     for (int i = 0; i < num_meshes; i++) {
         mesh[i].preprocessMesh();
     }
+
+
 
     // Following variables - Only for Hex Element
     int nnode = mesh[0].getNumNodes();          // number of nodes
