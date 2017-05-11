@@ -25,7 +25,7 @@ before_script:
   # Run your build commands next
   - mkdir build
   - cd build/
-  - cmake ../ -DEEMA_EXAMPLES=ON -DEXAMPLE1=ON -DEEMA_GUI=ON
+  - cmake ../ -DEEMA=ON -DEEMA_EXAMPLES=ON -DEXAMPLE1=ON -DEEMA_GUI=ON
 script:
   - make
   # test example 1 
