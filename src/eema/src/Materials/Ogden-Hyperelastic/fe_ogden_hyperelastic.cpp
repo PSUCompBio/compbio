@@ -33,17 +33,17 @@ VectorXd fe_ogden_hyperelastic(VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, V
 	n_3 << V(0, 2), V(1, 2), V(2, 2);
 
 
-	double D_1 = fe_get_mats(3, 1) / 2;
+	double D_1 = fe_get_mats(3, 1, "mechanical") / 2;
 	double p = -2 * D_1 * (defJacobian - 1);
 
-	double n = fe_get_mats(opt, 3);
+	double n = fe_get_mats(opt, 3, "mechanical");
 	int counter = 4;
 	double W_1 = 0;
 	double W_2 = 0;
 	double W_3 = 0;
 	for (double i = 0.0; i < n;) {
-		double mu = fe_get_mats(opt, counter);
-		double alpha = fe_get_mats(3, counter + 1);
+		double mu = fe_get_mats(opt, counter, "mechanical");
+		double alpha = fe_get_mats(3, counter + 1, "mechanical");
 		W_1 = W_1 + (mu * pow(l_1, (alpha - 1)));
 		W_2 = W_2 + (mu * pow(l_2, (alpha - 1)));
 		W_3 = W_3 + (mu * pow(l_3, (alpha - 1)));
@@ -98,17 +98,17 @@ void fe_ogden_hyperelastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& 
 	n_3 << V(0, 2), V(1, 2), V(2, 2);
 
 
-	double D_1 = fe_get_mats(3, 1) / 2;
+	double D_1 = fe_get_mats(3, 1, "mechanical") / 2;
 	double p = -2 * D_1 * (defJacobian - 1);
 
-	double n = fe_get_mats(opt, 3);
+	double n = fe_get_mats(opt, 3, "mechanical");
 	int counter = 4;
 	double W_1 = 0;
 	double W_2 = 0;
 	double W_3 = 0;
 	for (double i = 0.0; i < n;) {
-		double mu = fe_get_mats(opt, counter);
-		double alpha = fe_get_mats(3, counter + 1);
+		double mu = fe_get_mats(opt, counter, "mechanical");
+		double alpha = fe_get_mats(3, counter + 1, "mechanical");
 		W_1 = W_1 + (mu * pow(l_1, (alpha - 1)));
 		W_2 = W_2 + (mu * pow(l_2, (alpha - 1)));
 		W_3 = W_3 + (mu * pow(l_3, (alpha - 1)));

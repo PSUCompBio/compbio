@@ -19,7 +19,7 @@ VectorXd fe_massLumped(MatrixXd* nodes, VectorXi elements_row) {
     zcoord(j) = (*nodes)(g, 3);
   }
 
-  double rho = fe_get_mats(elements_row(1), 0); // material density
+  double rho = fe_get_mats(elements_row(1), 0, "mechanical"); // material density
   double volume_element = fe_calVolume(xcoord, ycoord, zcoord);
   // The above function fe_calVolume gives volume for a 3d element, area for a 2d element and length for a 1d element.
 

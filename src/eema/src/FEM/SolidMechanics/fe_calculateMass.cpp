@@ -87,8 +87,8 @@ void fe_calculateMassDirectLumped_embed(VectorXd& m_system, int host_id, int emb
         zcoord_embed(j) = (*nodes_embed)(g, 3);
       }
 
-      double rho_truss = fe_get_mats((*elements_embed)(fib, 1), 0);
-      double rho_host = fe_get_mats((*elements_host)(i, 1), 0);
+      double rho_truss = fe_get_mats((*elements_embed)(fib, 1), 0, "mechanical");
+      double rho_host = fe_get_mats((*elements_host)(i, 1), 0, "mechanical");
 
       double m_truss = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed) * area_truss * rho_truss;
       double m_correction = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed) * area_truss * rho_host;

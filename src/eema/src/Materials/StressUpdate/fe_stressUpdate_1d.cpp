@@ -24,10 +24,10 @@ fe_stressUpdate_1d(int material_id, VectorXd u_embed_local, VectorXd xcoord_embe
     VectorXd pk_S = VectorXd::Zero(6);
 
     std::string model;
-    model = fe_get_model(material_id);
+    model = fe_get_model(material_id, "mechanical");
 
     if (model == "simple_elastic") { // Isotropic truss element
-        double E = fe_get_mats(material_id, 1);
+        double E = fe_get_mats(material_id, 1, "mechanical");
         //std::cout << "Elastic Modulus - Fiber: " << E << "\n";
         cauchy_sigma = E * log(lambda);
         //std::cout << "Fiber Stretch: " << lambda << "\n";
@@ -36,8 +36,8 @@ fe_stressUpdate_1d(int material_id, VectorXd u_embed_local, VectorXd xcoord_embe
     }
 
     if (model == "mooney-rivlin_hyperelastic") {
-        double c_1 = fe_get_mats(material_id, 3);
-        double c_2 = fe_get_mats(material_id, 4);
+        double c_1 = fe_get_mats(material_id, 3, "mechanical");
+        double c_2 = fe_get_mats(material_id, 4, "mechanical");
         cauchy_sigma = ((2 * c_1) + ((2 * c_2) / (lambda))) * ((pow(lambda, 2)) - (1 / lambda));
     }
 
@@ -77,16 +77,16 @@ fe_stressUpdate_1d(int material_id, VectorXd u_embed_local, VectorXd xcoord_embe
     // VectorXd pk_S         = VectorXd::Zero(6);
 
     std::string model;
-    model = fe_get_model(material_id);
+    model = fe_get_model(material_id, "mechanical");
 
     if (model == "simple_elastic") { // Isotropic truss element
-        double E = fe_get_mats(material_id, 1);
+        double E = fe_get_mats(material_id, 1, "mechanical");
         cauchy_sigma(0) = E * log(lambda);
     }
 
     if (model == "mooney-rivlin_hyperelastic") {
-        double c_1 = fe_get_mats(material_id, 3);
-        double c_2 = fe_get_mats(material_id, 4);
+        double c_1 = fe_get_mats(material_id, 3, "mechanical");
+        double c_2 = fe_get_mats(material_id, 4, "mechanical");
         cauchy_sigma(0) = ((2 * c_1) + ((2 * c_2) / (lambda))) * ((pow(lambda, 2)) - (1 / lambda));
     }
 

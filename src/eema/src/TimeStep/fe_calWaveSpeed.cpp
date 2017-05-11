@@ -6,13 +6,13 @@ using namespace Eigen;
 double
 fe_calWaveSpeed(int material_id, double volume_initial, double volume_current)
 {
-    std::string model = fe_get_model(material_id);
+    std::string model = fe_get_model(material_id, "mechanical");
     double c_wave     = 0;
 
     if (model == "simple_elastic") {
-        double E   = fe_get_mats(material_id, 1);
-        double nu  = fe_get_mats(material_id, 2);
-        double rho = fe_get_mats(material_id, 0);
+        double E   = fe_get_mats(material_id, 1, "mechanical");
+        double nu  = fe_get_mats(material_id, 2, "mechanical");
+        double rho = fe_get_mats(material_id, 0, "mechanical");
 
         if (nu == 0.5) {
             c_wave = sqrt(E / rho);
@@ -22,8 +22,8 @@ fe_calWaveSpeed(int material_id, double volume_initial, double volume_current)
     }
 
     if (model == "mooney-rivlin_hyperelastic") {
-        double K   = fe_get_mats(material_id, 1);
-        double rho = fe_get_mats(material_id, 0);
+        double K   = fe_get_mats(material_id, 1, "mechanical");
+        double rho = fe_get_mats(material_id, 0, "mechanical");
         c_wave = sqrt(volume_current / volume_initial) * sqrt(K / rho) * 1.3;
     }
 

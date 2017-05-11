@@ -9,7 +9,7 @@ VectorXd fe_stressUpdate(VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, MatrixX
 	/** This function is  for 2d or 3d elements. For 1d elements, different stress update function was included */
 
 	std::string model;
-	model = fe_get_model(opt);
+	model = fe_get_model(opt, "mechanical");
 
 	VectorXd sigma = VectorXd::Zero(ndof * 2); //stress-vector
 
@@ -44,7 +44,7 @@ void fe_stressUpdate_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd& dndy, Vector
 	/** This function is  for 2d or 3d elements. For 1d elements, different stress update function was included */
 
 	std::string model;
-	model = fe_get_model(opt);
+	model = fe_get_model(opt, "mechanical");
 
 	/** This block develops outputs the updated stress for a 3d elastic material */
 	if (model == "simple_elastic") {
