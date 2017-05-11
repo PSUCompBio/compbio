@@ -35,8 +35,6 @@ bool embedded_constraint;
 
 void fe_mainRead(std::string file) {
 
-  std::cout << " EEMA Input File Reader - Started .... " << '\n';
-
   num_meshes = 0;
   int num_meshes_counter = 0;
   material_types = 0;
@@ -224,7 +222,7 @@ void fe_mainRead(std::string file) {
     std::getline(myfile1, line);
   }
 
-  std::cout << " EEMA Input File Reader - Completed !! " << '\n';
+  std::cout << "EEMA: Reading Input File --> Completed !!" << "\n";
 
   /*std::cout << "*************************" << '\n';
   std::cout << "Mesh Details: \n";
@@ -247,5 +245,16 @@ void fe_mainRead(std::string file) {
     cons[i].printInfo();
   }
   std::cout << "*************************" << '\n';*/
+
+  if (num_meshes == 0) {
+    std::cout << "No meshes included - Simulation is not possible !! " << "\n";
+    std::exit(-1);
+  }
+
+  for (int i = 0; i < num_meshes; i++) {
+    mesh[i].preprocessMesh();
+  }
+
+  std::cout << "EEMA: Mesh Preprocessing --> Completed !!" << "\n";
 
 }

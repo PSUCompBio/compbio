@@ -151,7 +151,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
     /** Point Scalar Data - Electric Potential */
     if ((*electric_potential).size() != 0) {
         myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Electric-Potential\" "
-               << "NumberOfComponents=\"1\" ComponentName0=\"X\" format=\"ascii\">\n";
+               << "format=\"ascii\">\n";
         int num = 0;
         for (int i = 0; i < (*nodes).rows(); i++)
         {
@@ -166,29 +166,34 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
 
     /** Cell Data - Stresses and Strains */
     myfile << "\t\t\t<CellData>\n";
-    myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Stress (Cauchy)\" NumberOfComponents=\"9\" ComponentName0=\"XX\" ComponentName1=\"XY\" ComponentName2=\"XZ\" ComponentName3=\"YX\" ComponentName4=\"YY\" ComponentName5=\"YZ\" ComponentName6=\"ZX\" ComponentName7=\"ZY\" ComponentName8=\"ZZ\" format=\"ascii\">\n";
-    for (int i = 0; i < (*element_stress).size();)
-    {
-        myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_stress)(i + 0) << " " << (*element_stress)(i + 1) << " " << (*element_stress)(i + 2) << "\n";
-        myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_stress)(i + 3) << " " << (*element_stress)(i + 4) << " " << (*element_stress)(i + 5) << "\n";
-        myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_stress)(i + 6) << " " << (*element_stress)(i + 7) << " " << (*element_stress)(i + 8) << "\n";
 
-        i = i + 9;
+    if ((*element_stress).rows() == 0 && (*element_stress).cols() == 0) {
+        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Stress (Cauchy)\" NumberOfComponents=\"9\" ComponentName0=\"XX\" ComponentName1=\"XY\" ComponentName2=\"XZ\" ComponentName3=\"YX\" ComponentName4=\"YY\" ComponentName5=\"YZ\" ComponentName6=\"ZX\" ComponentName7=\"ZY\" ComponentName8=\"ZZ\" format=\"ascii\">\n";
+        for (int i = 0; i < (*element_stress).size();)
+        {
+            myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_stress)(i + 0) << " " << (*element_stress)(i + 1) << " " << (*element_stress)(i + 2) << "\n";
+            myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_stress)(i + 3) << " " << (*element_stress)(i + 4) << " " << (*element_stress)(i + 5) << "\n";
+            myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_stress)(i + 6) << " " << (*element_stress)(i + 7) << " " << (*element_stress)(i + 8) << "\n";
+
+            i = i + 9;
+        }
+        myfile << "\t\t\t\t</DataArray>\n";
     }
-    myfile << "\t\t\t\t</DataArray>\n";
 
-    myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Strain (Logarithmic)\" NumberOfComponents=\"9\" ComponentName0=\"XX\" ComponentName1=\"XY\" ComponentName2=\"XZ\" ComponentName3=\"YX\" ComponentName4=\"YY\" ComponentName5=\"YZ\" ComponentName6=\"ZX\" ComponentName7=\"ZY\" ComponentName8=\"ZZ\" format=\"ascii\">\n";
-    for (int i = 0; i < (*element_strain).size();)
-    {
-        myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_strain)(i + 0) << " " << (*element_strain)(i + 1) << " " << (*element_strain)(i + 2) << "\n";
-        myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_strain)(i + 3) << " " << (*element_strain)(i + 4) << " " << (*element_strain)(i + 5) << "\n";
-        myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_strain)(i + 6) << " " << (*element_strain)(i + 7) << " " << (*element_strain)(i + 8) << "\n";
+    if ((*element_strain).rows() == 0 && (*element_strain).cols() == 0) {
+        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Strain (Logarithmic)\" NumberOfComponents=\"9\" ComponentName0=\"XX\" ComponentName1=\"XY\" ComponentName2=\"XZ\" ComponentName3=\"YX\" ComponentName4=\"YY\" ComponentName5=\"YZ\" ComponentName6=\"ZX\" ComponentName7=\"ZY\" ComponentName8=\"ZZ\" format=\"ascii\">\n";
+        for (int i = 0; i < (*element_strain).size();)
+        {
+            myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_strain)(i + 0) << " " << (*element_strain)(i + 1) << " " << (*element_strain)(i + 2) << "\n";
+            myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_strain)(i + 3) << " " << (*element_strain)(i + 4) << " " << (*element_strain)(i + 5) << "\n";
+            myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_strain)(i + 6) << " " << (*element_strain)(i + 7) << " " << (*element_strain)(i + 8) << "\n";
 
-        i = i + 9;
+            i = i + 9;
+        }
+        myfile << "\t\t\t\t</DataArray>\n";
     }
-    myfile << "\t\t\t\t</DataArray>\n";
+
     myfile << "\t\t\t</CellData>\n";
-
     myfile << "\t\t</Piece>\n";
     myfile << "\t</UnstructuredGrid>\n";
     myfile << "</VTKFile>\n";
