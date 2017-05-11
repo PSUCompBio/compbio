@@ -13,11 +13,12 @@ SET(FEM_src
     SolidMechanics/fe_checkEnergies.cpp
     Explicit/fe_mainEXPLICIT.cpp
     Explicit/fe_timeUpdate.cpp
-    Electromechanics/fe_electromechanics.cpp
+    BioElectroPhysics/fe_bioElectroPhysics.cpp
+    BioElectroPhysics/fe_electroStatics_normal.cpp
     BoundaryConditions/fe_apply_bc.cpp
     Assembly-Global-Local/fe_scatter.cpp
     Assembly-Global-Local/fe_gather.cpp
     Assembly-Global-Local/fe_find_index.cpp
-    Assembly-Global-Local/fe_assemble_mass.cpp
+    Assembly-Global-Local/fe_assemble.cpp
      )
 ADD_LIBRARY(FEM OBJECT ${FEM_src})

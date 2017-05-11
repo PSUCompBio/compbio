@@ -111,17 +111,54 @@ void fe_apply_bc_load(VectorXd& fe, double& time) {
 
 }
 
-MatrixXd fe_apply_bc_stiffness(MatrixXd kk, VectorXi bcdof, VectorXd bcval) {
-
-	int n = bcdof.size();
-	int sdof = kk.rows();
-
-	for (int i = 0; i < n; i++) {
-		int c = bcdof(i);
-		for (int j = 0; j < sdof; j++) {
-			kk(c, j) = 0;
+void fe_apply_bc_current(VectorXd& I, double &time) {
+	for (int i = 0; i < bc_types; i++) {
+		std::string type = bc[i].getType();
+		if (type == "current") {
+			double input_load_amp = bc[i].getAmplitude();
+			std::string load_curve = bc[i].getTimeBehavior();
+			int number_of_dof = bc[i].getNumDOF();
+			VectorXi local_dof = bc[i].getDOF();
+			for (int j = 0; j < number_of_dof; j++) {
+				int c = local_dof(j);
+				I(c) = fe_function(input_load_amp, load_curve, time);
+			}
 		}
-		kk(c, c) = 1;
 	}
-	return kk;
+}
+
+void fe_apply_bc_potential(VectorXd& VP, double &time) {
+	for (int i = 0; i < bc_types; i++) {
+		std::string type = bc[i].getType();
+		if (type == "potential") {
+			double input_load_amp = bc[i].getAmplitude();
+			std::string load_curve = bc[i].getTimeBehavior();
+			int number_of_dof = bc[i].getNumDOF();
+			VectorXi local_dof = bc[i].getDOF();
+			for (int j = 0; j < number_of_dof; j++) {
+				int c = local_dof(j);
+				VP(c) = fe_function(input_load_amp, load_curve, time);
+			}
+		}
+	}
+}
+
+void fe_apply_bc_potential(MatrixXd& kk, VectorXd& ff, double time) {
+	for (int i = 0; i < bc_types; i++) {
+		std::string type = bc[i].getType();
+		if (type == "potential") {
+			double input_load_amp = bc[i].getAmplitude();
+			std::string load_curve = bc[i].getTimeBehavior();
+			int number_of_dof = bc[i].getNumDOF();
+			VectorXi local_dof = bc[i].getDOF();
+			for (int j = 0; j < number_of_dof; j++) {
+				int c = local_dof(j);
+				for (int k = 0; k < kk.cols(); k++) {
+					kk(c, k) = 0;
+				}
+				kk(c, c) = 1;
+				ff(c) = fe_function(input_load_amp, load_curve, time);
+			}
+		}
+	}
 }

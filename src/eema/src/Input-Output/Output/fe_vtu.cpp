@@ -2,8 +2,9 @@
 
 using namespace Eigen;
 
-void fe_vtuWrite(int time_step, double time, Mesh mesh1)
+void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
 {
+
     std::string output = mesh1.getName();
 
     /** Points Info */
@@ -26,6 +27,8 @@ void fe_vtuWrite(int time_step, double time, Mesh mesh1)
 
     /** Mesh Data - Strains */
     VectorXd* element_strain = mesh1.getCellStrainPointer();
+
+    VectorXd* electric_potential = mesh1.getNodalEPotentialPointer();
 
     /** Output File Name */
     std::string name;
@@ -93,49 +96,72 @@ void fe_vtuWrite(int time_step, double time, Mesh mesh1)
 
     /** Point Vector Data - Displacements */
     myfile << "\t\t\t<PointData>\n";
-    myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Displacement\" "
-           << "NumberOfComponents=\"3\" ComponentName0=\"X\" "
-           << "ComponentName1=\"Y\" ComponentName2=\"Z\" format=\"ascii\">\n";
-    int num = 0;
-    for (int i = 0; i < (*nodes).rows(); i++)
-    {
-        myfile << "\t\t\t\t\t" << std::setw(10) << std::scientific << std::setprecision(10)
-               << (*U_mesh)(num) << " "
-               << (*U_mesh)(num + 1) << " "
-               << (*U_mesh)(num + 2) << " \n";
-        num = num + 3;
+
+    if ((*U_mesh).size() != 0) {
+        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Displacement\" "
+               << "NumberOfComponents=\"3\" ComponentName0=\"X\" "
+               << "ComponentName1=\"Y\" ComponentName2=\"Z\" format=\"ascii\">\n";
+        int num = 0;
+        for (int i = 0; i < (*nodes).rows(); i++)
+        {
+            myfile << "\t\t\t\t\t" << std::setw(10) << std::scientific << std::setprecision(10)
+                   << (*U_mesh)(num) << " "
+                   << (*U_mesh)(num + 1) << " "
+                   << (*U_mesh)(num + 2) << " \n";
+            num = num + 3;
+        }
+        myfile << "\t\t\t\t</DataArray>\n";
     }
-    myfile << "\t\t\t\t</DataArray>\n";
 
     /** Point Vector Data - Velocities */
-    myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Velocity\" "
-           << "NumberOfComponents=\"3\" ComponentName0=\"X\" "
-           << "ComponentName1=\"Y\" ComponentName2=\"Z\" format=\"ascii\">\n";
-    num = 0;
-    for (int i = 0; i < (*nodes).rows(); i++)
-    {
-        myfile << "\t\t\t\t\t" << std::setw(10) << std::scientific << std::setprecision(10)
-               << (*V_mesh)(num) << " "
-               << (*V_mesh)(num + 1) << " "
-               << (*V_mesh)(num + 2) << " \n";
-        num = num + 3;
+    if ((*V_mesh).size() != 0) {
+        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Velocity\" "
+               << "NumberOfComponents=\"3\" ComponentName0=\"X\" "
+               << "ComponentName1=\"Y\" ComponentName2=\"Z\" format=\"ascii\">\n";
+        int num = 0;
+        for (int i = 0; i < (*nodes).rows(); i++)
+        {
+            myfile << "\t\t\t\t\t" << std::setw(10) << std::scientific << std::setprecision(10)
+                   << (*V_mesh)(num) << " "
+                   << (*V_mesh)(num + 1) << " "
+                   << (*V_mesh)(num + 2) << " \n";
+            num = num + 3;
+        }
+        myfile << "\t\t\t\t</DataArray>\n";
     }
-    myfile << "\t\t\t\t</DataArray>\n";
 
     /** Point Vector Data - Accelerations */
-    myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Acceleration\" "
-           << "NumberOfComponents=\"3\" ComponentName0=\"X\" "
-           << "ComponentName1=\"Y\" ComponentName2=\"Z\" format=\"ascii\">\n";
-    num = 0;
-    for (int i = 0; i < (*nodes).rows(); i++)
-    {
-        myfile << "\t\t\t\t\t" << std::setw(10) << std::scientific << std::setprecision(10)
-               << (*A_mesh)(num) << " "
-               << (*A_mesh)(num + 1) << " "
-               << (*A_mesh)(num + 2) << " \n";
-        num = num + 3;
+    if ((*A_mesh).size() != 0) {
+        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Acceleration\" "
+               << "NumberOfComponents=\"3\" ComponentName0=\"X\" "
+               << "ComponentName1=\"Y\" ComponentName2=\"Z\" format=\"ascii\">\n";
+        int num = 0;
+        for (int i = 0; i < (*nodes).rows(); i++)
+        {
+            myfile << "\t\t\t\t\t" << std::setw(10) << std::scientific << std::setprecision(10)
+                   << (*A_mesh)(num) << " "
+                   << (*A_mesh)(num + 1) << " "
+                   << (*A_mesh)(num + 2) << " \n";
+            num = num + 3;
+        }
+        myfile << "\t\t\t\t</DataArray>\n";
     }
-    myfile << "\t\t\t\t</DataArray>\n";
+
+
+    /** Point Scalar Data - Electric Potential */
+    if ((*electric_potential).size() != 0) {
+        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Electric-Potential\" "
+               << "NumberOfComponents=\"1\" ComponentName0=\"X\" format=\"ascii\">\n";
+        int num = 0;
+        for (int i = 0; i < (*nodes).rows(); i++)
+        {
+            myfile << "\t\t\t\t\t" << std::setw(10) << std::scientific << std::setprecision(10)
+                   << (*electric_potential)(num) << "\n";
+            num = num + 1;
+        }
+        myfile << "\t\t\t\t</DataArray>\n";
+    }
+
     myfile << "\t\t\t</PointData>\n";
 
     /** Cell Data - Stresses and Strains */

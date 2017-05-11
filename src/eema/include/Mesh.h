@@ -67,11 +67,15 @@ class Mesh
   VectorXd element_charateristic;
   VectorXd* element_charateristic_pointer;
 
+  VectorXd nodal_electric_potential;
+  VectorXd* nodal_electric_potential_pointer;
+
 public:
   void readMesh(std::string name, MatrixXd& n, MatrixXi& e);
   void readNodalKinematics(VectorXd& Usystem, VectorXd& Vsystem, VectorXd& Asystem);
   void readNodalStressStrain(VectorXd& stress_tmp, VectorXd& strain_tmp);
   void readElementStressStrain(VectorXd& stress_tmp, VectorXd& strain_tmp);
+  void readNodalElectroPhysics(VectorXd& VP);
 
   MatrixXd getNodes();
   MatrixXi getElements();
@@ -113,6 +117,9 @@ public:
 
   void calculateElementCharateristic();
   VectorXd* getElementCharacteristicPointer();
+
+  VectorXd getNodalEPotential();
+  VectorXd* getNodalEPotentialPointer();
 
   int getNumNodes();
   int getNumElements();

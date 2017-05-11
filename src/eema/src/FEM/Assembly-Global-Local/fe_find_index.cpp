@@ -13,7 +13,7 @@
 #include "functions.h"
 using namespace Eigen;
 
-VectorXi fe_find_index(VectorXi node_list){
+VectorXi fe_find_index(VectorXi node_list) {
 
 	VectorXi index;
 	int edof = (node_list.size()) * ndof;
@@ -22,16 +22,17 @@ VectorXi fe_find_index(VectorXi node_list){
 
 	index = VectorXi::Zero(edof);
 
-	for(int i=0; i<node_list.size(); i++){
-		start = (node_list(i))*(ndof);
-		for (int j=0; j<ndof ; j++){
+	for (int i = 0; i < node_list.size(); i++) {
+		start = (node_list(i)) * (ndof);
+		for (int j = 0; j < ndof ; j++) {
 			index(k) = start + j;
-			k = k+1;
+			k = k + 1;
 		}
 	}
 
 	return index;
 }
+
 
 
 
