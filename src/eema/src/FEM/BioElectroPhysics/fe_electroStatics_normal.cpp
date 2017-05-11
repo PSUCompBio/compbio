@@ -4,30 +4,22 @@ using namespace Eigen;
 
 void fe_electroStatics_normal(double time) {
 
-	std::cout << "Debugging in Electrostatics 1" << "\n";
-
 	MatrixXd* nodes = mesh[0].getNewNodesPointer();
-
-	std::cout << "Debugging in Electrostatics 2" << "\n";
 	MatrixXi* elements = mesh[0].getNewElementsPointer();
 
 	int nel = mesh[0].getNumElements();
 	int nnode = mesh[0].getNumNodes();
 	int nnel = mesh[0].getNumNodesPerElement();
-	std::cout << "Num Nodes Per Element: " << nel << "\n";
 	int sdof = nnode;
 
-	std::cout << "Debugging in Electrostatics 3" << "\n";
 	MatrixXd electrical_kk = MatrixXd::Zero(nnode, nnode);
-	std::cout << "Debugging in Electrostatics 4" << "\n";
+
 	MatrixXd electrical_kk_element = MatrixXd::Zero(nnel, nnel);
-	std::cout << "Debugging in Electrostatics 5" << "\n";
 	VectorXd electrical_force = VectorXd::Zero(nnode);
 	VectorXd electrical_force_element = VectorXd::Zero(nnel);
 	VectorXd VP = VectorXd::Zero(nnode);
 	VectorXd I = VectorXd::Zero(nel);
-
-	std::cout << "Debugging in Electrostatics END" << "\n";
+	I(0) = 10;
 
 	// Element Data
 	VectorXd xcoord      = VectorXd::Zero(nnel);
@@ -37,6 +29,7 @@ void fe_electroStatics_normal(double time) {
 	//fe_apply_bc_current(I, time);
 
 	for (int i = 0; i < nel; i++) {
+
 		for (int j = 0; j < nnel; j++) {
 			int g = (*elements)(i, j + 2);
 			xcoord(j)      = (*nodes)(g, 1);
@@ -66,6 +59,7 @@ void fe_electroStatics_normal(double time) {
 		MatrixXd conductivity = 0.1 * MatrixXd::Identity(ndof, ndof);
 		MatrixXd electrical_shape_mat = MatrixXd(nnode, ndof);
 
+
 		for (int intx = 0; intx < nglx; intx++) {
 			double x = points(intx);
 			double wtx = weights(intx);
@@ -85,7 +79,7 @@ void fe_electroStatics_normal(double time) {
 					fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
 					fe_electrical_shapeMatrix(electrical_shape_mat, dndx, dndy, dndz);
 
-					electrical_kk_element = electrical_kk_element + (electrical_shape_mat * conductivity * electrical_kk_element.transpose() * wtx * wty * wtz * detJacobian);
+					electrical_kk_element = electrical_kk_element + (electrical_shape_mat * conductivity * electrical_shape_mat.transpose() * wtx * wty * wtz * detJacobian);
 
 					shapes = fe_shapes_8(x, y, z);
 					electrical_force_element = electrical_force_element + (I(i) * shapes * wtx * wty * detJacobian);
