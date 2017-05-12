@@ -39,21 +39,15 @@ Fiber
 # Material-1
 *MATERIAL
 1
-mooney-rivlin_hyperelastic
-500
-4e5
-0.5
-1000
-1000
+mechanical mooney-rivlin_hyperelastic 5 
+500 4e5 0.5 1000 1000
 *END_MATERIAL
 # -------------------------------
 # Material-2
 *MATERIAL
 2
-simple_elastic
-800
-4e5
-0.4
+mechanical simple_elastic 3
+800 4e5 0.4
 *END_MATERIAL
 # ------------------------------
 # Time Details. Include the values in this order line by line.
