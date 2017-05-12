@@ -259,16 +259,15 @@ void fe_scatter_pbr(VectorXd& global_vec, VectorXd& local_vec, VectorXi node_lis
 MatrixXd
 fe_updateNodes(MatrixXd nodes, VectorXd displacements);
 
-VectorXd
-fe_embed_preprocessing_mapping(Mesh host, Mesh embed);
-VectorXd
-fe_embed_preprocessing(Mesh host, Mesh embed);
-void
-fe_embed_preprocessing_length(Mesh host, Mesh embed);
-int
-fe_compute_host(VectorXd A, MatrixXd nodes_host, MatrixXd elements_host_tmp);
-MatrixXd
-fe_create_bbox(VectorXd A, MatrixXd nodes_host, MatrixXd elements_host, double length);
+VectorXd fe_embed_preprocessing_mapping(Mesh& host, Mesh& embed);
+
+VectorXd fe_embed_preprocessing(Mesh host, Mesh embed);
+
+void fe_embed_preprocessing_length(Mesh& host, Mesh& embed);
+
+int fe_compute_host(VectorXd A, MatrixXd nodes_host, MatrixXd elements_host_tmp);
+
+MatrixXd fe_create_bbox(VectorXd A, MatrixXd nodes_host, MatrixXd elements_host, double length);
 
 /* =================================================================== */
 /* TimeStep */
@@ -381,10 +380,11 @@ void fe_energyWrite_append(std::string& internal_energy, std::string& external_e
 void fe_electrical_shapeMatrix(MatrixXd& electrical_shape_mat, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz);
 void fe_apply_bc_current(VectorXd& I, double &time);
 void fe_bioelectrophysics();
-void fe_electroStatics_normal(double time);
 void fe_assemble_electricStiffness(MatrixXd& global, MatrixXd& local, VectorXi node_list);
 void fe_scatter_electricalForce(VectorXd& global_vec, VectorXd& local_vec, VectorXi node_list);
 void fe_apply_bc_potential(VectorXd& VP, double &time);
 void fe_apply_bc_potential(MatrixXd& kk, VectorXd& ff, double time);
+void fe_get_conductivity(MatrixXd& conductivity, int mat_id);
+void fe_electroStatics_normal(double time);
 
 #endif // ifndef FUNCTIONS_H_

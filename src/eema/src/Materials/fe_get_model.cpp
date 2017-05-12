@@ -24,7 +24,7 @@ std::string fe_get_model(int matl_code, std::string type) {
 				break;
 			}
 		}
-		model = mat[num_pointer].mechanical_mat_model;
+		model = mat[num_pointer].electrical_mat_model;
 	}
 
 	return model;
