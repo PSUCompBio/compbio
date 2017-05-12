@@ -1,6 +1,7 @@
 SET(Materials_src 
     fe_get_mats.cpp
     fe_get_model.cpp
+    fe_get_conductivity.cpp
     StressUpdate/fe_stressUpdate_1d.cpp
     StressUpdate/fe_stressUpdate.cpp
     Saint-Venant/fe_saintvenant_elastic.cpp

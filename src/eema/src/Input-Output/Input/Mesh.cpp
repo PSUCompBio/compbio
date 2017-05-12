@@ -152,12 +152,12 @@ void Mesh::preprocessMesh(void)
     int tmp = nodes.col(0).minCoeff();
 
     if ( tmp != 0) {
-        for (int i = 0; i < nodes.rows(); i++) {
-            nodes_new(i, 0) = nodes(i, 0) - tmp;
+        for (int i = 0; i < nodes_new.rows(); i++) {
+            nodes_new(i, 0) = nodes_new(i, 0) - tmp;
         }
-        for (int i = 0; i < elements.rows(); i++) {
-            for (int j = 0; j < (elements.cols() - 2); j++) {
-                elements_new(i, j + 2) = elements(i, j + 2) - tmp;
+        for (int i = 0; i < elements_new.rows(); i++) {
+            for (int j = 0; j < (elements_new.cols() - 2); j++) {
+                elements_new(i, j + 2) = elements_new(i, j + 2) - tmp;
             }
         }
     }
@@ -229,18 +229,18 @@ VectorXd Mesh::getMinCharLength(std::string choice)
 
     VectorXd min_details;
 
-    MatrixXd nodes_local;
-    MatrixXi elements_local;
+    MatrixXd* nodes_local;
+    MatrixXi* elements_local;
 
     if (choice == "old")
     {
-        nodes_local = nodes;
-        elements_local = elements;
+        nodes_local = &nodes;
+        elements_local = &elements;
     }
     else
     {
-        nodes_local = nodes_new;
-        elements_local = elements_new;
+        nodes_local = &nodes_new;
+        elements_local = &elements_new;
     }
 
     VectorXd xcoord;
@@ -250,25 +250,17 @@ VectorXd Mesh::getMinCharLength(std::string choice)
     double id = 0;
     double lc;
 
-    xcoord = VectorXd::Zero(elements_local.cols() - 2);
-    ycoord = VectorXd::Zero(elements_local.cols() - 2);
-    zcoord = VectorXd::Zero(elements_local.cols() - 2);
-    for (int i = 0; i < elements_local.rows(); i++)
+    xcoord = VectorXd::Zero((*elements_local).cols() - 2);
+    ycoord = VectorXd::Zero((*elements_local).cols() - 2);
+    zcoord = VectorXd::Zero((*elements_local).cols() - 2);
+    for (int i = 0; i < (*elements_local).rows(); i++)
     {
-        for (int j = 0; j < (elements_local.cols() - 2); j++)
+        for (int j = 0; j < ((*elements_local).cols() - 2); j++)
         {
-            int g = -1;
-            for (int f = 0; f < nodes_local.rows(); f++)
-            {
-                if (elements_local(i, j + 2) == nodes_local(f, 0))
-                {
-                    g = f;
-                    break;
-                }
-            }
-            xcoord[j] = nodes_local(g, 1);
-            ycoord[j] = nodes_local(g, 2);
-            zcoord[j] = nodes_local(g, 3);
+            int g = (*elements_local)(i, j + 2);
+            xcoord[j] = (*nodes_local)(g, 1);
+            ycoord[j] = (*nodes_local)(g, 2);
+            zcoord[j] = (*nodes_local)(g, 3);
         }
 
         lc = fe_minElementLength(xcoord, ycoord, zcoord);
@@ -292,18 +284,18 @@ VectorXd Mesh::getMaxCharLength(std::string choice)
     VectorXd max_details;
     double id;
 
-    MatrixXd nodes_local;
-    MatrixXi elements_local;
+    MatrixXd* nodes_local;
+    MatrixXi* elements_local;
 
     if (choice == "old")
     {
-        nodes_local = nodes;
-        elements_local = elements;
+        nodes_local = &nodes;
+        elements_local = &elements;
     }
     else
     {
-        nodes_local = nodes_new;
-        elements_local = elements_new;
+        nodes_local = &nodes_new;
+        elements_local = &elements_new;
     }
 
     VectorXd xcoord;
@@ -312,25 +304,25 @@ VectorXd Mesh::getMaxCharLength(std::string choice)
     double max_length = 0.0;
     double lc;
 
-    xcoord = VectorXd::Zero(elements_local.cols() - 2);
-    ycoord = VectorXd::Zero(elements_local.cols() - 2);
-    zcoord = VectorXd::Zero(elements_local.cols() - 2);
-    for (int i = 0; i < elements_local.rows(); i++)
+    xcoord = VectorXd::Zero((*elements_local).cols() - 2);
+    ycoord = VectorXd::Zero((*elements_local).cols() - 2);
+    zcoord = VectorXd::Zero((*elements_local).cols() - 2);
+    for (int i = 0; i < (*elements_local).rows(); i++)
     {
-        for (int j = 0; j < (elements_local.cols() - 2); j++)
+        for (int j = 0; j < ((*elements_local).cols() - 2); j++)
         {
             int g = -1;
-            for (int f = 0; f < nodes_local.rows(); f++)
+            for (int f = 0; f < (*nodes_local).rows(); f++)
             {
-                if (elements_local(i, j + 2) == nodes_local(f, 0))
+                if ((*elements_local)(i, j + 2) == (*nodes_local)(f, 0))
                 {
                     g = f;
                     break;
                 }
             }
-            xcoord[j] = nodes_local(g, 1);
-            ycoord[j] = nodes_local(g, 2);
-            zcoord[j] = nodes_local(g, 3);
+            xcoord[j] = (*nodes_local)(g, 1);
+            ycoord[j] = (*nodes_local)(g, 2);
+            zcoord[j] = (*nodes_local)(g, 3);
         }
 
         lc = fe_maxElementLength(xcoord, ycoord, zcoord);

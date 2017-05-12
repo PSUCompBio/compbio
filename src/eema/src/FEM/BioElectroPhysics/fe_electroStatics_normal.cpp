@@ -13,13 +13,12 @@ void fe_electroStatics_normal(double time) {
 	int sdof = nnode;
 
 	MatrixXd electrical_kk = MatrixXd::Zero(nnode, nnode);
-
 	MatrixXd electrical_kk_element = MatrixXd::Zero(nnel, nnel);
 	VectorXd electrical_force = VectorXd::Zero(nnode);
 	VectorXd electrical_force_element = VectorXd::Zero(nnel);
+	MatrixXd conductivity = MatrixXd::Zero(ndof, ndof);
 	VectorXd VP = VectorXd::Zero(nnode);
 	VectorXd I = VectorXd::Zero(nel);
-	I(0) = 10;
 
 	// Element Data
 	VectorXd xcoord      = VectorXd::Zero(nnel);
@@ -29,6 +28,13 @@ void fe_electroStatics_normal(double time) {
 	//fe_apply_bc_current(I, time);
 
 	for (int i = 0; i < nel; i++) {
+
+		if (nel > 2) {
+			I(8) = 10;
+		}
+		else {
+			I(0) = 10;
+		}
 
 		for (int j = 0; j < nnel; j++) {
 			int g = (*elements)(i, j + 2);
@@ -56,9 +62,9 @@ void fe_electroStatics_normal(double time) {
 		MatrixXd invJacobian(ndof, ndof);
 		VectorXd shapes(nnel);
 
-		MatrixXd conductivity = 0.1 * MatrixXd::Identity(ndof, ndof);
-		MatrixXd electrical_shape_mat = MatrixXd(nnode, ndof);
+		fe_get_conductivity(conductivity, (*elements)(i, 1));
 
+		MatrixXd electrical_shape_mat = MatrixXd(nnel, ndof);
 
 		for (int intx = 0; intx < nglx; intx++) {
 			double x = points(intx);
@@ -89,7 +95,6 @@ void fe_electroStatics_normal(double time) {
 
 		fe_assemble_electricStiffness(electrical_kk, electrical_kk_element, (*elements).block<1, 8>(i, 2));
 		fe_scatter_electricalForce(electrical_force, electrical_force_element, (*elements).block<1, 8>(i, 2));
-
 	}
 
 	fe_apply_bc_potential(electrical_kk, electrical_force, time);
