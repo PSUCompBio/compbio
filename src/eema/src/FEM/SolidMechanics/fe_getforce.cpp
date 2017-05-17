@@ -31,8 +31,11 @@ void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int tim
                         embed_id = i;
                     }
                 }
+
+                VectorXi* embed_map = cons[i].get_EmbedMapPointer();
+
                 f_tot = VectorXd::Zero((mesh[host_id].getNumNodes() * ndof));
-                fe_getForce_3d_embed(f_tot, u, fext, time_step_counter, host_id, embed_id, correct_vr);
+                fe_getForce_3d_embed(f_tot, u, fext, time_step_counter, host_id, embed_id, correct_vr, (*embed_map));
             }
         }
     }

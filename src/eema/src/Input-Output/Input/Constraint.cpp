@@ -34,3 +34,31 @@ std::string Constraint::get_EmbedSlave() {
 bool Constraint::get_EmbedAddressVR() {
 	return address_volume_redundancy;
 }
+
+void Constraint::preprocess() {
+
+	if (constraint_name == "embedded") {
+		int host_id, embed_id;
+		for (int i = 0; i < num_meshes; ++i) {
+			std::string name = mesh[i].getName();
+			if (name == master_name) {
+				host_id = i;
+			}
+			if (name == slave_name) {
+				embed_id = i;
+			}
+		}
+
+		std::cout << "Here - Constraint.cpp \n";
+
+		embed_map = fe_embed_preprocessing(mesh[host_id], mesh[embed_id]);
+		embed_map_pointer = &embed_map;
+
+		std::cout << "EMBED MAP: \n" << embed_map << "\n";
+	}
+
+}
+
+VectorXi* Constraint::get_EmbedMapPointer() {
+	return embed_map_pointer;
+}

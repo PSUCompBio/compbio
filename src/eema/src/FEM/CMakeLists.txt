@@ -20,5 +20,13 @@ SET(FEM_src
     Assembly-Global-Local/fe_gather.cpp
     Assembly-Global-Local/fe_find_index.cpp
     Assembly-Global-Local/fe_assemble.cpp
+    Constraints/EmbeddedElements/fe_compute_host.cpp
+    Constraints/EmbeddedElements/fe_embed_preprocessing.cpp
+    Constraints/EmbeddedElements/fe_embed_preprocessing_length.cpp
+    Constraints/EmbeddedElements/fe_embed_preprocessing_mapping.cpp
+    Constraints/EmbeddedElements/fe_create_bbox.cpp
+    Constraints/EmbeddedElements/fe_find_common_face.cpp
+    Constraints/EmbeddedElements/fe_form_face_matrix.cpp
+    Constraints/EmbeddedElements/fe_find_intersection.cpp
      )
 ADD_LIBRARY(FEM OBJECT ${FEM_src})

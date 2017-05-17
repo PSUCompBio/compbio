@@ -125,9 +125,12 @@ public:
   int getNumElements();
   int getNumNodesPerElement();
 
-  void preprocessMesh();
+  void preprocessMesh(std::string choice);
   void replaceNodes(MatrixXd A, std::string B);
   void replaceElements(MatrixXi A, std::string B);
+  void append2nodes(std::string choice, VectorXd& b);
+  void append2elements(std::string choice, VectorXi& b);
+  void reNumber();
   void checkMesh();
   void printInfo();
 };

@@ -1,7 +1,7 @@
 #include "functions.h"
 using namespace Eigen;
 
-MatrixXd fe_create_bbox(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_host, double length) {
+MatrixXi fe_create_bbox(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_host, double length) {
 
     MatrixXi elements_host_tmp;
 
@@ -21,10 +21,11 @@ MatrixXd fe_create_bbox(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_ho
         for (int j = 0; j < elements_host.cols() - 2; j++) {
             confirm = 0;
 
-            index = fe_find(nodes_host.col(1), elements_host(i, j + 2));
-            int x = nodes_host(x_i, 1);
-            int y = nodes_host(x_i, 2);
-            int z = nodes_host(x_i, 3);
+            VectorXd node_list = nodes_host.col(0);
+            index = fe_find(node_list, elements_host(i, j + 2));
+            double x = nodes_host(index, 1);
+            double y = nodes_host(index, 2);
+            double z = nodes_host(index, 3);
 
             if ((x > xmin) && (x < xmax)) {
                 if ((y > ymin) && (y < ymax)) {
@@ -34,12 +35,15 @@ MatrixXd fe_create_bbox(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_ho
                 }
             }
 
-            if (confirm == 1) break;
+            if (confirm == 1) {
+                break;
+            }
 
         }
 
         if (confirm == 1) {
-            elements_host_tmp = fe_concatenate_vector2matrix(elements_host_tmp, elements_host.row(i), 1);
+            VectorXi element_list = elements_host.row(i);
+            fe_concatenate_vector2matrix(elements_host_tmp, element_list, 1);
         }
 
     }
