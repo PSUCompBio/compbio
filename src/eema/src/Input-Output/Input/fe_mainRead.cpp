@@ -210,7 +210,7 @@ void fe_mainRead(std::string file) {
 
       if (line == "*CONSTRAINT")
       {
-        std::cout << "Reading Constraint Information" << "\n";
+
         std::string type;
         int id;
         std::string master;
@@ -221,7 +221,7 @@ void fe_mainRead(std::string file) {
         {
           myfile1 >> id;
           myfile1 >> type;
-          std::cout << "Type: " << type << "\n";
+
           if (type == "embedded")
           {
             embedded_constraint = true;
@@ -273,7 +273,11 @@ void fe_mainRead(std::string file) {
   }
 
   for (int i = 0; i < num_meshes; i++) {
-    mesh[i].preprocessMesh();
+    mesh[i].preprocessMesh("default");
+  }
+
+  for (int i = 0; i < num_constraints; i++) {
+    cons[i].preprocess();
   }
 
   std::cout << "EEMA: Mesh Preprocessing --> Completed !!" << "\n";

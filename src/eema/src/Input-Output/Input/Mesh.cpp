@@ -143,22 +143,42 @@ VectorXd* Mesh::getNodalEPotentialPointer() {
     return nodal_electric_potential_pointer;
 }
 
-void Mesh::preprocessMesh(void)
+void Mesh::preprocessMesh(std::string choice)
 {
 
     nodes_new = nodes;
     elements_new = elements;
 
-    int tmp = nodes.col(0).minCoeff();
+    if (choice == "re-number" || choice == "default" || choice.length() == 0) {
+        int tmp = nodes.col(0).minCoeff();
+        if ( tmp != 0) {
+            for (int i = 0; i < nodes_new.rows(); i++) {
+                nodes_new(i, 0) = nodes_new(i, 0) - tmp;
+            }
+            for (int i = 0; i < elements_new.rows(); i++) {
+                for (int j = 0; j < (elements_new.cols() - 2); j++) {
+                    elements_new(i, j + 2) = elements_new(i, j + 2) - tmp;
+                }
+            }
+        }
+    }
 
-    if ( tmp != 0) {
-        for (int i = 0; i < nodes_new.rows(); i++) {
-            nodes_new(i, 0) = nodes_new(i, 0) - tmp;
+    if (choice == "re-order") {
+        /** Nodes Preprocessing - Putting the numbering in order */
+        for (int i = 0; i < nodes.rows(); i++) {
+            nodes_new(i, 0) = i;
+        }
+        /** Elements Preprocessing - Correcting the element definitions */
+        for (int i = 0; i < elements.rows(); i++) {
+            elements_new(i, 0) = i;
+            elements_new(i, 1) = elements(i, 1);
+            for (int j = 2; j < elements.cols(); j++) {
+                VectorXd node_list = nodes.col(0);
+                elements_new(i, j) = fe_find(node_list, elements(i, j));
+            }
         }
         for (int i = 0; i < elements_new.rows(); i++) {
-            for (int j = 0; j < (elements_new.cols() - 2); j++) {
-                elements_new(i, j + 2) = elements_new(i, j + 2) - tmp;
-            }
+            elements_new(i, 0) = i + 1;
         }
     }
 
@@ -173,6 +193,97 @@ void Mesh::preprocessMesh(void)
     element_strain_pointer = &element_strain;
     element_charateristic_pointer = &element_charateristic;
     nodal_electric_potential_pointer = &nodal_electric_potential;
+}
+
+void Mesh::append2nodes(std::string choice, VectorXd& b) {
+
+    if (choice == "new") {
+        MatrixXd tmp = MatrixXd::Zero(nodes_new.rows(), nodes_new.cols());
+        tmp = nodes_new;
+        nodes_new = MatrixXd::Zero(tmp.rows() + 1, tmp.cols());
+        for (int i = 0; i < nodes_new.rows(); i++) {
+            if (i != nodes_new.rows() - 1) {
+                nodes_new.row(i) = tmp.row(i);
+            }
+            else
+            {
+                nodes_new.row(i) = b;
+            }
+
+        }
+    }
+
+    if (choice == "old") {
+        MatrixXd tmp = MatrixXd::Zero(nodes.rows(), nodes.cols());
+        tmp = nodes;
+        nodes = MatrixXd::Zero(tmp.rows() + 1, tmp.cols());
+        for (int i = 0; i < nodes.rows(); i++) {
+            if (i != nodes.rows() - 1) {
+                nodes_new.row(i) = tmp.row(i);
+            }
+            else
+            {
+                nodes_new.row(i) = b;
+            }
+
+        }
+    }
+
+}
+
+void Mesh::append2elements(std::string choice, VectorXi& b) {
+
+    if (choice == "new") {
+        MatrixXi tmp = MatrixXi::Zero(elements_new.rows(), elements_new.cols());
+        tmp = elements_new;
+        elements_new = MatrixXi::Zero(tmp.rows() + 1, tmp.cols());
+        for (int i = 0; i < elements_new.rows(); i++) {
+            if (i != elements_new.rows() - 1) {
+                elements_new.row(i) = tmp.row(i);
+            }
+            else
+            {
+                elements_new.row(i) = b;
+            }
+
+        }
+    }
+
+    if (choice == "old") {
+        MatrixXi tmp = MatrixXi::Zero(elements.rows(), elements.cols());
+        tmp = elements;
+        elements = MatrixXi::Zero(tmp.rows() + 1, tmp.cols());
+        for (int i = 0; i < elements.rows(); i++) {
+            if (i != elements.rows() - 1) {
+                elements.row(i) = tmp.row(i);
+            }
+            else
+            {
+                elements.row(i) = b;
+            }
+
+        }
+    }
+
+}
+
+void Mesh::reNumber() {
+
+    MatrixXd tmp1 = nodes_new;
+    MatrixXi tmp2 = elements_new;
+
+    /** Nodes Preprocessing - Putting the numbering in order */
+    for (int i = 0; i < nodes_new.rows(); i++) {
+        nodes_new(i, 0) = i;
+    }
+    /** Elements Preprocessing - Correcting the element definitions */
+    for (int i = 0; i < elements_new.rows(); i++) {
+        elements_new(i, 0) = i + 1;
+        for (int j = 2; j < elements_new.cols(); j++) {
+            VectorXd node_list = tmp1.col(0);
+            elements_new(i, j) = fe_find(node_list, tmp2(i, j));
+        }
+    }
 }
 
 void Mesh::calculateElementCharateristic() {
@@ -227,7 +338,7 @@ void Mesh::replaceElements(MatrixXi new_elements, std::string choice)
 VectorXd Mesh::getMinCharLength(std::string choice)
 {
 
-    VectorXd min_details;
+    Vector2d min_details;
 
     MatrixXd* nodes_local;
     MatrixXi* elements_local;
@@ -281,7 +392,7 @@ VectorXd Mesh::getMinCharLength(std::string choice)
 VectorXd Mesh::getMaxCharLength(std::string choice)
 {
 
-    VectorXd max_details;
+    Vector2d max_details;
     double id;
 
     MatrixXd* nodes_local;
@@ -341,7 +452,7 @@ VectorXd Mesh::getMaxCharLength(std::string choice)
 /** \brief Check the mesh for zero charateristic lengths */
 void Mesh::checkMesh()
 {
-    VectorXd lc;
+    Vector2d lc;
 
     lc = getMinCharLength("new");
 

@@ -198,10 +198,12 @@ double fe_calVolume(VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord);
 
 /** find the poistion index of a double value in a vector -- analogous to 'find' function in MATLAB */
 int
-fe_find(VectorXd A, double a);
+fe_find(VectorXd& A, double a);
 /** find the poistion index of a integer value in a vector -- analogous to 'find' function in MATLAB */
 int
-fe_find(VectorXd A, int a);
+fe_find(VectorXd& A, int a);
+
+int fe_find(VectorXi& A, int a);
 
 /** Function calculates vector result using newton rhapson model */
 VectorXd fe_newtonRhapson(VectorXd& nat_coord, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord);
@@ -215,12 +217,17 @@ fe_function_derivative(double a, std::string b, double time);
 /** Function outputs the double derivative of a time dependent variable at a time instant */
 double
 fe_function_d_derivative(double a, std::string b, double time);
+
 /** Concatenate a vector to a matrix -- rowwise or coloumn wise */
-MatrixXd
-fe_concatenate_vector2matrix(MatrixXd A, VectorXd B, int opt);
+void fe_concatenate_vector2matrix(MatrixXd& A, VectorXd& B, int opt);
+void fe_concatenate_vector2matrix(MatrixXi& A, VectorXi& B, int opt);
+
 /** Function concatenates vector to a matrix */
-MatrixXd
-fe_insert_vector2matrix(MatrixXd A, VectorXd B, int num, int opt);
+void fe_insert_vector2matrix(MatrixXd& A, VectorXd& B, int num, int opt);
+void fe_insert_vector2matrix(MatrixXi& A, VectorXi& B, int num, int opt);
+void fe_insert_double2vector(VectorXd& A, double b);
+void fe_insert_int2vector(VectorXi& A, int b);
+void fe_insert_int2vector(VectorXi& A, int num, int b);
 
 /* =================================================================== */
 /* FEM */
@@ -259,15 +266,15 @@ void fe_scatter_pbr(VectorXd& global_vec, VectorXd& local_vec, VectorXi node_lis
 MatrixXd
 fe_updateNodes(MatrixXd nodes, VectorXd displacements);
 
-VectorXd fe_embed_preprocessing_mapping(Mesh& host, Mesh& embed);
+void fe_embed_preprocessing_mapping(VectorXi& host_elements_embed_nodes, Mesh& host, Mesh& embed);
 
-VectorXd fe_embed_preprocessing(Mesh host, Mesh embed);
+VectorXi fe_embed_preprocessing(Mesh& host, Mesh& embed);
 
 void fe_embed_preprocessing_length(Mesh& host, Mesh& embed);
 
-int fe_compute_host(VectorXd A, MatrixXd nodes_host, MatrixXd elements_host_tmp);
+int fe_compute_host(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_host_tmp);
 
-MatrixXd fe_create_bbox(VectorXd A, MatrixXd nodes_host, MatrixXd elements_host, double length);
+MatrixXi fe_create_bbox(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_host, double length);
 
 /* =================================================================== */
 /* TimeStep */
@@ -335,7 +342,7 @@ text2vector(std::string name);
 
 void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id);
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr);
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map);
 
 VectorXd fe_calCentroidStress_3d(int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id);
 void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id);
@@ -386,5 +393,14 @@ void fe_apply_bc_potential(VectorXd& VP, double &time);
 void fe_apply_bc_potential(MatrixXd& kk, VectorXd& ff, double time);
 void fe_get_conductivity(MatrixXd& conductivity, int mat_id);
 void fe_electroStatics_normal(double time);
+
+void fe_form_face_matrix(MatrixXi& face_mat, int tmp, MatrixXi& elements);
+void fe_find_common_face(VectorXi& common_face, bool com_face_value, int id_1, int id_2, MatrixXd& nodes_host, MatrixXi& elements_host);
+void fe_find_intersection(VectorXd& intersection, VectorXi& common_face, MatrixXd& nodes_embed, MatrixXd& nodes_host, int i_1, int i_2);
+Vector3d fe_find_normals(VectorXd& c1, VectorXd& c2, VectorXd& c3);
+void fe_crossProduct(VectorXd& result, VectorXd& A, VectorXd& B);
+VectorXd fe_sort_ascendingVectorXd(VectorXd A);
+VectorXi fe_sort_ascendingVectorXi(VectorXi A);
+
 
 #endif // ifndef FUNCTIONS_H_

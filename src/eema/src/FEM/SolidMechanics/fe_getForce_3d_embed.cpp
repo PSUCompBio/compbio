@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr)
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map)
 {
 
     MatrixXd* nodes_host     = mesh[host_id].getNewNodesPointer();
@@ -141,87 +141,89 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
 
             for (int fib = 0; fib < (*elements_embed).rows(); fib++) {
-                for (int j = 0; j < ((*elements_embed).cols() - 2); j++) {
-                    int g = (*elements_embed)(fib, j + 2);
-                    xcoord_embed(j)      = (*nodes_embed)(g, 1);
-                    ycoord_embed(j)      = (*nodes_embed)(g, 2);
-                    zcoord_embed(j)      = (*nodes_embed)(g, 3);
+                if (embed_map(fib) == (*elements_host)(i, 0)) {
+                    for (int j = 0; j < ((*elements_embed).cols() - 2); j++) {
+                        int g = (*elements_embed)(fib, j + 2);
+                        xcoord_embed(j)      = (*nodes_embed)(g, 1);
+                        ycoord_embed(j)      = (*nodes_embed)(g, 2);
+                        zcoord_embed(j)      = (*nodes_embed)(g, 3);
 
-                    VectorXd nat_cooord_nodes = VectorXd::Zero(3);
-                    nat_cooord_nodes(0) = xcoord_embed(j);
-                    nat_cooord_nodes(1) = ycoord_embed(j);
-                    nat_cooord_nodes(2) = zcoord_embed(j);
-                    VectorXd iso_coord_nodes = fe_newtonRhapson(nat_cooord_nodes, xcoord, ycoord, zcoord);
-                    VectorXd shapes = fe_shapes_8(iso_coord_nodes(0), iso_coord_nodes(1), iso_coord_nodes(2));
-                    MatrixXd shape_mat_embed = fe_shapeMatrix(edof, nnel, shapes);
-                    u_embed.segment<3>(g * ndof)   = (shape_mat_embed * u_e);
-                    u_embed_local.segment<3>(j * ndof) = u_embed.segment<3>(g * ndof);
-                }
-
-
-
-                //std::cout << "Embedded Displacements: \n" << u_embed << "\n";
-                //std::cout << "Local Embed Displacement: \n" << u_embed_local << "\n";
-
-
-                double length_embed = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed);
-
-                for (int embed_intg = 0; embed_intg < ngl_embed; embed_intg++) {
-
-                    VectorXd local_intg_points = fe_findIntgPoints_1d(xcoord_embed, ycoord_embed, zcoord_embed, points_embed(embed_intg), length_embed);
-                    VectorXd global_intg_poins = fe_newtonRhapson(local_intg_points, xcoord, ycoord, zcoord);
-
-                    VectorXd global_intg_points(3);
-                    global_intg_points(0) = 0;
-                    global_intg_points(1) = 0;
-                    global_intg_points(2) = points_embed(embed_intg);
-
-                    double wtt = weights_embed(embed_intg);
-
-                    fe_dniso_8(dndr, dnds, dndt, global_intg_points(0), global_intg_points(1), global_intg_points(2));
-
-                    jacobian    = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-                    invJacobian = jacobian.inverse();
-                    fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
-                    fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
-                    fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
-                    fe_strDispMatrix_totalLagrangian_pbr(disp_mat, edof, nnel, dndx, dndy, dndz, u_e);
-
-                    // Procedure - 1: (Same Deformation Gradient - Because No Slip)
-                    fe_stressUpdate_pbr(sigma_embed, dndx, dndy, dndz, disp_mat, u_e, (*elements_embed)(fib, 1), 0);
-
-                    VectorXd f_int_truss = (disp_mat.transpose() * sigma_embed * wtt * (length_embed / 2) * area_truss);
-
-                    // Procedure - 2: (Same Displacements - Same Deformation Gradient - Transformation Matrix Inside)
-                    /* sigma_truss = fe_stressUpdate_1d(elements_embed(fib, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, dndx, dndy, dndz, u_e, 0);
-                    VectorXd f_int_truss = (disp_mat.transpose() * sigma_truss * wtt * (length_embed / 2) * area_truss); */
-
-                    // Procedure - 3: (Same Displacements - Same Deformation Gradient - Transformation Matrix Outside)
-                    /* MatrixXd stress_transformation_mat = fe_calTransformation(xcoord_embed, ycoord_embed, zcoord_embed, 1);
-                    sigma_truss = fe_stressUpdate_1d(elements_embed(fib, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, 0);
-                    VectorXd f_int_truss = (disp_mat.transpose() * stress_transformation_mat.transpose() * sigma_truss * wtt * (length_embed / 2) * area_truss);*/
-
-                    f_int_e = f_int_e + f_int_truss;
-
-                    if (address_vr == true) {
-                        fe_stressUpdate_pbr(sigma_correction, dndx, dndy, dndz, disp_mat, u_e, (*elements_embed)(fib, 1), 0);
-                        VectorXd f_int_correction = (disp_mat.transpose() * sigma_correction * wtt * (length_embed / 2) * area_truss);
-
-                        /*sigma_correction = fe_stressUpdate_1d(elements_host(i, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, 0);
-                        VectorXd f_int_correction = (disp_mat.transpose() * stress_transformation_mat.transpose() * sigma_correction * wtt * (length_embed / 2) * area_truss );*/
-
-                        f_int_e = f_int_e - f_int_correction;
+                        VectorXd nat_cooord_nodes = VectorXd::Zero(3);
+                        nat_cooord_nodes(0) = xcoord_embed(j);
+                        nat_cooord_nodes(1) = ycoord_embed(j);
+                        nat_cooord_nodes(2) = zcoord_embed(j);
+                        VectorXd iso_coord_nodes = fe_newtonRhapson(nat_cooord_nodes, xcoord, ycoord, zcoord);
+                        VectorXd shapes = fe_shapes_8(iso_coord_nodes(0), iso_coord_nodes(1), iso_coord_nodes(2));
+                        MatrixXd shape_mat_embed = fe_shapeMatrix(edof, nnel, shapes);
+                        u_embed.segment<3>(g * ndof)   = (shape_mat_embed * u_e);
+                        u_embed_local.segment<3>(j * ndof) = u_embed.segment<3>(g * ndof);
                     }
 
-                    // f_int_e = f_int_e + f_int_truss - f_int_correction; // no Volume Redundancy
-                    // f_int_e = (0.5*f_int_e) + f_int_truss; // no Volume Redundancy using volume fractions
-                    // With Volume Redundancy
-                }
 
-                fe_calCentroidStrain_embed_3d_pbr(tmp_storage, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed);
-                element_strain_embed_local.segment<9>(fib * 9) = tmp_storage;
-                fe_calCentroidStress_embed_3d_pbr(tmp_storage, (*elements_embed)(fib, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, xcoord, ycoord, zcoord);
-                element_stress_embed_local.segment<9>(fib * 9) = tmp_storage;
+
+                    //std::cout << "Embedded Displacements: \n" << u_embed << "\n";
+                    //std::cout << "Local Embed Displacement: \n" << u_embed_local << "\n";
+
+
+                    double length_embed = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed);
+
+                    for (int embed_intg = 0; embed_intg < ngl_embed; embed_intg++) {
+
+                        VectorXd local_intg_points = fe_findIntgPoints_1d(xcoord_embed, ycoord_embed, zcoord_embed, points_embed(embed_intg), length_embed);
+                        VectorXd global_intg_poins = fe_newtonRhapson(local_intg_points, xcoord, ycoord, zcoord);
+
+                        VectorXd global_intg_points(3);
+                        global_intg_points(0) = 0;
+                        global_intg_points(1) = 0;
+                        global_intg_points(2) = points_embed(embed_intg);
+
+                        double wtt = weights_embed(embed_intg);
+
+                        fe_dniso_8(dndr, dnds, dndt, global_intg_points(0), global_intg_points(1), global_intg_points(2));
+
+                        jacobian    = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
+                        invJacobian = jacobian.inverse();
+                        fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
+                        fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
+                        fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
+                        fe_strDispMatrix_totalLagrangian_pbr(disp_mat, edof, nnel, dndx, dndy, dndz, u_e);
+
+                        // Procedure - 1: (Same Deformation Gradient - Because No Slip)
+                        fe_stressUpdate_pbr(sigma_embed, dndx, dndy, dndz, disp_mat, u_e, (*elements_embed)(fib, 1), 0);
+
+                        VectorXd f_int_truss = (disp_mat.transpose() * sigma_embed * wtt * (length_embed / 2) * area_truss);
+
+                        // Procedure - 2: (Same Displacements - Same Deformation Gradient - Transformation Matrix Inside)
+                        /* sigma_truss = fe_stressUpdate_1d(elements_embed(fib, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, dndx, dndy, dndz, u_e, 0);
+                        VectorXd f_int_truss = (disp_mat.transpose() * sigma_truss * wtt * (length_embed / 2) * area_truss); */
+
+                        // Procedure - 3: (Same Displacements - Same Deformation Gradient - Transformation Matrix Outside)
+                        /* MatrixXd stress_transformation_mat = fe_calTransformation(xcoord_embed, ycoord_embed, zcoord_embed, 1);
+                        sigma_truss = fe_stressUpdate_1d(elements_embed(fib, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, 0);
+                        VectorXd f_int_truss = (disp_mat.transpose() * stress_transformation_mat.transpose() * sigma_truss * wtt * (length_embed / 2) * area_truss);*/
+
+                        f_int_e = f_int_e + f_int_truss;
+
+                        if (address_vr == true) {
+                            fe_stressUpdate_pbr(sigma_correction, dndx, dndy, dndz, disp_mat, u_e, (*elements_embed)(fib, 1), 0);
+                            VectorXd f_int_correction = (disp_mat.transpose() * sigma_correction * wtt * (length_embed / 2) * area_truss);
+
+                            /*sigma_correction = fe_stressUpdate_1d(elements_host(i, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, 0);
+                            VectorXd f_int_correction = (disp_mat.transpose() * stress_transformation_mat.transpose() * sigma_correction * wtt * (length_embed / 2) * area_truss );*/
+
+                            f_int_e = f_int_e - f_int_correction;
+                        }
+
+                        // f_int_e = f_int_e + f_int_truss - f_int_correction; // no Volume Redundancy
+                        // f_int_e = (0.5*f_int_e) + f_int_truss; // no Volume Redundancy using volume fractions
+                        // With Volume Redundancy
+                    }
+
+                    fe_calCentroidStrain_embed_3d_pbr(tmp_storage, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed);
+                    element_strain_embed_local.segment<9>(fib * 9) = tmp_storage;
+                    fe_calCentroidStress_embed_3d_pbr(tmp_storage, (*elements_embed)(fib, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, xcoord, ycoord, zcoord);
+                    element_stress_embed_local.segment<9>(fib * 9) = tmp_storage;
+                }
             }
         }
 

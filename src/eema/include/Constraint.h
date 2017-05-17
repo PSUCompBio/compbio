@@ -22,10 +22,16 @@ private:
 	// Embedded Element Constraint
 	std::string master_name;
 	std::string slave_name;
+
+	/** Vector Storing the host elements ids for each embedded element */
+	VectorXi embed_map;
+	VectorXi* embed_map_pointer;
+
 	bool address_volume_redundancy;
 
 public:
 	void readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR);
+	void preprocess();
 	void printInfo();
 
 	std::string getName();
@@ -34,6 +40,7 @@ public:
 	std::string get_EmbedMaster();
 	std::string get_EmbedSlave();
 	bool get_EmbedAddressVR();
+	VectorXi* get_EmbedMapPointer();
 };
 
 #endif /* HEADERS_CONSTRAINT_H_ */
