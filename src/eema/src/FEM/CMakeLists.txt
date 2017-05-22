@@ -16,7 +16,7 @@ SET(FEM_src
     BioElectroPhysics/fe_bioElectroPhysics.cpp
     BioElectroPhysics/fe_electroStatics_normal.cpp
     BioElectroPhysics/fe_electroStatics_embed.cpp
-    BioElectroPhysics/fe_electroStatics.cpp
+    BioElectroPhysics/fe_electrostatics.cpp
     BoundaryConditions/fe_apply_bc.cpp
     Assembly-Global-Local/fe_scatter.cpp
     Assembly-Global-Local/fe_gather.cpp
