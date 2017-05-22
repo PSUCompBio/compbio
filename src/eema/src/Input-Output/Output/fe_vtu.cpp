@@ -167,7 +167,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
     /** Cell Data - Stresses and Strains */
     myfile << "\t\t\t<CellData>\n";
 
-    if ((*element_stress).rows() == 0 && (*element_stress).cols() == 0) {
+    if ((*element_stress).rows() != 0 && (*element_stress).cols() != 0) {
         myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Stress (Cauchy)\" NumberOfComponents=\"9\" ComponentName0=\"XX\" ComponentName1=\"XY\" ComponentName2=\"XZ\" ComponentName3=\"YX\" ComponentName4=\"YY\" ComponentName5=\"YZ\" ComponentName6=\"ZX\" ComponentName7=\"ZY\" ComponentName8=\"ZZ\" format=\"ascii\">\n";
         for (int i = 0; i < (*element_stress).size();)
         {
@@ -180,7 +180,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
         myfile << "\t\t\t\t</DataArray>\n";
     }
 
-    if ((*element_strain).rows() == 0 && (*element_strain).cols() == 0) {
+    if ((*element_strain).rows() != 0 && (*element_strain).cols() != 0) {
         myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Strain (Logarithmic)\" NumberOfComponents=\"9\" ComponentName0=\"XX\" ComponentName1=\"XY\" ComponentName2=\"XZ\" ComponentName3=\"YX\" ComponentName4=\"YY\" ComponentName5=\"YZ\" ComponentName6=\"ZX\" ComponentName7=\"ZY\" ComponentName8=\"ZZ\" format=\"ascii\">\n";
         for (int i = 0; i < (*element_strain).size();)
         {

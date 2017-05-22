@@ -12,7 +12,7 @@ int main(int argc, char **argv) {
 	job_file = argv[2];
 
 	fe_mainRead(home_path + "/" + job_file);
-	fe_electroStatics_normal(0);
+	fe_electroStatics(0);
 
 	t = clock() - t;
 	std::cout << "--------------------------------------" << "\n";

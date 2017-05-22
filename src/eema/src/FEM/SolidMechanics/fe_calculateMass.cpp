@@ -20,7 +20,8 @@ void fe_calculateMass(VectorXd& m_system, std::string type) {
             embed_id = i;
           }
         }
-        fe_calculateMassDirectLumped_embed(m_system, host_id, embed_id, correct_vr);
+        VectorXi* embed_map = cons[i].get_EmbedMapPointer();
+        fe_calculateMassDirectLumped_embed(m_system, host_id, embed_id, correct_vr, (*embed_map));
       }
     }
   }
@@ -55,7 +56,7 @@ void fe_calculateMassDirectLumped(VectorXd& m_system, int mesh_id) {
 
 }
 
-void fe_calculateMassDirectLumped_embed(VectorXd& m_system, int host_id, int embed_id, bool address_vr) {
+void fe_calculateMassDirectLumped_embed(VectorXd& m_system, int host_id, int embed_id, bool address_vr, VectorXi& embed_map) {
 
   //std::cout << "Entered Mass - Embedded" << "\n";
 
@@ -80,23 +81,25 @@ void fe_calculateMassDirectLumped_embed(VectorXd& m_system, int host_id, int emb
     m_element = fe_massLumped(nodes_host, (*elements_host).row(i));
 
     for (int fib = 0; fib < (*elements_embed).rows(); fib++) {
-      for (int j = 0; j < (*elements_embed).cols() - 2; j++) {
-        int g = (*elements_embed)(fib, j + 2);
-        xcoord_embed(j) = (*nodes_embed)(g, 1);
-        ycoord_embed(j) = (*nodes_embed)(g, 2);
-        zcoord_embed(j) = (*nodes_embed)(g, 3);
-      }
+      if (embed_map(fib) == (*elements_host)(i, 0)) {
+        for (int j = 0; j < (*elements_embed).cols() - 2; j++) {
+          int g = (*elements_embed)(fib, j + 2);
+          xcoord_embed(j) = (*nodes_embed)(g, 1);
+          ycoord_embed(j) = (*nodes_embed)(g, 2);
+          zcoord_embed(j) = (*nodes_embed)(g, 3);
+        }
 
-      double rho_truss = fe_get_mats((*elements_embed)(fib, 1), 0, "mechanical");
-      double rho_host = fe_get_mats((*elements_host)(i, 1), 0, "mechanical");
+        double rho_truss = fe_get_mats((*elements_embed)(fib, 1), 0, "mechanical");
+        double rho_host = fe_get_mats((*elements_host)(i, 1), 0, "mechanical");
 
-      double m_truss = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed) * area_truss * rho_truss;
-      double m_correction = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed) * area_truss * rho_host;
+        double m_truss = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed) * area_truss * rho_truss;
+        double m_correction = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed) * area_truss * rho_host;
 
-      for (int k = 0; k < edof; k++) {
-        m_element(k) = m_element(k) + (m_truss / nnel);
-        if (address_vr == true) {
-          m_element(k) = m_element(k) - (m_correction / nnel);
+        for (int k = 0; k < edof; k++) {
+          m_element(k) = m_element(k) + (m_truss / nnel);
+          if (address_vr == true) {
+            m_element(k) = m_element(k) - (m_correction / nnel);
+          }
         }
       }
     }

@@ -2,14 +2,16 @@
 
 using namespace Eigen;
 
-void fe_electroStatics_normal(double time, int mesh_id) {
+void fe_electroStatics_embed(double time, int host_id, int embed_id, VectorXi& embed_map) {
 
-	MatrixXd* nodes = mesh[mesh_id].getNewNodesPointer();
-	MatrixXi* elements = mesh[mesh_id].getNewElementsPointer();
+	MatrixXd* nodes_host = mesh[host_id].getNewNodesPointer();
+	MatrixXi* elements_host = mesh[host_id].getNewElementsPointer();
+	MatrixXd* nodes_embed = mesh[embed_id].getNewNodesPointer();
+	MatrixXi* elements_embed = mesh[embed_id].getNewElementsPointer();
 
-	int nel = mesh[mesh_id].getNumElements();
-	int nnode = mesh[mesh_id].getNumNodes();
-	int nnel = mesh[mesh_id].getNumNodesPerElement();
+	int nel = mesh[host_id].getNumElements();
+	int nnode = mesh[host_id].getNumNodes();
+	int nnel = mesh[host_id].getNumNodesPerElement();
 	int sdof = nnode;
 
 	MatrixXd electrical_kk = MatrixXd::Zero(nnode, nnode);
@@ -24,23 +26,19 @@ void fe_electroStatics_normal(double time, int mesh_id) {
 	VectorXd xcoord      = VectorXd::Zero(nnel);
 	VectorXd ycoord      = VectorXd::Zero(nnel);
 	VectorXd zcoord      = VectorXd::Zero(nnel);
+	VectorXd xcoord_embed      = VectorXd::Zero((*elements_embed).cols() - 2);
+	VectorXd ycoord_embed      = VectorXd::Zero((*elements_embed).cols() - 2);
+	VectorXd zcoord_embed      = VectorXd::Zero((*elements_embed).cols() - 2);
 
 	//fe_apply_bc_current(I, time);
 
 	for (int i = 0; i < nel; i++) {
 
-		if (nel > 2) {
-			I(8) = 10;
-		}
-		else {
-			I(0) = 10;
-		}
-
 		for (int j = 0; j < nnel; j++) {
-			int g = (*elements)(i, j + 2);
-			xcoord(j)      = (*nodes)(g, 1);
-			ycoord(j)      = (*nodes)(g, 2);
-			zcoord(j)      = (*nodes)(g, 3);
+			int g = (*elements_host)(i, j + 2);
+			xcoord(j)      = (*nodes_host)(g, 1);
+			ycoord(j)      = (*nodes_host)(g, 2);
+			zcoord(j)      = (*nodes_host)(g, 3);
 		}
 
 		//VectorXd I_element = VectorXd::Zero(nnel);
@@ -62,7 +60,29 @@ void fe_electroStatics_normal(double time, int mesh_id) {
 		MatrixXd invJacobian(ndof, ndof);
 		VectorXd shapes(nnel);
 
-		fe_get_conductivity(conductivity, (*elements)(i, 1));
+		fe_get_conductivity(conductivity, (*elements_host)(i, 1));
+
+		for (int fib = 0; fib < (*elements_embed).rows(); fib++) {
+			if (embed_map(fib) == (*elements_host)(i, 0)) {
+				for (int j = 0; j < ((*elements_embed).cols() - 2); j++) {
+					int g = (*elements_embed)(fib, j + 2);
+					xcoord_embed(j)      = (*nodes_embed)(g, 1);
+					ycoord_embed(j)      = (*nodes_embed)(g, 2);
+					zcoord_embed(j)      = (*nodes_embed)(g, 3);
+				}
+
+				MatrixXd T = MatrixXd::Zero(3, 3);
+				T = fe_calTransformation(xcoord_embed, ycoord_embed, zcoord_embed, 3);
+
+				MatrixXd fiber_conductivity = MatrixXd::Zero(3, 3);
+				fiber_conductivity(0, 0) = 10;
+
+				fiber_conductivity = T * fiber_conductivity * T.transpose();
+				conductivity = conductivity + fiber_conductivity;
+				I(i) = I(i) + 10;
+			}
+		}
+
 
 		MatrixXd electrical_shape_mat = MatrixXd(nnel, ndof);
 
@@ -93,17 +113,23 @@ void fe_electroStatics_normal(double time, int mesh_id) {
 			}
 		}
 
-		fe_assemble_electricStiffness(electrical_kk, electrical_kk_element, (*elements).block<1, 8>(i, 2));
-		fe_scatter_electricalForce(electrical_force, electrical_force_element, (*elements).block<1, 8>(i, 2));
+		fe_assemble_electricStiffness(electrical_kk, electrical_kk_element, (*elements_host).block<1, 8>(i, 2));
+		fe_scatter_electricalForce(electrical_force, electrical_force_element, (*elements_host).block<1, 8>(i, 2));
 	}
 
 	fe_apply_bc_potential(electrical_kk, electrical_force, time);
 	VP = electrical_kk.inverse() * electrical_force ;
 
+	std::cout << "Effective conductivity: \n" << conductivity << "\n";
+	std::cout << "Result Potential: " << VP(7) << "; " << VP(6) << "; " << VP(5) << "; " << VP(4) << "\n";
+
 	mesh[0].readNodalElectroPhysics(VP);
 	fe_vtuWrite(0, 0, mesh[0]);
+	fe_vtuWrite(0, 0, mesh[1]);
 
-	nodes = NULL;
-	elements = NULL;
+	nodes_host = NULL;
+	elements_host = NULL;
+	nodes_embed = NULL;
+	elements_embed = NULL;
 
 }

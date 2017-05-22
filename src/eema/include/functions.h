@@ -325,7 +325,7 @@ fe_writeElementStress(MatrixXd sigma_all, double time);
 void fe_calculateMass(VectorXd& m_system, std::string type);
 
 void fe_calculateMassDirectLumped(VectorXd& m_system, int mesh_id);
-void fe_calculateMassDirectLumped_embed(VectorXd& m_system, int host_id, int embed_id, bool address_vr);
+void fe_calculateMassDirectLumped_embed(VectorXd& m_system, int host_id, int embed_id, bool address_vr, VectorXi& embed_map);
 
 VectorXd
 fe_massLumped(MatrixXd* nodes, VectorXi elements_row);
@@ -392,7 +392,9 @@ void fe_scatter_electricalForce(VectorXd& global_vec, VectorXd& local_vec, Vecto
 void fe_apply_bc_potential(VectorXd& VP, double &time);
 void fe_apply_bc_potential(MatrixXd& kk, VectorXd& ff, double time);
 void fe_get_conductivity(MatrixXd& conductivity, int mat_id);
-void fe_electroStatics_normal(double time);
+void fe_electroStatics_normal(double time, int mesh_id);
+void fe_electroStatics_embed(double time, int host_id, int embed_id, VectorXi& embed_map);
+void fe_electroStatics(double time);
 
 void fe_form_face_matrix(MatrixXi& face_mat, int tmp, MatrixXi& elements);
 void fe_find_common_face(VectorXi& common_face, bool com_face_value, int id_1, int id_2, MatrixXd& nodes_host, MatrixXi& elements_host);
