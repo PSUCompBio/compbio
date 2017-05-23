@@ -170,12 +170,12 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                     for (int embed_intg = 0; embed_intg < ngl_embed; embed_intg++) {
 
                         VectorXd local_intg_points = fe_findIntgPoints_1d(xcoord_embed, ycoord_embed, zcoord_embed, points_embed(embed_intg), length_embed);
-                        VectorXd global_intg_poins = fe_newtonRhapson(local_intg_points, xcoord, ycoord, zcoord);
+                        VectorXd global_intg_points = fe_newtonRhapson(local_intg_points, xcoord, ycoord, zcoord);
 
-                        VectorXd global_intg_points(3);
-                        global_intg_points(0) = 0;
-                        global_intg_points(1) = 0;
-                        global_intg_points(2) = points_embed(embed_intg);
+                        // VectorXd global_intg_points(3);
+                        // global_intg_points(0) = 0;
+                        // global_intg_points(1) = 0;
+                        // global_intg_points(2) = points_embed(embed_intg);
 
                         double wtt = weights_embed(embed_intg);
 

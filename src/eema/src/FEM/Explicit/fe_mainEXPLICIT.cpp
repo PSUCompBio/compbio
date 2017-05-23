@@ -2,7 +2,7 @@
 using namespace Eigen;
 
 double eps_energy = 0.01;
-double area_truss = 5e-6;
+double area_truss = 7.85398e-7;
 double failure_time_step = 1e-8;
 
 /*! \brief
@@ -117,13 +117,13 @@ fe_mainEXPLICIT()
         fi_curr = fe - F_net;
         fe_calculateFR(fr_curr, sdof, fi_curr, m_system, A);
 
-        //std::cout << "****************************************************\n";
-        //std::cout << "current time = " << t << std::endl;
-        //std::cout << "RF3 node #4 = " << fr_curr[14] << std::endl;
-        //std::cout << "RF3 node #5 = " << fr_curr[17] << std::endl;
-        //std::cout << "RF3 node #6 = " << fr_curr[20] << std::endl;
-        //std::cout << "RF3 node #7 = " << fr_curr[23] << std::endl;
-        //std::cout << "****************************************************\n";
+        std::cout << "****************************************************\n";
+        std::cout << "current time = " << t << std::endl;
+        std::cout << "RF3 node #4 = " << fr_curr[14] << std::endl;
+        std::cout << "RF3 node #5 = " << fr_curr[17] << std::endl;
+        std::cout << "RF3 node #6 = " << fr_curr[20] << std::endl;
+        std::cout << "RF3 node #7 = " << fr_curr[23] << std::endl;
+        std::cout << "****************************************************\n";
 
 
 
@@ -141,14 +141,14 @@ fe_mainEXPLICIT()
             plot_state_counter = plot_state_counter + 1;
 
             std::cout << "-----------------------------------" << "\n";
-            std::cout << " Timestep Value = " << std::setw(5) << std::scientific << std::setprecision(1) << dT
+            std::cout << " Timestep Value = " << std::setw(10) << std::scientific << std::setprecision(5) << dT
                       << "\n Current Time = " << std::setw(5) << std::setprecision(1) << t
                       << "\n Timestep Number = " << (time_step_counter)
                       << "\n Plot State = " << (plot_state_counter - 1)
                       << "\n CPU Time = " << std::setw(5) << std::setprecision(1)
                       << ((float) ds / CLOCKS_PER_SEC) << "s \n";
             std::cout << std::setw(5) << std::scientific << std::setprecision(5) << "Z Displacement: " << U(20) << "\n";
-            // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Current Precise Time: " << t << "\n";
+            //std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Current Precise Time: " << t << "\n";
             // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Internal Energy: " << energy_int_new << "\n";
             // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"External Work: " << energy_ext_new << "\n";
             // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Kinetic Energy: " << energy_kin << "\n";
