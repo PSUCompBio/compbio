@@ -260,17 +260,48 @@ VectorXd fe_calCentroidStress_embed_3d(int material_id, VectorXd& u_embed, Vecto
 
 }
 
-void fe_calCentroidStress_embed_3d_pbr(VectorXd& element_stress, int material_id, VectorXd& u_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed, double length_old, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord) {
+void fe_calCentroidStress_embed_3d_pbr(VectorXd& element_stress, int material_id, VectorXd& u_e, VectorXd& u_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed, double length_old, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord) {
 
     element_stress = VectorXd::Zero(ndof * ndof);
+    MatrixXd temp_stress = MatrixXd::Zero(ndof, ndof);
 
     if (xcoord_embed.size() == 2) {
         VectorXd local_intg_points = fe_findIntgPoints_1d(xcoord_embed, ycoord_embed, zcoord_embed, 0, length_old);
-        VectorXd global_intg_poins = fe_newtonRhapson(local_intg_points, xcoord, ycoord, zcoord);
+        VectorXd global_intg_points = fe_newtonRhapson(local_intg_points, xcoord, ycoord, zcoord);
+
         VectorXd sigma_truss = VectorXd::Zero(6);
-        sigma_truss = fe_stressUpdate_1d(material_id, u_embed, xcoord_embed, ycoord_embed, zcoord_embed, length_old, 1);
-        element_stress(0) = sigma_truss(0);
+
+        int nnel = xcoord.size();
+        int edof = nnel*ndof;
+
+
+        MatrixXd disp_mat(6, edof);
+
+        VectorXd dndr(nnel);
+        VectorXd dnds(nnel);
+        VectorXd dndt(nnel);
+        VectorXd dndx(nnel);
+        VectorXd dndy(nnel);
+        VectorXd dndz(nnel);
+        MatrixXd jacobian(ndof, ndof);
+        MatrixXd invJacobian(ndof, ndof);
+
+        fe_dniso_8(dndr, dnds, dndt, global_intg_points(0), global_intg_points(1), global_intg_points(2));
+        jacobian    = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
+        invJacobian = jacobian.inverse();
+        fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
+        fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
+        fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
+        fe_strDispMatrix_totalLagrangian_pbr(disp_mat, edof, nnel, dndx, dndy, dndz, u_e);
+
+        // Procedure - 1: (Same Deformation Gradient - Because No Slip)
+        fe_stressUpdate_pbr(sigma_truss, dndx, dndy, dndz, disp_mat, u_e, material_id, 1);
+
+        temp_stress = fe_voigt2tensor(sigma_truss);
+
+        MatrixXd T = fe_calTransformation(xcoord_embed, ycoord_embed, zcoord_embed, 3);
+        temp_stress = T.transpose() * temp_stress * T;
+        element_stress(0) = temp_stress(0,0);
     }
 
 }
-

@@ -170,12 +170,12 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                     for (int embed_intg = 0; embed_intg < ngl_embed; embed_intg++) {
 
                         VectorXd local_intg_points = fe_findIntgPoints_1d(xcoord_embed, ycoord_embed, zcoord_embed, points_embed(embed_intg), length_embed);
-                        VectorXd global_intg_poins = fe_newtonRhapson(local_intg_points, xcoord, ycoord, zcoord);
+                        VectorXd global_intg_points = fe_newtonRhapson(local_intg_points, xcoord, ycoord, zcoord);
 
-                        VectorXd global_intg_points(3);
-                        global_intg_points(0) = 0;
-                        global_intg_points(1) = 0;
-                        global_intg_points(2) = points_embed(embed_intg);
+                        // VectorXd global_intg_points(3);
+                        // global_intg_points(0) = 0;
+                        // global_intg_points(1) = 0;
+                        // global_intg_points(2) = points_embed(embed_intg);
 
                         double wtt = weights_embed(embed_intg);
 
@@ -221,7 +221,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
                     fe_calCentroidStrain_embed_3d_pbr(tmp_storage, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed);
                     element_strain_embed_local.segment<9>(fib * 9) = tmp_storage;
-                    fe_calCentroidStress_embed_3d_pbr(tmp_storage, (*elements_embed)(fib, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, xcoord, ycoord, zcoord);
+                    fe_calCentroidStress_embed_3d_pbr(tmp_storage, (*elements_embed)(fib, 1), u_e, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, xcoord, ycoord, zcoord);
                     element_stress_embed_local.segment<9>(fib * 9) = tmp_storage;
                 }
             }
