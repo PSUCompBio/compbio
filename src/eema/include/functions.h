@@ -357,7 +357,7 @@ VectorXd
 fe_calCentroidStress_embed_3d(int material_id, VectorXd& u_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed,
                               VectorXd& zcoord_embed, double length_old, VectorXd& xcoord, VectorXd& ycoord,
                               VectorXd& zcoord);
-void fe_calCentroidStress_embed_3d_pbr(VectorXd& element_stress, int material_id, VectorXd& u_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed, double length_old, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord);
+void fe_calCentroidStress_embed_3d_pbr(VectorXd& element_stress, int material_id, VectorXd& u_e, VectorXd& u_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed, double length_old, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord);
 
 VectorXd
 fe_calCentroidStrain_embed_3d(VectorXd& u_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed,
