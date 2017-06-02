@@ -125,11 +125,12 @@ fe_calCentroidStrain_3d(int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& 
     Ssvdmat(0, 0) = Ssvd(0);
     Ssvdmat(1, 1) = Ssvd(1);
     Ssvdmat(2, 2) = Ssvd(2);
-    MatrixXd Rpd = Usvd * Vsvd.adjoint();
-    MatrixXd Upd = Vsvd * Ssvdmat * Vsvd.adjoint();
+    MatrixXd Rpd = Usvd * Vsvd.adjoint(); //rotation tensor
+    MatrixXd Upd = Vsvd * Ssvdmat * Vsvd.adjoint(); //material stretch tensor
+    MatrixXd Vpd = Usvd * Ssvdmat * Usvd.adjoint(); //spatial stretch tensor
 
     // E = 0.5*(F.transpose()*F-I);
-    E = Upd.log();
+    E = Vpd.log();
     element_strain(0) = E(0, 0);
     element_strain(1) = E(0, 1);
     element_strain(2) = E(0, 2);
@@ -182,11 +183,12 @@ void fe_calCentroidStrain_3d_pbr(VectorXd& element_strain, int nnel, VectorXd& x
     Ssvdmat(0, 0) = Ssvd(0);
     Ssvdmat(1, 1) = Ssvd(1);
     Ssvdmat(2, 2) = Ssvd(2);
-    MatrixXd Rpd = Usvd * Vsvd.adjoint();
-    MatrixXd Upd = Vsvd * Ssvdmat * Vsvd.adjoint();
+    MatrixXd Rpd = Usvd * Vsvd.adjoint(); //rotation tensor
+    MatrixXd Upd = Vsvd * Ssvdmat * Vsvd.adjoint(); //material stretch
+    MatrixXd Vpd = Usvd * Ssvdmat * Usvd.adjoint(); //spatial stretch
 
     // E = 0.5*(F.transpose()*F-I);
-    E = Upd.log();
+    E = Vpd.log();
     element_strain(0) = E(0, 0);
     element_strain(1) = E(0, 1);
     element_strain(2) = E(0, 2);
