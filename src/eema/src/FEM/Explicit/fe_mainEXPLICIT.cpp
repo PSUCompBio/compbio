@@ -87,7 +87,7 @@ fe_mainEXPLICIT()
     while (t < t_end) {
 
 
-        if (((t + dT) >= t_end) && (t != t_end)) {
+        if ((t + dT) >= t_end) {
             dT = t_end - t;
             if (dT <= 0) {
                 break;
@@ -95,16 +95,14 @@ fe_mainEXPLICIT()
         }
 
 
-        /** Update Loading Conditions - time dependent loading conditions */
-        fe_apply_bc_load(fe, t);
-
         /** Steps - 4,5,6 and 7 from Belytschko Box 6.1 - Update time, velocity and displacements */
         fe_timeUpdate(U, V, V_half, A, t, dT, "newmark-beta-central-difference");
 
+        /** Update Loading Conditions - time dependent loading conditions */
+        fe_apply_bc_load(fe, t);
+
         /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
         fe_getforce(F_net, ndof, U, fe, time_step_counter); // Calculating the force term.
-
-
 
         /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
         fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.
