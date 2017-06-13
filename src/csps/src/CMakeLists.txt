@@ -1,18 +1,9 @@
-project("CSPS")
+install(FILES csps.py threespace_api.py threespace_utils.py win32_threespace_utils.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-macro(add_python_target tgt)
-  foreach(file ${ARGN})
-    set(OUT ${CMAKE_CURRENT_BINARY_DIR}/${file}.pyo)
-    list(APPEND OUT_FILES ${OUT})
-    add_custom_command(OUTPUT ${OUT}
-        COMMAND <python command you use to byte-compile .py file>)
-  endforeach()
-
-  add_custom_target(${tgt} ALL DEPENDS ${OUT_FILES})
-endmacro()
-
-add_python_target(csps main.py)
-#SET(csps_src 
-#    main.py  
-#   )
-#ADD_LIBRARY(csps ${csps_src})
+install (CODE "execute_process (COMMAND pyinstaller --noconfirm \
+													--clean \
+													--log-level=ERROR \
+													--noupx \
+													--onefile \
+													--windowed \
+													csps.py WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})")
