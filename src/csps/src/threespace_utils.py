@@ -20,8 +20,22 @@ import subprocess
 import collections
 import serial
 import multiprocessing
-import multiprocessing.forking
+#import multiprocessing.forking
 import time
+
+# kraft added
+# Module multiprocessing is organized differently in Python 3.4+
+#https://github.com/pyinstaller/pyinstaller/wiki/Recipe-Multiprocessing
+try:
+    # Python 3.4+
+    if sys.platform.startswith('win'):
+        import multiprocessing.popen_spawn_win32 as forking
+    else:
+        import multiprocessing.popen_fork as forking
+except ImportError:
+    import multiprocessing.forking as forking
+
+
 
 ### Globals ###
 TSS_FIND_BTL =          0x00000001

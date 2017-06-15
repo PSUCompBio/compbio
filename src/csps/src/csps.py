@@ -2,8 +2,9 @@ from __future__ import print_function, division, absolute_import
 import threespace_api as ts_api
 from PIL import Image, ImageTk
 from serial import Serial
-import Tkinter as tk
-import tkMessageBox
+from tkinter import *
+import tkinter as tk
+import tkinter.messagebox
 import numpy as np
 import time
 import sys
