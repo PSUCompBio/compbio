@@ -4,8 +4,7 @@ using namespace Eigen;
 
 /* Home Folder and Job File */
 std::string home_path; /** Job folder name */
-std::string controls_file; /** Job controls file name */
-std::string mesh_file; /** Job mesh file name */
+std::string job_file; /** Job input file name */
 
 /* Dimension of the Problem */
 int ndof;
@@ -34,7 +33,7 @@ int num_constraints;
 Constraint *cons;
 bool embedded_constraint;
 
-void fe_mainRead(std::string controls_file, std::string mesh_file) {
+void fe_mainRead(std::string file) {
 
   num_meshes = 0;
   int num_meshes_counter = 0;
@@ -45,15 +44,15 @@ void fe_mainRead(std::string controls_file, std::string mesh_file) {
   num_constraints = 0;
   int num_constraints_counter = 0;
 
-  std::ifstream myfile(controls_file.c_str());
+  std::ifstream myfile(file.c_str());
   std::string line;
   std::getline(myfile, line);
 
   while (line != "*END") {
     if (line[0] == '*') {
-      // if (line == "*MESH") {
-      //   num_meshes = num_meshes + 1;
-      // }
+      if (line == "*MESH") {
+        num_meshes = num_meshes + 1;
+      }
       if (line == "*MATERIAL") {
         material_types = material_types + 1;
       }
@@ -67,12 +66,12 @@ void fe_mainRead(std::string controls_file, std::string mesh_file) {
     std::getline(myfile, line);
   }
 
-  // mesh = new Mesh[num_meshes];
+  mesh = new Mesh[num_meshes];
   mat = new Materials[material_types];
   bc = new BC[bc_types];
   cons = new Constraint[num_constraints];
 
-  std::ifstream myfile1(controls_file.c_str());
+  std::ifstream myfile1(file.c_str());
   std::getline(myfile1, line);
 
   while (line != "*END") {
@@ -86,52 +85,52 @@ void fe_mainRead(std::string controls_file, std::string mesh_file) {
         }
       }
 
-      // if (line == "*MESH") {
-      //   std::getline(myfile1, line);
-      //   MatrixXd nodes;
-      //   MatrixXi elements;
-      //   std::string name;
-      //
-      //   while (line != "*END_MESH") {
-      //
-      //     if (line == "*NAME") {
-      //       myfile1 >> name;
-      //     }
-      //
-      //     if (line == "*NODES") {
-      //       int rows = 0;
-      //       int cols = 0;
-      //       myfile1 >> rows;
-      //       myfile1 >> cols;
-      //       nodes = MatrixXd::Zero(rows, cols + 1);
-      //       for (int i = 0; i < rows; i++) {
-      //         for (int j = 0; j < (cols + 1); j++) {
-      //           myfile1 >> nodes(i, j);
-      //         }
-      //       }
-      //     }
-      //
-      //     if (line == "*ELEMENTS") {
-      //       int rows = 0;
-      //       int cols = 0;
-      //       myfile1 >> rows;
-      //       myfile1 >> cols;
-      //       elements = MatrixXi::Zero(rows, cols + 2);
-      //       for (int i = 0; i < rows; i++) {
-      //         for (int j = 0; j < (cols + 2); j++) {
-      //           myfile1 >> elements(i, j);
-      //         }
-      //       }
-      //     }
-      //
-      //     if (nodes.rows() != 0 && elements.rows() != 0 && name.length() != 0) {
-      //       mesh[num_meshes_counter].readMesh(name, nodes, elements);
-      //       num_meshes_counter = num_meshes_counter + 1;
-      //     }
-      //
-      //     myfile1 >> line;
-      //   }
-      // }
+      if (line == "*MESH") {
+        std::getline(myfile1, line);
+        MatrixXd nodes;
+        MatrixXi elements;
+        std::string name;
+
+        while (line != "*END_MESH") {
+
+          if (line == "*NAME") {
+            myfile1 >> name;
+          }
+
+          if (line == "*NODES") {
+            int rows = 0;
+            int cols = 0;
+            myfile1 >> rows;
+            myfile1 >> cols;
+            nodes = MatrixXd::Zero(rows, cols + 1);
+            for (int i = 0; i < rows; i++) {
+              for (int j = 0; j < (cols + 1); j++) {
+                myfile1 >> nodes(i, j);
+              }
+            }
+          }
+
+          if (line == "*ELEMENTS") {
+            int rows = 0;
+            int cols = 0;
+            myfile1 >> rows;
+            myfile1 >> cols;
+            elements = MatrixXi::Zero(rows, cols + 2);
+            for (int i = 0; i < rows; i++) {
+              for (int j = 0; j < (cols + 2); j++) {
+                myfile1 >> elements(i, j);
+              }
+            }
+          }
+
+          if (nodes.rows() != 0 && elements.rows() != 0 && name.length() != 0) {
+            mesh[num_meshes_counter].readMesh(name, nodes, elements);
+            num_meshes_counter = num_meshes_counter + 1;
+          }
+
+          myfile1 >> line;
+        }
+      }
 
       if (line == "*MATERIAL") {
         int mat_id;
@@ -267,9 +266,6 @@ void fe_mainRead(std::string controls_file, std::string mesh_file) {
     cons[i].printInfo();
   }
   std::cout << "*************************" << '\n';*/
-
-std::cout << "*** Overhaul Checkpoint Reached! ***" << '\n';
-std::exit(1);
 
   if (num_meshes == 0) {
     std::cout << "No meshes included - Simulation is not possible !! " << "\n";

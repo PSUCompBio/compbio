@@ -60,8 +60,11 @@ using namespace Eigen;
 /** Job Folder */
 extern std::string home_path;
 
-/** Job Input File Name */
-extern std::string job_file;
+/** Job Contols File Name */
+extern std::string controls_file;
+
+/** Job Mesh File Name */
+extern std::string mesh_file;
 
 /** Dimension of the Simulation (3 for 3D, 2 for 2D and 1 for 1D) */
 extern int ndof;

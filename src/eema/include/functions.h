@@ -55,7 +55,7 @@ void
 fe_pvdAppend(std::string output, int time_step, double time);
 /** Read the input text file -- for a particular job */
 void
-fe_mainRead(std::string file);
+fe_mainRead(std::string controls_file, std::string mesh_file);
 
 /* =================================================================== */
 /* Elements */

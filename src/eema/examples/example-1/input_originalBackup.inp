@@ -1,0 +1,105 @@
+# -------------------------------
+# Enter the Dimension of the problem
+*DIMENSION
+3
+*END_DIMENSION
+# -------------------------------
+# Mesh-1 (Hex Mesh)
+*MESH
+*NAME
+Matrix
+*NODES
+8	3
+0	0	0	0
+1	0.005 	0	0
+2	0.005	0.005	0
+3	0 	0.005	0
+4	0	0	0.005
+5	0.005	0	0.005
+6	0.005	0.005	0.005
+7	0	0.005	0.005
+*ELEMENTS
+1	8
+1	1	0	1	2	3	4	5	6 7
+*END_MESH
+# -------------------------------
+# Mesh-2 (Truss Mesh)
+*MESH
+*NAME
+Fiber
+*NODES
+2	3
+0	0.0025	0.0025	0
+1	0.0025	0.0025	0.005
+*ELEMENTS
+1	2
+1	2	0	1
+*END_MESH
+# -------------------------------
+# Material-1
+*MATERIAL
+1
+mechanical mooney-rivlin_hyperelastic 5 
+500 4e5 0.5 1000 1000
+*END_MATERIAL
+# -------------------------------
+# Material-2
+*MATERIAL
+2
+mechanical simple_elastic 3
+800 4e5 0.4
+*END_MATERIAL
+# ------------------------------
+# Time Details. Include the values in this order line by line.
+# 1. Start Time
+# 2. End Time
+# 3. Ouput Frequency
+# 4. Max Time step
+# 5. Reduction Factor
+*TIME
+0
+0.05
+100
+10e-3
+0.5
+*END_TIME
+# ------------------------------
+# Boundary Condition Details.
+# For every boundary condition, enter the following details in order line by line
+# 1. Type of BC - 'displacement' or 'load' or 'velocity' or 'acceleration'
+# 2. Amplitude
+# 3. Number of DOF's on which BC's are applied
+# 4. DOF's on which BC's are applied
+# 5. Type of time behavior curve
+# IT IS IMPORTANT TO ENSURE THAT SAME DOF'S SHOULDN'T BE ALLOTTED WITH MORE THAN 1 TYPE OF BC.
+# ------------------------------
+# BC-1 (Constrained Displacements)
+*BC
+displacement
+0
+12
+0 1 2 4 5 8 9 11 12 13 16 21
+RAMP
+*END_BC
+# ------------------------------
+# BC-2 (Load)
+*BC
+load
+0.015
+4
+14 17 20 23
+RAMP
+*END_BC
+# ------------------------------
+# Constraint Details:
+# 1. Constraint ID - Constraint Number
+# 2. Constraint name - Constraint Name - "embedded"
+# 3. if "embedded" is the constraint name - Host Matrix
+# 4. if "embedded" is the constraint name - Slave Matrix
+# 5. Do you want to address volume redundancy - "0" for No and "1" for Yes
+# ------------------------------
+*CONSTRAINT
+1 embedded Matrix Fiber 0
+*END_CONSTRAINT
+# ------------------------------
+*END

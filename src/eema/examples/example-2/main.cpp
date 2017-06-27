@@ -8,8 +8,8 @@ int main(int argc, char **argv) {
 	t = clock();
 
 	/** Enter the path address for your job folder */
-	home_path = argv[1];
-	job_file = argv[2];
+	home_path = ".";
+	job_file = argv[1];
 
 	fe_mainRead(home_path + "/" + job_file);
 	fe_electroStatics(0);

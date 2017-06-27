@@ -6,12 +6,13 @@ using namespace Eigen;
 int main(int argc, char **argv){
 	clock_t t;
 	t = clock();
-	
-	/** Enter the path address for your job folder */
-	home_path = argv[1];
-	job_file = argv[2];
 
-	fe_mainRead(home_path+"/"+job_file);
+	/** Enter the path address for your job folder */
+	home_path = ".";
+	controls_file = argv[1];
+	mesh_file = argv[2];
+
+	fe_mainRead(home_path+"/"+controls_file, home_path+"/"+mesh_file);
 	fe_mainEXPLICIT();
 
 	t = clock()-t;
