@@ -39,7 +39,7 @@ Fiber
 # Material-1
 *MATERIAL
 1
-mechanical mooney-rivlin_hyperelastic 5 
+mechanical mooney-rivlin_hyperelastic 5
 500 4e5 0.5 1000 1000
 *END_MATERIAL
 # -------------------------------

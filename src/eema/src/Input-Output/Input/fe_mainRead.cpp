@@ -36,14 +36,16 @@ bool embedded_constraint;
 
 void fe_mainRead(std::string controls_file, std::string mesh_file) {
 
-  num_meshes = 0;
-  int num_meshes_counter = 0;
+  // num_meshes = 0;
+  // int num_meshes_counter = 0;
   material_types = 0;
   int material_types_counter = 0;
   bc_types = 0;
   int bc_types_counter = 0;
   num_constraints = 0;
   int num_constraints_counter = 0;
+
+/* Read Controls File */
 
   std::ifstream myfile(controls_file.c_str());
   std::string line;
@@ -241,6 +243,55 @@ void fe_mainRead(std::string controls_file, std::string mesh_file) {
     }
     std::getline(myfile1, line);
   }
+
+  num_parts = 0;
+  int num_parts_counter = 0;
+  num_sections = 0;
+  int num_sections_counter = 0;
+  num_elements_solid = 0;
+  int num_elements_solid_counter = 0;
+  num_elements_beam = 0;
+  int num_elements_beam_counter = 0;
+  num_nodes = 0;
+  int num_nodes_counter = 0;
+
+/* Read Mesh File */
+
+  std::ifstream myfile2(mesh_file.c_str());
+  std::getline(myfile2, line);
+
+  while (line != "*END") {
+    if (line[0] == '*') {
+      if (line == "*PART") {
+        num_parts = num_parts + 1;
+      }
+      if (line.substr(0,8) == "*SECTION") {
+        num_sections = num_sections + 1;
+      }
+      if (line.substr(0,14) == "*ELEMENT_SOLID") {
+        std::getline(myfile2, line);
+        std::getline(myfile2, line);
+        std::getline(myfile2, line);
+        std::getline(myfile2, line);
+        num_elements_solid = num_elements_solid + 1;
+        std::getline(myfile2, line);
+
+        while (line[0] != "*") {
+          std::getline(myfile2, line);
+          std::getline(myfile2, line);
+          num_elements_solid = num_elements_solid + 1;
+        }
+      }
+      if (line.substr(0,13) == "*ELEMENT_BEAM") {
+        num_elements_beam = num_elements_beam + 1; //come back
+      }
+      if (line == "*NODE") {
+        num_nodes = num_nodes + 1;
+      }
+    }
+    std::getline(myfile, line);
+  }
+
 
   std::cout << "EEMA: Reading Input File --> Completed !!" << "\n";
 
