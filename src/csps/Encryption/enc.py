@@ -6,7 +6,7 @@ f = open('public.pem', 'rb')
 publickey = RSA.importKey(f.read())
 f.close()
 
-encrypted = publickey.encrypt('AKIAI7XOEFVYPOUQKGYQ', 32)
+encrypted = publickey.encrypt('OUR AWS KEY', 32)
 print (encrypted)
 
 f2 = open ('aws_key.txt', 'w')
