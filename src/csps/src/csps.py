@@ -3,8 +3,9 @@ import threespace_api as ts_api
 from PIL import Image, ImageTk, ImageFont, ImageDraw, ImageGrab
 import matplotlib.pyplot as plt
 from serial import Serial
-import Tkinter as tk
-import tkMessageBox
+from tkinter import *
+import tkinter as tk
+import tkinter.messagebox
 import numpy as np
 import time
 import sys

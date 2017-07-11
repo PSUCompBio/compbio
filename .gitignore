@@ -9,6 +9,7 @@
 #tmp/**/*
 obj
 build
+protected
 lib
 .settings
 .vscode
