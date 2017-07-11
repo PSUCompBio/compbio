@@ -675,6 +675,7 @@ def genVideo():
         curFrame += 1
 
     out.release()
+    """
     uploadFileS3(videoFileName)
     temp = tk.Tk()
     temp.title("Email Address")
@@ -684,6 +685,7 @@ def genVideo():
     embox.grid(row=0, column=1, sticky="news")
     b = tk.Button(temp, text="Submit", command=gen)
     b.grid(row=1, column=0, columnspan=2, sticky="news")
+    """
 
 
 root = tk.Tk()
