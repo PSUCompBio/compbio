@@ -159,31 +159,12 @@ class CSPS(tk.Frame):
                 # turn off recording as entire replay has been recorded
                 record_on = False
 
-
         curWidth = video.winfo_width()
         curHeight = video.winfo_height()
         maxsize = (curWidth, curHeight)
         frame = cv2.resize(frame, maxsize)
         cv2image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
         img = Image.fromarray(cv2image)
-
-        #keeps caching for preimpact recording - Ishan
-        if len(videoCache) > CONST_cacheLimit/2:
-            videoCache.pop(0)
-            videoCache.append(img)
-            #print("limit reached")
-        else:
-                videoCache.append(img)
-
-        #in the event of an impact triggers postimpact recording into replayCache - Ishan
-        global record_on
-        if record_on:
-            if len(replayCache) < CONST_cacheLimit:
-                replayCache.append(img)
-            else:
-                #turn off recording as entire replay has been recorded
-                record_on = False
-        
         imgtk = ImageTk.PhotoImage(image=img)
         video.imgtk = imgtk
         video.configure(image=imgtk)
@@ -257,7 +238,6 @@ class CSPS(tk.Frame):
         w = self.winfo_width()
         h = self.winfo_height()
 
-
         coordsX, coordsY, coordsZ = [], [], []
         coordsX2, coordsY2, coordsZ2 = [], [], []
         coordsT1_1, coordsT1_2, coordsT2_1, coordsT2_2 = [], [], [], []
@@ -280,7 +260,6 @@ class CSPS(tk.Frame):
             coordsT1_2.append(x)
             coordsT1_2.append(h - ((h * (153)) / 200.0))
 
-
             coordsX2.append(x)
             coordsX2.append(h - ((h * (self.x2[n] + 50)) / 200.0))
             coordsY2.append(x)
@@ -293,7 +272,6 @@ class CSPS(tk.Frame):
 
             coordsT2_2.append(x)
             coordsT2_2.append(h - ((h * (53)) / 200.0))
-
 
         self.canvas.coords('X', *coordsX)
         self.canvas.coords('Y', *coordsY)
@@ -747,7 +725,6 @@ fileMenu.add_command(label="Exit", command=exit)
 helpMenu = tk.Menu(menu)
 menu.add_cascade(label="Help", menu=helpMenu)
 helpMenu.add_command(label="About", command=about)
-
 
 button = tk.Button(text="Show", height=8, bg='green', fg='black', state="disabled", command=call)
 button.grid(row=1, column=0, columnspan=3, sticky="news")
