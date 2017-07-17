@@ -205,7 +205,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         f_int_e = f_int_e + f_int_truss;
 
                         if (address_vr == true) {
-                            fe_stressUpdate_pbr(sigma_correction, dndx, dndy, dndz, disp_mat, u_e, (*elements_embed)(fib, 1), 0);
+                            fe_stressUpdate_pbr(sigma_correction, dndx, dndy, dndz, disp_mat, u_e, (*elements_host)(i, 1), 0);
                             VectorXd f_int_correction = (disp_mat.transpose() * sigma_correction * wtt * (length_embed / 2) * area_truss);
 
                             /*sigma_correction = fe_stressUpdate_1d(elements_host(i, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, 0);
