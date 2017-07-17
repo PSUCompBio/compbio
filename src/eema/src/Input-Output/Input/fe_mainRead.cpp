@@ -244,18 +244,18 @@ void fe_mainRead(std::string controls_file, std::string mesh_file) {
     std::getline(myfile1, line);
   }
 
-  num_parts = 0;
-  int num_parts_counter = 0;
-  num_sections = 0;
+  int num_parts = 0;
+  int num_parts_counter = 0; //delete these counters?
+  int num_sections = 0;
   int num_sections_counter = 0;
-  num_elements_solid = 0;
+  int num_elements_solid = 0;
   int num_elements_solid_counter = 0;
-  num_elements_beam = 0;
+  int num_elements_beam = 0;
   int num_elements_beam_counter = 0;
-  num_nodes = 0;
+  int num_nodes = 0;
   int num_nodes_counter = 0;
 
-/* Read Mesh File */
+/* Read Mesh File  - First Pass*/
 
   std::ifstream myfile2(mesh_file.c_str());
   std::getline(myfile2, line);
@@ -276,24 +276,163 @@ void fe_mainRead(std::string controls_file, std::string mesh_file) {
         num_elements_solid = num_elements_solid + 1;
         std::getline(myfile2, line);
 
-        while (line[0] != "*") {
-          std::getline(myfile2, line);
+        while (line[0] != '*' && line[0] != '$') {
           std::getline(myfile2, line);
           num_elements_solid = num_elements_solid + 1;
+          std::getline(myfile2, line);
         }
+
       }
       if (line.substr(0,13) == "*ELEMENT_BEAM") {
-        num_elements_beam = num_elements_beam + 1; //come back
+        std::getline(myfile2, line);
+        std::getline(myfile2, line);
+        num_elements_beam = num_elements_beam + 1;
+        std::getline(myfile2, line);
+
+        while (line[0] != '*' && line[0] != '$') {
+          num_elements_beam = num_elements_beam + 1;
+          std::getline(myfile2, line);
+          // std::cout << "line: " << line << '\n';
+          // std::cout << "line[0]: " << line[0] << '\n';
+        }
+
       }
       if (line == "*NODE") {
+        std::getline(myfile2, line);
+        std::getline(myfile2, line);
+        std::getline(myfile2, line);
         num_nodes = num_nodes + 1;
+        std::getline(myfile2, line);
+
+        while (line[0] != '*' && line[0] != '$') {
+          num_nodes = num_nodes + 1;
+          std::getline(myfile2, line);
+        }
+
       }
     }
-    std::getline(myfile, line);
+    std::getline(myfile2, line);
   }
 
+/* Create Temp Mesh Objects */
 
-  std::cout << "EEMA: Reading Input File --> Completed !!" << "\n";
+  int junk;
+  VectorXd coordinates;
+  VectorXi check_tet;
+  VectorXi pid2secid;
+  VectorXi pid2mid;
+  MatrixXi tmp_elements_beam;
+  MatrixXi tmp_elements_solid;
+
+  if (num_parts > 0) {
+    pid2secid = VectorXi::Zero(num_parts);
+    pid2mid = VectorXi::Zero(num_parts);
+  }
+
+  if (num_elements_solid > 0) {
+    tmp_elements_solid = MatrixXi::Zero(num_elements_solid, 10);
+    check_tet = VectorXi::Zero(num_elements_solid);
+  }
+
+  if (num_elements_beam > 0) {
+    tmp_elements_beam = MatrixXi::Zero(num_elements_beam, 4);
+  }
+
+  if (num_nodes > 0) {
+    coordinates = VectorXd::Zero(num_nodes * 3);
+  }
+
+  /* Read Mesh File  - Second Pass*/
+
+    std::ifstream myfile3(mesh_file.c_str());
+    std::getline(myfile3, line);
+
+    while (line != "*END") {
+      if (line[0] == '*') {
+        // if (line == "*PART") {
+        //   num_parts = num_parts + 1;
+        // }
+        // if (line.substr(0,8) == "*SECTION") {
+        //   num_sections = num_sections + 1;
+        // }
+        if (line.substr(0,14) == "*ELEMENT_SOLID") {
+          std::getline(myfile3, line);
+          int row = 0;
+          myfile3 >> tmp_elements_solid(row, 0);
+          myfile3 >> tmp_elements_solid(row, 1);
+          std::getline(myfile3, line);
+          std::getline(myfile3, line);
+          myfile3 >> tmp_elements_solid(row, 2);
+          myfile3 >> tmp_elements_solid(row, 3);
+          myfile3 >> tmp_elements_solid(row, 4);
+          myfile3 >> tmp_elements_solid(row, 5);
+          myfile3 >> tmp_elements_solid(row, 6);
+          myfile3 >> tmp_elements_solid(row, 7);
+          myfile3 >> tmp_elements_solid(row, 8);
+          myfile3 >> tmp_elements_solid(row, 9);
+          myfile3 >> junk;
+          myfile3 >> junk;
+          std::cout << "junk: " << junk << "\n";
+          std::getline(myfile3, line);
+          std::cout << "line: " << line << "\n";
+          row = row + 1;
+
+          while (line[0] != '*' && line[0] != '$') { //we are not processing lines anymore, need new logic...
+            myfile3 >> tmp_elements_solid(row, 0);
+            myfile3 >> tmp_elements_solid(row, 1);
+            myfile3 >> tmp_elements_solid(row, 2);
+            myfile3 >> tmp_elements_solid(row, 3);
+            myfile3 >> tmp_elements_solid(row, 4);
+            myfile3 >> tmp_elements_solid(row, 5);
+            myfile3 >> tmp_elements_solid(row, 6);
+            myfile3 >> tmp_elements_solid(row, 7);
+            myfile3 >> tmp_elements_solid(row, 8);
+            myfile3 >> tmp_elements_solid(row, 9);
+
+            std::cout << "tmp_elements_solid: " << '\n' << tmp_elements_solid << '\n';
+            std::exit(1);
+
+
+            row = row + 1;
+            std::getline(myfile3, line);
+          }
+
+
+          std::cout << "\n" << "***quick test***" << "\n" << "\n";
+        }
+        // if (line.substr(0,13) == "*ELEMENT_BEAM") {
+        //   std::getline(myfile2, line);
+        //   std::getline(myfile2, line);
+        //   num_elements_beam = num_elements_beam + 1;
+        //   std::getline(myfile2, line);
+        //
+        //   while (line[0] != '*' && line[0] != '$') {
+        //     num_elements_beam = num_elements_beam + 1;
+        //     std::getline(myfile2, line);
+        //     // std::cout << "line: " << line << '\n';
+        //     // std::cout << "line[0]: " << line[0] << '\n';
+        //   }
+        //
+        // }
+        // if (line == "*NODE") {
+        //   std::getline(myfile2, line);
+        //   std::getline(myfile2, line);
+        //   std::getline(myfile2, line);
+        //   num_nodes = num_nodes + 1;
+        //   std::getline(myfile2, line);
+        //
+        //   while (line[0] != '*' && line[0] != '$') {
+        //     num_nodes = num_nodes + 1;
+        //     std::getline(myfile2, line);
+        //   }
+        //
+        // }
+      }
+      std::getline(myfile3, line);
+    }
+
+
+
 
   /*std::cout << "*************************" << '\n';
   std::cout << "Mesh Details: \n";
@@ -319,8 +458,17 @@ void fe_mainRead(std::string controls_file, std::string mesh_file) {
   }
   std::cout << "*************************" << '\n';*/
 
-std::cout << "*** Overhaul Checkpoint Reached! ***" << '\n';
-std::exit(1);
+
+  std::cout << "num_parts: " << num_parts << '\n';
+  std::cout << "num_sections: " << num_sections << '\n';
+  std::cout << "num_elements_solid: " << num_elements_solid << '\n';
+  std::cout << "num_elements_beam: " << num_elements_beam << '\n';
+  std::cout << "num_nodes: " << num_nodes << '\n';
+
+  std::cout << "EEMA: Reading Input File --> Completed !!" << "\n";
+
+  std::cout << '\n' << "***Jesse Overhaul Checkpoint Reached***" << '\n' << '\n';
+  std::exit(1);
 
   if (num_meshes == 0) {
     std::cout << "No meshes included - Simulation is not possible !! " << "\n";
