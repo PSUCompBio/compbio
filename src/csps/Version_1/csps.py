@@ -617,7 +617,7 @@ def sendEmail(email):
     global videoFileName
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
-    server.login("coachsafeplaysafe@gmail.com", "QAZwsx123!@#")
+    server.login("coachsafeplaysafe@gmail.com", "")
     msg = """The video of the latest impact is at
     https://s3.amazonaws.com/cspsvideoupload/"""+ videoFileName 
     msg2 = "\r\n".join([
@@ -632,8 +632,8 @@ def sendEmail(email):
 
 #upload to s3 server
 def uploadFileS3(name):
-    aws_access_key_id='AKIAI7XOEFVYPOUQKGYQ'
-    aws_secret_access_key='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'
+    aws_access_key_id=''
+    aws_secret_access_key=''
     conn = tinys3.Connection(aws_access_key_id, aws_secret_access_key)    
     f = open(name, 'rb')
     conn.upload(name, f, 'cspsvideoupload')
