@@ -1,0 +1,34 @@
+<ScreenOne>:
+	canvas:
+        Color:
+            hsv: .7, .5, .3
+        Rectangle:
+            size: self.size
+
+    Label:
+        font_size: 42
+        text: root.name
+
+    Button:
+        text: "Replay"
+        size_hint: None, None
+        size: root.width, 75
+        on_press: root.manager.current = 'Replay'
+
+<ScreenTwo>:
+	canvas:
+        Color:
+            hsv: .1, .2, .3
+        Rectangle:
+            size: self.size
+
+    Label:
+        font_size: 42
+        text: root.name
+
+	BoxLayout:
+		Button:
+			text: "Live Feed"
+			size_hint: None, None
+			size: root.width, 75
+			on_press: root.manager.current = 'VidSensor'
