@@ -1,6 +1,6 @@
-from kivy.lang import Builder
-from kivy.properties import ListProperty
 from kivy.app import App
+from kivy.uix.screenmanager import ScreenManager, Screen, SwapTransition
+from kivy.properties import ListProperty
 import threespace_api as ts_api
 import os
 
@@ -11,96 +11,12 @@ notEstablished = True
 if os.name == 'posix':
 	no_sensor_api = True
 
-KV = '''
-#:import Camera kivy.uix.camera
-#:import chain itertools.chain
-#:import Clock kivy.clock.Clock
 
-<Graph@Widget>:
-	max: 100
-	canvas:
-		Color:
-			rgba: .4, .4, 1, 1
-		Line:
-			points:
-				list(chain(*
-				[[
-				self.x + x * self.width / len(app.gyroX),
-				self.y + (self.height * 0.3) + y * self.height / (self.max * 100)
-				] for x, y in enumerate(app.gyroX)])) if app.gyroX else []
-
-		Color:
-			rgba: 1, .4, .4, 1
-		Line:
-			points:
-				list(chain(*
-				[[
-				self.x + x * self.width / len(app.gyroY),
-				self.y + (self.height * 0.3) + y * self.height / (self.max * 100)
-				] for x, y in enumerate(app.gyroY)])) if app.gyroY else []
-
-		Color:
-			rgba: .4, 1, .4, 1
-		Line:
-			points:
-				list(chain(*
-				[[
-				self.x + x * self.width / len(app.gyroZ),
-				self.y + (self.height * 0.3) + y * self.height / (self.max * 100)
-				] for x, y in enumerate(app.gyroZ)])) if app.gyroZ else []
-
-		Color:
-			rgba: .4, .4, 1, 1
-		Line:
-			points:
-				list(chain(*
-				[[
-				self.x + x * self.width / len(app.accelX),
-				self.y + (self.height * 0.7) + y * self.height / (self.max * 100)
-				] for x, y in enumerate(app.accelX)])) if app.accelX else []
-
-		Color:
-			rgba: 1, .4, .4, 1
-		Line:
-			points:
-				list(chain(*
-				[[
-				self.x + x * self.width / len(app.accelY),
-				self.y + (self.height * 0.7) + y * self.height / (self.max * 100)
-				] for x, y in enumerate(app.accelY)])) if app.accelY else []
-
-		Color:
-			rgba: .4, 1, .4, 1
-		Line:
-			points:
-				list(chain(*
-				[[
-				self.x + x * self.width / len(app.accelZ),
-				self.y + (self.height * 0.7) + y * self.height / (self.max * 100)
-				] for x, y in enumerate(app.accelZ)])) if app.accelZ else []
-
-GridLayout:
-	rows: 2
-	GridLayout:
-		cols: 2
-		Camera:
-			id: 'Cam'
-			index: 0
-			resolution: (1920, 1080)
-			size: (self.width, self.height)
-		Graph:
-			max: 1
-
-	ToggleButton:
-		text: 'Start/Stop'
-		size_hint_y: None
-		on_state:
-			if self.state == 'down': Clock.schedule_interval(app.add_running_values, 0)
-			else: Clock.unschedule(app.add_running_values)
-'''
+class ScreenOne(Screen):
+	pass
 
 
-class Graph(App):
+class ScreenTwo(Screen):
 	gyroX = ListProperty([])
 	gyroY = ListProperty([])
 	gyroZ = ListProperty([])
@@ -110,7 +26,7 @@ class Graph(App):
 	accelZ = ListProperty([])
 
 	def __init__(self, **kwargs):
-		super(Graph, self).__init__(**kwargs)
+		super(ScreenTwo, self).__init__(**kwargs)
 		global no_sensor
 		self.tssensor = None
 		if not no_sensor_api:
@@ -144,10 +60,7 @@ class Graph(App):
 			else:
 				no_sensor = True
 		else:
-			print ("No sensor API")
-
-	def build(self):
-		return Builder.load_string(KV)
+			print ("No Sensor API")
 
 	def add_running_values(self, dt):
 		global notEstablished
@@ -170,9 +83,17 @@ class Graph(App):
 			self.accelZ = self.accelZ[-100:]
 		else:
 			if notEstablished:
-				print ("No sensor")
+				print ("Sensor not Connected")
 				notEstablished = False
 
 
-if __name__ == '__main__':
-	Graph().run()
+class CoachSafePlaySafeApp(App):
+	def build(self):
+		screen_manager = ScreenManager(transition=SwapTransition())
+		screen_manager.add_widget(ScreenOne(name="MPV"))
+		screen_manager.add_widget(ScreenTwo(name="VidSensor"))
+		return screen_manager
+
+
+if __name__ == "__main__":
+	CoachSafePlaySafeApp().run()
