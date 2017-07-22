@@ -1,24 +1,11 @@
+#:import Camera kivy.uix.camera
+#:import chain itertools.chain
+#:import Clock kivy.clock.Clock
+
 <ScreenOne>:
 	canvas:
         Color:
             hsv: .7, .5, .3
-        Rectangle:
-            size: self.size
-
-    Label:
-        font_size: 42
-        text: root.name
-
-    Button:
-        text: "Replay"
-        size_hint: None, None
-        size: root.width, 75
-        on_press: root.manager.current = 'Replay'
-
-<ScreenTwo>:
-	canvas:
-        Color:
-            hsv: .1, .2, .3
         Rectangle:
             size: self.size
 
@@ -32,3 +19,92 @@
 			size_hint: None, None
 			size: root.width, 75
 			on_press: root.manager.current = 'VidSensor'
+
+<ScreenTwo>:
+    GridLayout:
+        rows: 2
+        GridLayout:
+            cols: 2
+
+            Camera:
+                id: 'Cam'
+                index: 0
+                resolution: (1920, 1080)
+                size: (self.width, self.height)
+
+            GridLayout:
+                rows: 2
+
+                canvas:
+                    Color:
+                        rgba: .4, .4, 1, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.gyroX),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.gyroX)])) if root.gyroX else []
+
+                    Color:
+                        rgba: 1, .4, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.gyroY),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.gyroY)])) if root.gyroY else []
+
+                    Color:
+                        rgba: .4, 1, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.gyroZ),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.gyroZ)])) if root.gyroZ else []
+
+                    Color:
+                        rgba: .4, .4, 1, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.accelX),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.accelX)])) if root.accelX else []
+
+                    Color:
+                        rgba: 1, .4, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.accelY),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.accelY)])) if root.accelY else []
+
+                    Color:
+                        rgba: .4, 1, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.accelZ),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.accelZ)])) if root.accelZ else []
+
+                ToggleButton:
+                    text: 'Start/Stop'
+                    size_hint_y: None
+                    on_state:
+                        if self.state == 'down': Clock.schedule_interval(root.add_running_values, 0)
+                        else: Clock.unschedule(root.add_running_values)
+
+		Button:
+			text: "Multiplayer View"
+			size_hint: None, None
+			size: root.width, 75
+			on_press: root.manager.current = 'MPV'
