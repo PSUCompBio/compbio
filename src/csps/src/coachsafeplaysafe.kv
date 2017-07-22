@@ -1,9 +1,11 @@
 #:import Camera kivy.uix.camera
 #:import chain itertools.chain
 #:import Clock kivy.clock.Clock
+#:import gauss random.gauss
+#:import Animation kivy.animation.Animation
 
 <ScreenOne>:
-	canvas:
+    canvas:
         Color:
             hsv: .7, .5, .3
         Rectangle:
@@ -13,12 +15,12 @@
         font_size: 42
         text: root.name
 
-	BoxLayout:
-		Button:
-			text: "Live Feed"
-			size_hint: None, None
-			size: root.width, 75
-			on_press: root.manager.current = 'VidSensor'
+    BoxLayout:
+        Button:
+            text: "Live Feed"
+            size_hint: None, None
+            size: root.width, 75
+            on_press: root.manager.current = 'VidSensor'
 
 <ScreenTwo>:
     GridLayout:
@@ -96,6 +98,16 @@
                             self.y + (self.height * 0.7) + y * self.height / 100
                             ] for x, y in enumerate(root.accelZ)])) if root.accelZ else []
 
+                    Color:
+                        rgba: .4, .4, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.values),
+                            self.y + self.height/2 + y * self.height / 10
+                            ] for x, y in enumerate(root.values)])) if root.values else []
+
                 ToggleButton:
                     text: 'Start/Stop'
                     size_hint_y: None
@@ -103,8 +115,8 @@
                         if self.state == 'down': Clock.schedule_interval(root.add_running_values, 0)
                         else: Clock.unschedule(root.add_running_values)
 
-		Button:
-			text: "Multiplayer View"
-			size_hint: None, None
-			size: root.width, 75
-			on_press: root.manager.current = 'MPV'
+        Button:
+            text: "Multiplayer View"
+            size_hint: None, None
+            size: root.width, 75
+            on_press: root.manager.current = 'MPV'
