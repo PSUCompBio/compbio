@@ -3,24 +3,56 @@
 #:import Clock kivy.clock.Clock
 #:import gauss random.gauss
 #:import Animation kivy.animation.Animation
+#: import main studentdb
+#: import ListAdapter kivy.adapters.listadapter.ListAdapter
+#: import ListItemButton kivy.uix.listview.ListItemButton
+ScreenOne:
 
-<ScreenOne>:
-    canvas:
-        Color:
-            hsv: .7, .5, .3
-        Rectangle:
-            size: self.size
+<ScreenOne>
+    fn: first_name
+    ln: last_name
+    student_list: students_list_view
 
-    Label:
-        font_size: 42
-        text: root.name
+    ListView:
+        id: students_list_view
+        adapter:
+            ListAdapter(data=["Doug Smith"], cls=main.StudentListButton)
 
-    BoxLayout:
-        Button:
-            text: "Live Feed"
-            size_hint: None, None
-            size: root.width, 75
-            on_press: root.manager.current = 'VidSensor'
+    GridLayout:
+        rows: 2
+        GridLayout:
+            cols: 4
+            Label:
+                text: "First Name"
+                height:20
+            TextInput:
+                height: 20
+                id: first_name
+            Label:
+                text: "Last Name"
+                height:20
+            TextInput:
+                height: 20
+                id: last_name
+        GridLayout:
+            cols: 4
+            Button:
+                text: "Submit"
+                size_hint_x: 15
+                on_press: root.submit_student()
+            Button:
+                text: "Delete"
+                size_hint_x: 15
+                on_press: root.delete_student()
+            Button:
+                text: "Replace"
+                size_hint_x: 15
+                on_press: root.replace_student()
+            Button:
+                text: "Live Feed"
+                size_hint_x: 15
+                on_press: root.manager.current = 'VidSensor'
+
 
 <ScreenTwo>:
     GridLayout:
@@ -120,3 +152,4 @@
             size_hint: None, None
             size: root.width, 75
             on_press: root.manager.current = 'MPV'
+
