@@ -94,7 +94,7 @@ void fe_mooneyrivlin_hyperelastic_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd&
 
     double c1 = fe_get_mats(opt, 3, "mechanical");
     double c2 = fe_get_mats(opt, 4, "mechanical");
-    double D  = fe_get_mats(opt, 1, "mechanical") / 2;
+    double D  = fe_get_mats(opt, 1, "mechanical") * one_half;
 
     double p = -2 * D * (defJacobian - 1);
 
