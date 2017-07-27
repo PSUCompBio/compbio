@@ -3,54 +3,73 @@
 #:import Clock kivy.clock.Clock
 #:import gauss random.gauss
 #:import Animation kivy.animation.Animation
-#:import main coachsafeplaysafe
-#: import ListAdapter kivy.adapters.listadapter.ListAdapter
-#: import ListItemButton kivy.uix.listview.ListItemButton
-ScreenOne:
+#:import ListAdapter kivy.adapters.listadapter.ListAdapter
+#:import ListItemButton kivy.uix.listview.ListItemButton
 
-<ScreenOne>
+<CustomButton@Button>:
+    backgroud_color: 0, 1, 0, 1
+    height: self.parent.height * 0.222
+
+<CustomButton2@Button>:
+    backgroud_color: 0, 1, 0, 1
+    height: self.parent.height * 0.111
+
+
+<ScreenOne>:
     fn: first_name
     ln: last_name
     student_list: students_list_view
 
-    ListView:
-        id: students_list_view
-        adapter:
-            ListAdapter(data=["Doug Smith"], cls=main.StudentListButton)
-
     GridLayout:
-        rows: 2
+        rows: 3
+
         GridLayout:
             cols: 4
-            Label:
-                text: "First Name"
-                height:20
+            CustomButton:
+                text: "Player Name"
+                size_hint_y: None
+
             TextInput:
-                height: 20
                 id: first_name
-            Label:
-                text: "Last Name"
-                height:20
+                size_hint_y: None
+                height: self.parent.height * 0.222
+                font_size: self.height - 10
+
+            CustomButton:
+                text: "Team Name"
+                size_hint_y: None
+
             TextInput:
-                height: 20
                 id: last_name
+                size_hint_y: None
+                height: self.parent.height * 0.222
+                font_size: self.height - 10
+        
+        ListView:
+            id: students_list_view
+            adapter:
+                ListAdapter(data=["Player 1"], cls=ListItemButton)
+
         GridLayout:
             cols: 4
-            Button:
+            CustomButton2:
                 text: "Submit"
-                size_hint_x: 15
+                pos: root.x, 0
                 on_press: root.submit_student()
-            Button:
+
+            CustomButton2:
                 text: "Delete"
-                size_hint_x: 15
+                pos: root.x + (root.width / 4), 0
                 on_press: root.delete_student()
-            Button:
+
+            CustomButton2:
                 text: "Replace"
-                size_hint_x: 15
+                pos: root.x + (root.width / 2), 0
                 on_press: root.replace_student()
-            Button:
+
+            CustomButton2:
                 text: "Live Feed"
-                size_hint_x: 15
+                pos: root.x + (3 * root.width / 4), 0
                 on_press: root.manager.current = 'VidSensor'
 
 
