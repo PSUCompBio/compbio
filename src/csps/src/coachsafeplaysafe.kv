@@ -3,24 +3,75 @@
 #:import Clock kivy.clock.Clock
 #:import gauss random.gauss
 #:import Animation kivy.animation.Animation
+#:import ListAdapter kivy.adapters.listadapter.ListAdapter
+#:import ListItemButton kivy.uix.listview.ListItemButton
+
+<CustomButton@Button>:
+    backgroud_color: 0, 1, 0, 1
+    height: self.parent.height * 0.222
+
+<CustomButton2@Button>:
+    backgroud_color: 0, 1, 0, 1
+    height: self.parent.height * 0.111
+
 
 <ScreenOne>:
-    canvas:
-        Color:
-            hsv: .7, .5, .3
-        Rectangle:
-            size: self.size
+    fn: first_name
+    ln: last_name
+    student_list: students_list_view
 
-    Label:
-        font_size: 42
-        text: root.name
+    GridLayout:
+        rows: 3
 
-    BoxLayout:
-        Button:
-            text: "Live Feed"
-            size_hint: None, None
-            size: root.width, 75
-            on_press: root.manager.current = 'VidSensor'
+        GridLayout:
+            cols: 4
+            CustomButton:
+                text: "Player Name"
+                size_hint_y: None
+
+            TextInput:
+                id: first_name
+                size_hint_y: None
+                height: self.parent.height * 0.222
+                font_size: self.height - 10
+
+            CustomButton:
+                text: "Team Name"
+                size_hint_y: None
+
+            TextInput:
+                id: last_name
+                size_hint_y: None
+                height: self.parent.height * 0.222
+                font_size: self.height - 10
+        
+        ListView:
+	        id: students_list_view
+	        adapter:
+	            ListAdapter(data=["Player 1"], cls=ListItemButton)
+
+        GridLayout:
+            cols: 4
+            CustomButton2:
+                text: "Submit"
+                pos: root.x, 0
+                on_press: root.submit_student()
+
+            CustomButton2:
+                text: "Delete"
+                pos: root.x + (root.width / 4), 0
+                on_press: root.delete_student()
+
+            CustomButton2:
+                text: "Replace"
+                pos: root.x + (root.width / 2), 0
+                on_press: root.replace_student()
+
+            CustomButton2:
+                text: "Live Feed"
+                pos: root.x + (3 * root.width / 4), 0
+                on_press: root.manager.current = 'VidSensor'
+
 
 <ScreenTwo>:
     GridLayout:
@@ -120,3 +171,4 @@
             size_hint: None, None
             size: root.width, 75
             on_press: root.manager.current = 'MPV'
+

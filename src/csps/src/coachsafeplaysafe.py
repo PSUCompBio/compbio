@@ -1,9 +1,16 @@
-from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, SwapTransition
+from kivy.uix.listview import ListItemButton
+from kivy.properties import ObjectProperty
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.pagelayout import PageLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ListProperty
+from kivy.app import App
 import threespace_api as ts_api
 from random import gauss
+import sqlite3
 import os
+
 
 no_sensor_api = False
 no_sensor = False
@@ -14,7 +21,43 @@ if os.name == 'posix':
 
 
 class ScreenOne(Screen):
-    pass
+   
+    fn = ObjectProperty()
+    ln = ObjectProperty()
+    student_list = ObjectProperty()
+
+    def submit_student(self):
+        student_name = self.fn.text +" "+ self.ln.text
+        first_name = self.fn.text
+        last_name =self.ln.text
+        
+        self.student_list.adapter.data.extend([student_name])
+        self.student_list._trigger_reset_populate()
+        
+        con = sqlite3.connect('players.db')
+        cur = con.cursor() 
+        cur.execute("Create TABLE if not exists Players(first_name TEXT primary key, last_name TEXT unique)")
+        cur.execute("INSERT INTO Players (first_name, last_name) VALUES (?,?)", (first_name, last_name))
+        con.commit()   
+        cur.execute("SELECT * FROM Players")
+        data = cur.fetchall()
+
+    def delete_student(self, *args):
+        if self.student_list.adapter.selection:
+            selection = self.student_list.adapter.selection[0].text
+            self.student_list.adapter.data.remove(selection)
+            self.student_list._trigger_reset_populate()
+        
+        first_name = self.fn.text
+        last_name =self.ln.text
+
+    def replace_student(self, *args):
+        if self.student_list.adapter.selection:
+            selection = self.student_list.adapter.selection[0].text
+            self.student_list.adapter.data.remove(selection)
+            student_name = self.fn.text +" "+ self.ln.text
+            self.student_list.adapter.data.extend([student_name])
+            self.student_list._trigger_reset_populate()
 
 
 class ScreenTwo(Screen):
