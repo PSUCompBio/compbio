@@ -1,7 +1,6 @@
 #:import Camera kivy.uix.camera
-#:import chain itertools.chain
-#:import Clock kivy.clock.Clock
 #:import gauss random.gauss
+#:import chain itertools.chain
 #:import Animation kivy.animation.Animation
 #:import ListAdapter kivy.adapters.listadapter.ListAdapter
 #:import ListItemButton kivy.uix.listview.ListItemButton
@@ -83,19 +82,16 @@
                 id: 'Cam'
                 index: 0
                 resolution: (1920, 1080)
-                size: (self.width, self.height)
-
+            
             GridLayout:
-                rows: 2
-
                 canvas:
                     Color:
                         rgba: .4, .4, 1, 1
                     Line:
-                        points:
+                        points: 
                             list(chain(*
                             [[
-                            self.x + x * self.width / len(root.gyroX),
+                            self.x + x * self.width / len(root.gyroZ),
                             self.y + (self.height * 0.3) + y * self.height / 100
                             ] for x, y in enumerate(root.gyroX)])) if root.gyroX else []
 
@@ -150,21 +146,65 @@
                             ] for x, y in enumerate(root.accelZ)])) if root.accelZ else []
 
                     Color:
-                        rgba: .4, .4, .4, 1
+                        rgba: .4, .4, 1, 1
                     Line:
                         points:
                             list(chain(*
                             [[
-                            self.x + x * self.width / len(root.values),
-                            self.y + self.height/2 + y * self.height / 10
-                            ] for x, y in enumerate(root.values)])) if root.values else []
+                            self.x + x * self.width / len(root.dgyroZ),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.dgyroX)])) if root.demo else []
 
-                ToggleButton:
-                    text: 'Start/Stop'
-                    size_hint_y: None
-                    on_state:
-                        if self.state == 'down': Clock.schedule_interval(root.add_running_values, 0)
-                        else: Clock.unschedule(root.add_running_values)
+                    Color:
+                        rgba: 1, .4, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.dgyroY),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.dgyroY)])) if root.demo else []
+
+                    Color:
+                        rgba: .4, 1, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.dgyroZ),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.dgyroZ)])) if root.demo else []
+
+                    Color:
+                        rgba: .4, .4, 1, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.daccelX),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.daccelX)])) if root.demo else []
+
+                    Color:
+                        rgba: 1, .4, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.daccelY),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.daccelY)])) if root.demo else []
+
+                    Color:
+                        rgba: .4, 1, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.daccelZ),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.daccelZ)])) if root.demo else []
+
 
         Button:
             text: "Multiplayer View"
