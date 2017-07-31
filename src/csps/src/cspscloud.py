@@ -1,13 +1,6 @@
-from __future__ import print_function, division, absolute_import
-from PIL import Image, ImageTk, ImageFont, ImageDraw, ImageGrab
-import matplotlib.pyplot as plt
-from serial import Serial
-import Tkinter as tk
-import tkMessageBox
 import numpy as np
 import time
 import sys
-import cv2
 import math
 import random
 import timeit
