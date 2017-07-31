@@ -73,6 +73,97 @@
 
 
 <ScreenTwo>:
+    GridLayout:
+        rows: 2
+        GridLayout:
+            cols: 2
+
+            Camera:
+                id: 'Cam'
+                index: 0
+                resolution: (1920, 1080)
+                size: (self.width, self.height)
+
+            GridLayout:
+                rows: 2
+
+                canvas:
+                    Color:
+                        rgba: .4, .4, 1, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.gyroX),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.gyroX)])) if root.gyroX else []
+
+                    Color:
+                        rgba: 1, .4, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.gyroY),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.gyroY)])) if root.gyroY else []
+
+                    Color:
+                        rgba: .4, 1, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.gyroZ),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.gyroZ)])) if root.gyroZ else []
+
+                    Color:
+                        rgba: .4, .4, 1, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.accelX),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.accelX)])) if root.accelX else []
+
+                    Color:
+                        rgba: 1, .4, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.accelY),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.accelY)])) if root.accelY else []
+
+                    Color:
+                        rgba: .4, 1, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.accelZ),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.accelZ)])) if root.accelZ else []
+
+                    Color:
+                        rgba: .4, .4, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.values),
+                            self.y + self.height/2 + y * self.height / 10
+                            ] for x, y in enumerate(root.values)])) if root.values else []
+
+                ToggleButton:
+                    text: 'Start/Stop'
+                    size_hint_y: None
+                    on_state:
+                        if self.state == 'down': Clock.schedule_interval(root.add_running_values, 0)
+                        else: Clock.unschedule(root.add_running_values)
 
     Button:
         text: "Multiplayer View"
