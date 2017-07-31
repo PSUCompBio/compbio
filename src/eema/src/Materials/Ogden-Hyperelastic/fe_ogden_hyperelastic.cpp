@@ -81,13 +81,8 @@ void fe_ogden_hyperelastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& 
 
   double defJacobian = F.determinant(); // Jacobian - determinant of deformation gradient
 
-  // MatrixXd C = MatrixXd::Zero(ndof, ndof);
-  // C = F.transpose() * F;
-
 	MatrixXd b = MatrixXd::Zero(ndof, ndof);
 	b = F * F.transpose();
-
-	// EigenSolver<MatrixXd> es(C);
 
 	EigenSolver<MatrixXd> es(b);
 
@@ -97,17 +92,6 @@ void fe_ogden_hyperelastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& 
 	double l_1 = sqrt(D(0, 0));
 	double l_2 = sqrt(D(1, 1));
 	double l_3 = sqrt(D(2, 2));
-
-	// std::cout << "l_1 = " << l_1 << '\n';
-	// std::cout << "l_2 = " << l_2 << '\n';
-	// std::cout << "l_3 = " << l_3 << '\n' << '\n';
-
-	// VectorXd N_1 = VectorXd::Zero(3);
-	// N_1 << V(0, 0), V(1, 0), V(2, 0);
-	// VectorXd N_2 = VectorXd::Zero(3);
-	// N_2 << V(0, 1), V(1, 1), V(2, 1);
-	// VectorXd N_3 = VectorXd::Zero(3);
-	// N_3 << V(0, 2), V(1, 2), V(2, 2);
 
 	VectorXd n_1 = VectorXd::Zero(3);
 	n_1 << V(0, 0), V(1, 0), V(2, 0);
@@ -129,9 +113,6 @@ void fe_ogden_hyperelastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& 
 	MatrixXd tau = MatrixXd::Identity(ndof, ndof); // Kirchhoff stress
 	MatrixXd pk_S = MatrixXd::Zero(ndof, ndof); // second Piola-Kirchhoff stress
 	MatrixXd cauchy_sigma = MatrixXd::Zero(ndof, ndof); // Cauchy stress
-
-	// pk_S = ((1/l_1) * dW_1 * N_1 * N_1.transpose()) + ((1/l_2) * dW_2 * N_2 * N_2.transpose()) + ((1/l_3) * dW_3 * N_3 * N_3.transpose());
-
 
 	if (l_1 != l_2 && l_1 != l_3 && l_2 != l_3) {
 		tau = (l_1 * dW_1 * n_1 * n_1.transpose()) + (l_2 * dW_2 * n_2 * n_2.transpose()) + (l_3 * dW_3 * n_3 * n_3.transpose());
