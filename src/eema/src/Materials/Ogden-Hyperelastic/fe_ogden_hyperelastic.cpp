@@ -71,6 +71,13 @@ VectorXd fe_ogden_hyperelastic(VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, V
 
 void fe_ogden_hyperelastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, int opt, int return_opt) {
 
+	// References:
+
+	// I. Doghri, Mechanics of deformable solids: linear, nonlinear, analytical and computational aspects. Berlin [u.a.: Springer, 2010.
+
+	// J. C. Simo and R. L. Taylor, “Quasi-incompressible finite elasticity in principal stretches. continuum basis and numerical algorithms,”
+	// Comput. Methods Appl. Mech. Eng., vol. 85, no. 3, pp. 273–310, Feb. 1991.
+
   double one_third  = 1.0 / 3.0;
   double two_third  = 2.0 / 3.0;
   double four_third = 4.0 / 3.0;
