@@ -1,3 +1,5 @@
+# Imports
+
 from kivy.uix.screenmanager import ScreenManager, Screen, SwapTransition
 from kivy.uix.listview import ListItemButton
 from kivy.properties import ObjectProperty
@@ -12,180 +14,277 @@ import sqlite3
 import os
 
 
-no_sensor_api = False
-no_sensor = False
-notEstablished = True
-iterator = 0
+# Constants and global variables
+
 demoGyro = [(0.002327037276700139, -0.012798705138266087, -0.002327037276700139), (0.0, -0.016289260238409042, -0.0011635186383500695), (0.0011635186383500695, -0.015125742182135582, -0.0011635186383500695), (0.002327037276700139, -0.016289260238409042, -0.0011635186383500695), (0.0011635186383500695, -0.016289260238409042, 0.0), (0.002327037276700139, -0.015125742182135582, -0.0011635186383500695), (-0.0034905560314655304, -0.019779816269874573, -0.0011635186383500695), (-0.002327037276700139, -0.013962224125862122, -0.002327037276700139), (-0.0034905560314655304, -0.015125742182135582, -0.0034905560314655304), (0.002327037276700139, -0.016289260238409042, -0.0011635186383500695), (-0.005817593075335026, -0.016289260238409042, 0.0), (0.0011635186383500695, -0.017452780157327652, -0.002327037276700139), (0.0011635186383500695, -0.013962224125862122, 0.0011635186383500695), (-0.0011635186383500695, -0.018616298213601112, -0.0034905560314655304), (0.002327037276700139, -0.011635186150670052, 0.0), (0.002327037276700139, -0.017452780157327652, -0.002327037276700139), (0.0, -0.013962224125862122, -0.0011635186383500695), (0.004654074553400278, -0.015125742182135582, -0.0034905560314655304), (0.0, -0.016289260238409042, 0.0011635186383500695), (0.0, -0.016289260238409042, 0.0), (0.0011635186383500695, -0.015125742182135582, -0.0011635186383500695), (-0.0034905560314655304, -0.016289260238409042, -0.002327037276700139), (-0.0011635186383500695, -0.017452780157327652, -0.0011635186383500695), (0.0011635186383500695, -0.016289260238409042, -0.0034905560314655304), (0.0034905560314655304, -0.015125742182135582, -0.0011635186383500695), (0.0011635186383500695, -0.013962224125862122, -0.0034905560314655304), (0.002327037276700139, -0.016289260238409042, 0.0), (-0.0011635186383500695, -0.015125742182135582, -0.0034905560314655304), (0.0, -0.015125742182135582, -0.0011635186383500695), (0.0011635186383500695, -0.013962224125862122, 0.0), (0.002327037276700139, -0.017452780157327652, 0.0), (-0.0011635186383500695, -0.015125742182135582, -0.0011635186383500695), (0.0, -0.015125742182135582, 0.0), (-0.0011635186383500695, -0.013962224125862122, -0.004654074553400278), (0.0034905560314655304, -0.012798705138266087, 0.0), (-0.009308149106800556, -0.016289260238409042, -0.005817593075335026), (0.011635186150670052, -0.013962224125862122, -0.0011635186383500695), (0.002327037276700139, -0.012798705138266087, -0.0034905560314655304), (0.0011635186383500695, -0.013962224125862122, 0.0), (0.0, -0.012798705138266087, 0.0), (-0.0011635186383500695, -0.016289260238409042, -0.002327037276700139), (-0.0011635186383500695, -0.015125742182135582, -0.004654074553400278), (-0.0011635186383500695, -0.015125742182135582, -0.002327037276700139), (0.0034905560314655304, -0.016289260238409042, -0.0011635186383500695), (-0.0011635186383500695, -0.016289260238409042, -0.002327037276700139), (-0.002327037276700139, -0.012798705138266087, 0.0034905560314655304), (0.0011635186383500695, -0.018616298213601112, -0.0011635186383500695), (0.0011635186383500695, -0.016289260238409042, -0.0011635186383500695), (0.0011635186383500695, -0.013962224125862122, -0.0011635186383500695), (0.0011635186383500695, -0.016289260238409042, -0.0011635186383500695), (0.002327037276700139, -0.015125742182135582, 0.002327037276700139), (-0.002327037276700139, -0.015125742182135582, -0.002327037276700139), (0.0011635186383500695, -0.015125742182135582, 0.0), (-0.002327037276700139, -0.017452780157327652, -0.0011635186383500695), (0.002327037276700139, -0.017452780157327652, -0.004654074553400278), (-0.0011635186383500695, -0.016289260238409042, -0.004654074553400278), (0.0011635186383500695, -0.013962224125862122, -0.0011635186383500695), (0.0, -0.012798705138266087, -0.0034905560314655304), (-0.002327037276700139, -0.015125742182135582, 0.0011635186383500695), (-0.0011635186383500695, -0.015125742182135582, -0.002327037276700139), (0.0, -0.015125742182135582, -0.0011635186383500695), (-0.002327037276700139, -0.012798705138266087, -0.0011635186383500695), (0.0011635186383500695, -0.016289260238409042, 0.0), (0.0, -0.015125742182135582, -0.002327037276700139), (-0.0011635186383500695, -0.016289260238409042, -0.002327037276700139), (-0.0011635186383500695, -0.016289260238409042, 0.0), (-0.0011635186383500695, -0.013962224125862122, 0.0), (0.0034905560314655304, -0.013962224125862122, 0.0), (-0.0011635186383500695, -0.019779816269874573, 0.002327037276700139), (0.0011635186383500695, -0.016289260238409042, -0.0034905560314655304), (0.0, -0.015125742182135582, 0.0), (-0.0034905560314655304, -0.015125742182135582, -0.0011635186383500695), (0.0011635186383500695, -0.013962224125862122, 0.0011635186383500695), (-0.002327037276700139, -0.011635186150670052, 0.0), (0.0011635186383500695, -0.013962224125862122, 0.0), (0.0, -0.013962224125862122, -0.002327037276700139), (0.0011635186383500695, -0.016289260238409042, -0.002327037276700139), (0.0011635186383500695, -0.012798705138266087, -0.004654074553400278), (-0.0011635186383500695, -0.016289260238409042, -0.0011635186383500695), (0.0011635186383500695, -0.013962224125862122, -0.0011635186383500695), (0.0, -0.016289260238409042, -0.002327037276700139), (-0.0011635186383500695, -0.010471668094396591, -0.0011635186383500695), (-0.0011635186383500695, -0.016289260238409042, -0.004654074553400278), (-0.0011635186383500695, -0.015125742182135582, -0.0011635186383500695), (0.0, -0.016289260238409042, -0.0034905560314655304), (0.0, -0.016289260238409042, 0.0011635186383500695), (0.0011635186383500695, -0.015125742182135582, -0.0034905560314655304), (0.0, -0.015125742182135582, -0.002327037276700139), (-0.0034905560314655304, -0.018616298213601112, -0.002327037276700139), (0.0011635186383500695, -0.012798705138266087, 0.002327037276700139), (0.0, -0.013962224125862122, 0.0), (0.0011635186383500695, -0.013962224125862122, -0.002327037276700139), (-0.002327037276700139, -0.013962224125862122, -0.0011635186383500695), (0.002327037276700139, -0.017452780157327652, -0.002327037276700139), (0.0, -0.013962224125862122, 0.0), (0.002327037276700139, -0.015125742182135582, -0.004654074553400278), (0.002327037276700139, -0.016289260238409042, 0.0), (-0.002327037276700139, -0.016289260238409042, -0.0034905560314655304), (0.002327037276700139, -0.015125742182135582, -0.002327037276700139), (0.0034905560314655304, -0.016289260238409042, 0.0034905560314655304), (-0.013962224125862122, -0.015125742182135582, -0.002327037276700139), (-0.006981112062931061, -0.012798705138266087, 0.0011635186383500695), (0.019779816269874573, -0.013962224125862122, 0.002327037276700139), (-0.002327037276700139, -0.016289260238409042, -0.004654074553400278), (0.010471668094396591, -0.015125742182135582, 0.0011635186383500695), (-0.004654074553400278, -0.015125742182135582, -0.002327037276700139), (-0.004654074553400278, -0.015125742182135582, 0.0), (0.002327037276700139, -0.016289260238409042, 0.0), (-0.031415004283189774, -0.017452780157327652, 0.002327037276700139), (-0.29437020421028137, -1.1926065683364868, -2.022195339202881), (4.657565116882324, 3.904768466949463, 14.623102188110352), (2.267697811126709, 0.941286563873291, 12.420561790466309), (4.096749305725098, 3.545241355895996, 9.097552299499512), (-0.9738650918006897, -1.695246696472168, -4.204956531524658), (-2.1815974712371826, -2.927412986755371, -15.200207710266113), (-2.0629186630249023, 0.20477928221225739, -9.216231346130371), (-2.3735780715942383, -0.4339924454689026, -7.8234992027282715), (0.7702493667602539, 0.8319158554077148, 0.7946832180023193), (0.6888030171394348, -0.13380464911460876, -4.541213035583496), (0.048867784440517426, -0.1035531610250473, 0.1826724261045456), (0.07330167293548584, 0.010471668094396591, 0.5747781991958618), (0.013962224125862122, -0.05817593261599541, -0.07097464054822922), (0.018616298213601112, -0.005817593075335026, -0.0802827849984169), (0.0011635186383500695, -0.015125742182135582, 0.0), (0.0034905560314655304, -0.017452780157327652, -0.0011635186383500695), (-0.009308149106800556, -0.013962224125862122, -0.002327037276700139), (-0.0011635186383500695, -0.015125742182135582, -0.0011635186383500695), (0.0011635186383500695, -0.013962224125862122, -0.0011635186383500695), (0.0011635186383500695, -0.015125742182135582, -0.0034905560314655304), (0.0011635186383500695, -0.016289260238409042, -0.004654074553400278), (-0.0034905560314655304, -0.015125742182135582, 0.0), (-0.023270372301340103, -0.015125742182135582, -0.0034905560314655304), (-0.031415004283189774, -0.019779816269874573, -0.005817593075335026), (0.002327037276700139, -0.012798705138266087, 0.0), (0.004654074553400278, -0.013962224125862122, -0.002327037276700139), (-0.0011635186383500695, -0.019779816269874573, -0.0011635186383500695), (0.005817593075335026, -0.015125742182135582, -0.002327037276700139), (-0.0034905560314655304, -0.022106854245066643, -0.019779816269874573), (-0.005817593075335026, -0.013962224125862122, 0.006981112062931061), (-0.0011635186383500695, -0.016289260238409042, -0.002327037276700139), (0.0, -0.015125742182135582, 0.0011635186383500695), (0.0011635186383500695, -0.016289260238409042, -0.002327037276700139), (-0.0011635186383500695, -0.015125742182135582, -0.0011635186383500695), (0.0, -0.015125742182135582, 0.0), (-0.002327037276700139, -0.013962224125862122, -0.0011635186383500695), (-0.002327037276700139, -0.015125742182135582, -0.004654074553400278), (0.0, -0.011635186150670052, -0.002327037276700139), (0.004654074553400278, -0.015125742182135582, 0.0), (-0.009308149106800556, -0.015125742182135582, 0.009308149106800556), (0.015125742182135582, -0.013962224125862122, 0.0011635186383500695), (-0.004654074553400278, -0.012798705138266087, -0.0011635186383500695), (-0.002327037276700139, -0.015125742182135582, -0.004654074553400278), (-0.002327037276700139, -0.012798705138266087, -0.0011635186383500695), (-0.0011635186383500695, -0.015125742182135582, 0.0), (-0.002327037276700139, -0.013962224125862122, -0.002327037276700139), (0.0011635186383500695, -0.017452780157327652, -0.0034905560314655304), (0.0011635186383500695, -0.013962224125862122, -0.0011635186383500695), (0.0011635186383500695, -0.015125742182135582, -0.0011635186383500695), (0.0, -0.016289260238409042, -0.002327037276700139), (0.002327037276700139, -0.012798705138266087, 0.0011635186383500695), (-0.0034905560314655304, -0.015125742182135582, -0.0011635186383500695), (0.0034905560314655304, -0.013962224125862122, -0.002327037276700139), (-0.0011635186383500695, -0.015125742182135582, 0.0), (0.002327037276700139, -0.013962224125862122, -0.0034905560314655304), (-0.0011635186383500695, -0.017452780157327652, -0.004654074553400278), (-0.002327037276700139, -0.013962224125862122, 0.0), (0.0, -0.013962224125862122, -0.0011635186383500695), (0.0, -0.013962224125862122, 0.0)]
 demoAccel = [(0.537109375, 1.5625, 0.09765625), (0.439453125, 1.171875, -0.390625), (-0.09765625, 0.5859375, -0.048828125), (0.29296875, 1.3671875, -0.439453125), (0.1953125, 1.5625, -0.09765625), (0.09765625, 2.05078125, -0.48828125), (0.5859375, 0.9765625, -0.244140625), (0.341796875, 1.025390625, -0.439453125), (0.439453125, 1.5625, -0.29296875), (0.87890625, 0.927734375, 0.0), (0.390625, 1.123046875, -0.390625), (0.048828125, 1.5625, -0.48828125), (0.1953125, 1.318359375, -0.244140625), (0.09765625, 1.318359375, -0.341796875), (0.68359375, 1.171875, -0.634765625), (0.439453125, 1.171875, -0.29296875), (0.29296875, 0.9765625, 0.29296875), (0.390625, 1.26953125, -0.927734375), (0.5859375, 1.26953125, -0.5859375), (-0.048828125, 1.953125, -0.244140625), (0.29296875, 1.171875, 0.1953125), (0.29296875, 0.732421875, -0.390625), (0.68359375, 1.416015625, -0.5859375), (0.48828125, 1.07421875, -0.244140625), (0.244140625, 1.3671875, -0.5859375), (0.29296875, 1.5625, 0.09765625), (0.341796875, 0.9765625, -0.439453125), (0.29296875, 1.5625, -0.439453125), (0.390625, 1.318359375, 0.048828125), (0.29296875, 1.220703125, -0.048828125), (0.29296875, 1.318359375, -0.390625), (1.025390625, 1.416015625, -0.439453125), (0.146484375, 1.220703125, -0.048828125), (0.341796875, 1.5625, -0.390625), (0.09765625, 1.26953125, -0.537109375), (0.439453125, 0.9765625, -0.244140625), (1.025390625, 1.025390625, -0.29296875), (0.1953125, 1.220703125, -0.68359375), (0.439453125, 1.26953125, -0.341796875), (0.146484375, 1.220703125, -0.390625), (0.537109375, 1.171875, -0.390625), (0.29296875, 1.3671875, -0.29296875), (0.537109375, 0.9765625, -0.5859375), (0.830078125, 1.07421875, -0.29296875), (0.341796875, 1.806640625, -0.5859375), (0.390625, 1.26953125, -0.341796875), (0.244140625, 1.318359375, -0.48828125), (0.390625, 1.123046875, -0.341796875), (0.732421875, 1.416015625, -0.29296875), (0.29296875, 0.9765625, -0.146484375), (0.244140625, 1.5625, -0.390625), (0.537109375, 1.3671875, -0.439453125), (0.537109375, 1.5625, -0.048828125), (0.1953125, 1.220703125, -0.68359375), (0.537109375, 1.416015625, -0.244140625), (0.29296875, 0.927734375, -0.1953125), (0.5859375, 0.78125, -0.439453125), (0.0, 0.927734375, -0.244140625), (0.341796875, 1.07421875, -0.390625), (0.78125, 0.68359375, -0.29296875), (0.0, 1.025390625, -0.87890625), (0.1953125, 1.3671875, -0.244140625), (0.48828125, 1.220703125, -0.390625), (0.1953125, 1.5625, -0.390625), (0.5859375, 1.611328125, -0.244140625), (0.09765625, 1.26953125, -0.09765625), (0.1953125, 1.46484375, -0.146484375), (0.5859375, 0.439453125, -0.5859375), (0.634765625, 1.318359375, -0.341796875), (0.390625, 1.5625, 0.048828125), (0.732421875, 0.634765625, -0.29296875), (0.048828125, 1.3671875, -0.5859375), (0.341796875, 1.5625, -0.29296875), (0.1953125, 1.66015625, -0.244140625), (0.29296875, 1.3671875, -0.439453125), (0.5859375, 1.46484375, -0.537109375), (0.5859375, 1.5625, -0.390625), (0.146484375, 1.07421875, -0.29296875), (0.78125, 1.171875, -0.1953125), (-0.341796875, 1.7578125, -0.048828125), (0.48828125, 0.927734375, -0.390625), (0.09765625, 1.7578125, -0.5859375), (0.634765625, 1.3671875, 0.146484375), (0.5859375, 1.318359375, -0.29296875), (0.537109375, 1.07421875, 0.244140625), (0.29296875, 1.318359375, -0.048828125), (0.09765625, 1.5625, -0.48828125), (0.29296875, 1.025390625, 0.0), (0.390625, 1.3671875, -0.244140625), (0.341796875, 1.123046875, -0.927734375), (0.29296875, 1.07421875, -0.439453125), (0.29296875, 0.9765625, -0.244140625), (0.439453125, 0.927734375, -0.732421875), (0.390625, 1.66015625, -0.48828125), (0.48828125, 1.123046875, -0.048828125), (0.146484375, 1.318359375, -0.634765625), (0.390625, 1.123046875, -0.48828125), (0.68359375, 1.318359375, -0.341796875), (0.5859375, 1.611328125, -0.29296875), (0.1953125, 1.123046875, -0.48828125), (0.341796875, 1.171875, -0.09765625), (0.244140625, 1.123046875, -0.390625), (0.48828125, 0.732421875, -0.87890625), (0.732421875, 1.025390625, -0.09765625), (-0.09765625, 1.025390625, -0.5859375), (0.48828125, 1.26953125, -0.341796875), (0.244140625, 1.7578125, -0.048828125), (0.390625, 0.927734375, -0.634765625), (0.439453125, 0.68359375, -0.244140625), (-1.025390625, 1.025390625, 1.171875), (1.7578125, 1.953125, -0.048828125), (-0.5859375, 1.025390625, -0.341796875), (0.5859375, -0.927734375, 0.244140625), (0.732421875, -1.220703125, -0.048828125), (0.1953125, -0.537109375, 0.146484375), (0.634765625, 1.171875, 0.1953125), (0.5859375, 1.26953125, 0.146484375), (0.341796875, 1.3671875, -0.048828125), (1.025390625, 1.46484375, -0.78125), (0.244140625, 0.927734375, -0.537109375), (0.830078125, 1.025390625, -0.390625), (0.439453125, 1.26953125, -0.390625), (-0.09765625, 1.025390625, -0.68359375), (0.439453125, 1.5625, -0.390625), (0.244140625, 0.87890625, -0.5859375), (0.390625, 0.87890625, -0.48828125), (0.048828125, 1.07421875, -0.48828125), (0.29296875, 1.7578125, 0.09765625), (0.68359375, 1.416015625, -0.244140625), (0.634765625, 0.78125, -0.244140625), (0.1953125, 0.9765625, -0.244140625), (0.390625, 1.220703125, -0.341796875), (-0.048828125, 1.3671875, -0.1953125), (0.5859375, 1.7578125, -0.5859375), (0.341796875, 1.318359375, -0.537109375), (0.146484375, 2.05078125, 0.146484375), (0.29296875, 1.46484375, -0.29296875), (0.390625, 1.416015625, 0.0), (0.146484375, 1.513671875, -0.09765625), (0.048828125, 1.220703125, -0.244140625), (0.29296875, 1.123046875, -0.537109375), (0.5859375, 1.171875, -0.87890625), (0.1953125, 1.3671875, -0.732421875), (0.1953125, 1.5625, 0.0), (0.48828125, 1.220703125, -0.1953125), (0.5859375, 0.927734375, -0.341796875), (0.1953125, 1.5625, -0.68359375), (0.48828125, 1.7578125, -0.1953125), (0.634765625, 0.927734375, -0.1953125), (0.390625, 1.318359375, -0.244140625), (0.48828125, 1.5625, -0.634765625), (0.537109375, 1.025390625, 0.146484375), (0.390625, 1.708984375, -0.244140625), (0.537109375, 1.318359375, -0.5859375), (0.09765625, 0.9765625, -0.48828125), (0.1953125, 0.87890625, -0.439453125), (0.439453125, 1.26953125, 0.048828125), (0.09765625, 1.611328125, -0.390625), (0.439453125, 0.927734375, -0.341796875), (0.0, 1.07421875, -0.341796875), (0.1953125, 1.416015625, -0.341796875), (-0.048828125, 0.87890625, -0.048828125), (0.341796875, 1.611328125, 0.146484375), (0.048828125, 1.123046875, -0.244140625), (0.244140625, 1.5625, -0.68359375), (0.78125, 0.927734375, -0.29296875), (0.5859375, 1.7578125, -0.68359375), (0.146484375, 1.318359375, -0.29296875)]
 
+no_sensor_api = False
+no_sensor = False
+notEstablished = True
+
+iterator = 0
+
+CONST_processingSlack = 0.7
+CONST_replayDuration = 3
+CONST_videoRateMs = 20
+CONST_slowDown = 4.0
+
+replay_on = False
+record_on = False
+replay_frame = 0
+
+accelCacheReplay = []
+gyroCacheReplay = []
+accelCache = []
+gyroCache = []
+
+CONST_cacheLimit = 1000 / CONST_videoRateMs * CONST_replayDuration * CONST_processingSlack
+
+
+# Check if Operating System is Mac (Sensor doesn't support posix systems)
 
 if os.name == 'posix':
-    no_sensor_api = True
+	no_sensor_api = True
 
 
-class StudentListButton(ListItemButton):
-    pass
-
+# Multi Player View with database linkup
 
 class ScreenOne(Screen):
    
-    fn = ObjectProperty()
-    ln = ObjectProperty()
-    student_list = ObjectProperty()
+	fn = ObjectProperty()
+	ln = ObjectProperty()
+	student_list = ObjectProperty()
 
-    def submit_student(self):
-        student_name = self.fn.text +" "+ self.ln.text
-        first_name = self.fn.text
-        last_name =self.ln.text
+	def submit_student(self):
+		student_name = self.fn.text +" "+ self.ln.text
+		first_name = self.fn.text
+		last_name =self.ln.text
 
-        self.student_list.adapter.data.extend([student_name])
-        self.student_list._trigger_reset_populate()
+		self.student_list.adapter.data.extend([student_name])
+		self.student_list._trigger_reset_populate()
 
-        con = sqlite3.connect('players.db')
-        cur = con.cursor()
-        cur.execute("Create TABLE if not exists Players(first_name TEXT primary key, last_name TEXT unique)")
-        cur.execute("INSERT INTO Players (first_name, last_name) VALUES (?,?)", (first_name, last_name))
-        con.commit()
-        cur.execute("SELECT * FROM Players")
-        data = cur.fetchall()
+		con = sqlite3.connect('players.db')
+		cur = con.cursor()
+		cur.execute("Create TABLE if not exists Players(first_name TEXT primary key, last_name TEXT unique)")
+		cur.execute("INSERT INTO Players (first_name, last_name) VALUES (?,?)", (first_name, last_name))
+		con.commit()
+		cur.execute("SELECT * FROM Players")
+		data = cur.fetchall()
 
-    def delete_student(self, *args):
-        if self.student_list.adapter.selection:
-            selection = self.student_list.adapter.selection[0].text
-            self.student_list.adapter.data.remove(selection)
-            self.student_list._trigger_reset_populate()
+	def delete_student(self, *args):
+		if self.student_list.adapter.selection:
+			selection = self.student_list.adapter.selection[0].text
+			self.student_list.adapter.data.remove(selection)
+			self.student_list._trigger_reset_populate()
 
-        first_name = self.fn.text
-        last_name =self.ln.text
+		first_name = self.fn.text
+		last_name =self.ln.text
 
-    def replace_student(self, *args):
-        if self.student_list.adapter.selection:
-            selection = self.student_list.adapter.selection[0].text
-            self.student_list.adapter.data.remove(selection)
-            student_name = self.fn.text +" "+ self.ln.text
-            self.student_list.adapter.data.extend([student_name])
-            self.student_list._trigger_reset_populate()
+	def replace_student(self, *args):
+		if self.student_list.adapter.selection:
+			selection = self.student_list.adapter.selection[0].text
+			self.student_list.adapter.data.remove(selection)
+			student_name = self.fn.text +" "+ self.ln.text
+			self.student_list.adapter.data.extend([student_name])
+			self.student_list._trigger_reset_populate()
 
+
+# Live Feed with sensor data or demo data (only on Mac)
 
 class ScreenTwo(Screen):
-    gyroX = ListProperty([])
-    gyroY = ListProperty([])
-    gyroZ = ListProperty([])
+	gyroX = ListProperty([])
+	gyroY = ListProperty([])
+	gyroZ = ListProperty([])
 
-    accelX = ListProperty([])
-    accelY = ListProperty([])
-    accelZ = ListProperty([])
+	accelX = ListProperty([])
+	accelY = ListProperty([])
+	accelZ = ListProperty([])
 
-    dgyroX = ListProperty([])
-    dgyroY = ListProperty([])
-    dgyroZ = ListProperty([])
+	dgyroX = ListProperty([])
+	dgyroY = ListProperty([])
+	dgyroZ = ListProperty([])
 
-    daccelX = ListProperty([])
-    daccelY = ListProperty([])
-    daccelZ = ListProperty([])
+	daccelX = ListProperty([])
+	daccelY = ListProperty([])
+	daccelZ = ListProperty([])
 
-    demo = False
+	demo = False
 
-    def __init__(self, **kwargs):
-        super(ScreenTwo, self).__init__(**kwargs)
-        global no_sensor, no_sensor_api
-        self.tssensor = None
-        if not no_sensor_api:
-            self.com_port = None
-            self.device_list = ts_api.getComPorts()
-            if len(self.device_list) > 0:
-                for self.device in self.device_list:
-                    self.cp = self.device.com_port
-                    self.port_info = ts_api.getDeviceInfoFromComPort(self.cp, poll_device=True)
-                    if self.port_info.dev_type == 'BT-H3' or self.port_info.dev_type == 'BT':
-                        self.com_port = self.cp
-                        self.tssensor = ts_api.TSBTSensor(self.com_port)
-                        break
-                    if self.port_info.dev_type == 'DNG':
-                        self.com_port = self.cp
-                        self.tsdongle = ts_api.TSDongle(self.com_port)
-                        if not self.tsdongle:
-                            no_sensor = True
-                            break
-                        self.tssensor = self.tsdongle.getSensorFromDongle(0)
-                        if not self.tssensor:
-                            no_sensor = True
-                            break
-                        break
-                    if self.port_info.dev_type == 'WL-H3' or self.port_info.dev_type == 'WL':
-                        self.com_port = self.cp
-                        self.tssensor = ts_api.TSWLSensor(self.com_port)
-                        break
-                if not self.com_port:
-                    no_sensor = True
-            else:
-                no_sensor = True
+	def __init__(self, **kwargs):
+		super(ScreenTwo, self).__init__(**kwargs)
+		global no_sensor, no_sensor_api
+		self.tssensor = None
+		if not no_sensor_api:
+			self.com_port = None
+			self.device_list = ts_api.getComPorts()
+			if len(self.device_list) > 0:
+				for self.device in self.device_list:
+					self.cp = self.device.com_port
+					self.port_info = ts_api.getDeviceInfoFromComPort(self.cp, poll_device=True)
+					if self.port_info.dev_type == 'BT-H3' or self.port_info.dev_type == 'BT':
+						self.com_port = self.cp
+						self.tssensor = ts_api.TSBTSensor(self.com_port)
+						break
+					if self.port_info.dev_type == 'DNG':
+						self.com_port = self.cp
+						self.tsdongle = ts_api.TSDongle(self.com_port)
+						if not self.tsdongle:
+							no_sensor = True
+							break
+						self.tssensor = self.tsdongle.getSensorFromDongle(0)
+						if not self.tssensor:
+							no_sensor = True
+							break
+						break
+					if self.port_info.dev_type == 'WL-H3' or self.port_info.dev_type == 'WL':
+						self.com_port = self.cp
+						self.tssensor = ts_api.TSWLSensor(self.com_port)
+						break
+				if not self.com_port:
+					no_sensor = True
+			else:
+				no_sensor = True
 
-        else:
-            no_sensor = True
-            no_sensor_api = True
-            print ("No Sensor API")
+		else:
+			no_sensor = True
+			no_sensor_api = True
+			print ("No Sensor API")
 
-        if no_sensor == True:
-            self.demo = True
+		if no_sensor:
+			self.demo = True
 
-        Clock.schedule_interval(self.add_running_values, 0)
+		Clock.schedule_interval(self.add_running_values, 0)
 
-    def add_running_values(self, dt):
-        global notEstablished, no_sensor, iterator, demoGyro, demoAccel
+	def add_running_values(self, dt):
+		global notEstablished, no_sensor, iterator, demoGyro, demoAccel, gyroCache, gyroCacheReplay, accelCache, accelCacheReplay, record_on, replay_frame, replay_on
 
-        if not no_sensor:
-            data = self.tssensor.getCorrectedGyroRate()
-            self.gyroX.append(data[0])
-            self.gyroX = self.gyroX[-100:]
-            self.gyroY.append(data[1])
-            self.gyroY = self.gyroY[-100:]
-            self.gyroZ.append(data[2])
-            self.gyroZ = self.gyroZ[-100:]
+		if not no_sensor:
+			data = self.tssensor.getCorrectedGyroRate()
+			self.gyroX.append(data[0])
+			self.gyroX = self.gyroX[-100:]
+			self.gyroY.append(data[1])
+			self.gyroY = self.gyroY[-100:]
+			self.gyroZ.append(data[2])
+			self.gyroZ = self.gyroZ[-100:]
 
-            data = self.tssensor.getCorrectedAccelerometerVector()
-            self.accelX.append(data[0])
-            self.accelX = self.accelX[-100:]
-            self.accelY.append(data[1])
-            self.accelY = self.accelY[-100:]
-            self.accelZ.append(data[2])
-            self.accelZ = self.accelZ[-100:]
+			data2 = self.tssensor.getCorrectedAccelerometerVector()
+			self.accelX.append(data2[0])
+			self.accelX = self.accelX[-100:]
+			self.accelY.append(data2[1])
+			self.accelY = self.accelY[-100:]
+			self.accelZ.append(data2[2])
+			self.accelZ = self.accelZ[-100:]
 
-        else:
-            iterator += 1
+			if len(gyroCache) > CONST_cacheLimit / 2:
+				gyroCache.pop(0)
+				accelCache.pop(0)
 
-            if iterator == len(demoGyro) - 1:
-                iterator = 0
+			gyroCache.append(data)
+			accelCache.append(data2)
 
-            data = demoGyro[iterator]
-            self.dgyroX.append(data[0])
-            self.dgyroX = self.dgyroX[-100:]
-            self.dgyroY.append(data[1])
-            self.dgyroY = self.dgyroY[-100:]
-            self.dgyroZ.append(data[2])
-            self.dgyroZ = self.dgyroZ[-100:]
+			if record_on:
+				if len(gyroCacheReplay) < CONST_cacheLimit:
+					gyroCacheReplay.append(data)
+					accelCacheReplay.append(data2)
+				else:
+					record_on = False
+					replay_on = True
 
-            data = demoAccel[iterator]
-            self.daccelX.append(data[0])
-            self.daccelX = self.daccelX[-100:]
-            self.daccelY.append(data[1])
-            self.daccelY = self.daccelY[-100:]
-            self.daccelZ.append(data[2])
-            self.daccelZ = self.daccelZ[-100:]
+			if data[0] > 5 or data[0] < -5 or data[1] > 5 or data[1] < -5 or data[2] > 5 or data[2] < -5 or data2[0] > 5 or data2[0] < -5 or data2[1] > 5 or data2[1] < -5 or data2[2] > 5 or data2[2] < -5:
+				self.ids.replay_button.disabled = False
+				record_on = True
+				gyroCacheReplay = gyroCache[:]
+				accelCacheReplay = accelCache[:]
+				replay_frame = 0
 
-            if notEstablished:
-                print ("Sensor not Connected")
-                notEstablished = False
+		else:
+			iterator += 1
 
+			if iterator == len(demoGyro) - 1:
+				iterator = 0
+
+			data = demoGyro[iterator]
+			self.dgyroX.append(data[0])
+			self.dgyroX = self.dgyroX[-100:]
+			self.dgyroY.append(data[1])
+			self.dgyroY = self.dgyroY[-100:]
+			self.dgyroZ.append(data[2])
+			self.dgyroZ = self.dgyroZ[-100:]
+
+			data = demoAccel[iterator]
+			self.daccelX.append(data[0])
+			self.daccelX = self.daccelX[-100:]
+			self.daccelY.append(data[1])
+			self.daccelY = self.daccelY[-100:]
+			self.daccelZ.append(data[2])
+			self.daccelZ = self.daccelZ[-100:]
+
+			if notEstablished:
+				print ("Sensor not Connected")
+				notEstablished = False
+
+
+# Replay of impact
+
+class ScreenThree(Screen):
+	
+	gyroX = ListProperty([])
+	gyroY = ListProperty([])
+	gyroZ = ListProperty([])
+
+	accelX = ListProperty([])
+	accelY = ListProperty([])
+	accelZ = ListProperty([])
+
+	def __init__(self, **kwargs):
+		super(ScreenThree, self).__init__(**kwargs)
+		Clock.schedule_interval(self.loop, 0)
+
+	def loop(self, dt):
+		global replay_on
+
+		if replay_on:
+			Clock.schedule_interval(self.add_cache_values, 0)
+			Clock.unschedule(self.loop)
+
+	def add_cache_values(self, dt):
+		global gyroCacheReplay, accelCacheReplay, replay_frame, replay_on
+
+		if replay_on:
+			data = gyroCacheReplay[int(replay_frame)]
+			self.gyroX.append(data[0])
+			self.gyroX = self.gyroX[-100:]
+			self.gyroY.append(data[1])
+			self.gyroY = self.gyroY[-100:]
+			self.gyroZ.append(data[2])
+			self.gyroZ = self.gyroZ[-100:]
+
+			data = accelCacheReplay[int(replay_frame)]
+			self.accelX.append(data[0])
+			self.accelX = self.accelX[-100:]
+			self.accelY.append(data[1])
+			self.accelY = self.accelY[-100:]
+			self.accelZ.append(data[2])
+			self.accelZ = self.accelZ[-100:]
+
+			replay_frame += 1
+
+			if len(gyroCacheReplay) == replay_frame:
+				replay_on = False
+				replay_frame = 0
+
+
+# Main Application Window of the Kivy Application
 
 class CoachSafePlaySafeApp(App):
-    def build(self):
-        screen_manager = ScreenManager(transition=SwapTransition())
-        screen_manager.add_widget(ScreenOne(name="MPV"))
-        screen_manager.add_widget(ScreenTwo(name="VidSensor"))
-        return screen_manager
+	def build(self):
+		screen_manager = ScreenManager(transition=SwapTransition())
+		screen_manager.add_widget(ScreenOne(name="MPV"))
+		screen_manager.add_widget(ScreenTwo(name="VidSensor"))
+		screen_manager.add_widget(ScreenThree(name="Replay"))
+		return screen_manager
 
 
 if __name__ == "__main__":
-    CoachSafePlaySafeApp().run()
+	CoachSafePlaySafeApp().run()
