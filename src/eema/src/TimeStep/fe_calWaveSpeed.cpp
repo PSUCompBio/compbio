@@ -27,5 +27,11 @@ fe_calWaveSpeed(int material_id, double volume_initial, double volume_current)
         c_wave = sqrt(volume_current / volume_initial) * sqrt(K / rho) * 1.3;
     }
 
+    if (model == "ogden_hyperelastic") {
+        double K   = fe_get_mats(material_id, 1, "mechanical");
+        double rho = fe_get_mats(material_id, 0, "mechanical");
+        c_wave = sqrt(volume_current / volume_initial) * sqrt(K / rho) * 1.3;
+    }
+
     return c_wave;
 }

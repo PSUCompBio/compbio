@@ -111,19 +111,16 @@ fe_mainEXPLICIT()
         /** Step- 10 from Belytschko Box 6.1 - Second Partial Update of Nodal Velocities */
         fe_timeUpdate_velocity(V, V_half, A, t, dT, "newmark-beta-central-difference");
 
-
         fi_curr = fe - F_net;
         fe_calculateFR(fr_curr, sdof, fi_curr, m_system, A);
 
-        std::cout << "****************************************************\n";
-        std::cout << "current time = " << t << std::endl;
-        std::cout << "RF3 node #4 = " << fr_curr[14] << std::endl;
-        std::cout << "RF3 node #5 = " << fr_curr[17] << std::endl;
-        std::cout << "RF3 node #6 = " << fr_curr[20] << std::endl;
-        std::cout << "RF3 node #7 = " << fr_curr[23] << std::endl;
-        std::cout << "****************************************************\n";
-
-
+        // std::cout << "****************************************************\n";
+        // std::cout << "current time = " << t << std::endl;
+        // std::cout << "RF3 node #1 = " << fr_curr[5] << std::endl;
+        // std::cout << "RF3 node #2 = " << fr_curr[8] << std::endl;
+        // std::cout << "RF3 node #5 = " << fr_curr[17] << std::endl;
+        // std::cout << "RF3 node #6 = " << fr_curr[20] << std::endl;
+        // std::cout << "****************************************************\n";
 
         /** Step - 11 from Belytschko Box 6.1 - Calculating energies and Checking Energy Balance */
         fe_checkEnergies(U_prev, U, fi_prev, fi_curr, fe_prev, fe, fr_prev, fr_curr, m_system, V, energy_int_old, energy_int_new, energy_ext_old, energy_ext_new, energy_kin, energy_total, energy_max);
