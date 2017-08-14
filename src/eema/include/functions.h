@@ -380,6 +380,10 @@ void fe_energyWrite_new(std::string& internal_energy, std::string& external_ener
 
 void fe_energyWrite_append(std::string& internal_energy, std::string& external_energy, std::string& kinetic_energy, std::string& total_energy, int plot_state_counter, double& t, double& energy_int_new, double& energy_ext_new, double& energy_kin, double& energy_total);
 
+void fe_reactionForceWrite_new(std::string& reaction_forces, int plot_state_counter, double& t, double& fr_curr_1, double& fr_curr_2, double& fr_curr_3, double& fr_curr_4);
+
+void fe_reactionForceWrite_append(std::string& reaction_forces, int plot_state_counter, double& t, double& fr_curr_1, double& fr_curr_2, double& fr_curr_3, double& fr_curr_4);
+
 /* =================================================================== */
 /* BioElectroPhysics */
 /* =================================================================== */

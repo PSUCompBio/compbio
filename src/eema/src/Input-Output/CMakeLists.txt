@@ -1,4 +1,4 @@
-SET(Input_Output_src 
+SET(Input_Output_src
     Input/fe_text2matrix.cpp
     Input/fe_mainRead.cpp
     Input/Mesh.cpp
@@ -11,5 +11,6 @@ SET(Input_Output_src
     Output/fe_matrix2text.cpp
     Output/fe_display.cpp
     Output/fe_energyWrite.cpp
+    Output/fe_reactionForceWrite.cpp
      )
 ADD_LIBRARY(Input-Output OBJECT ${Input_Output_src})
