@@ -50,6 +50,9 @@ fe_mainEXPLICIT()
     std::string total_energy = home_path + "/" + "results/total_energy_system.txt";
     fe_energyWrite_new(internal_energy, external_energy, kinetic_energy, total_energy, plot_state_counter, t, energy_int_new, energy_ext_new, energy_kin, energy_total);
 
+    std::string reaction_forces = home_path + "/" + "results/reaction_forces.txt";
+    fe_reactionForceWrite_new(reaction_forces, plot_state_counter, t, fr_curr[5], fr_curr[8], fr_curr[17], fr_curr[20]);
+
     // Loading Conditions
     fe_apply_bc_load(fe, t_start);
 
@@ -114,14 +117,6 @@ fe_mainEXPLICIT()
         fi_curr = fe - F_net;
         fe_calculateFR(fr_curr, sdof, fi_curr, m_system, A);
 
-        // std::cout << "****************************************************\n";
-        // std::cout << "current time = " << t << std::endl;
-        // std::cout << "RF3 node #1 = " << fr_curr[5] << std::endl;
-        // std::cout << "RF3 node #2 = " << fr_curr[8] << std::endl;
-        // std::cout << "RF3 node #5 = " << fr_curr[17] << std::endl;
-        // std::cout << "RF3 node #6 = " << fr_curr[20] << std::endl;
-        // std::cout << "****************************************************\n";
-
         /** Step - 11 from Belytschko Box 6.1 - Calculating energies and Checking Energy Balance */
         fe_checkEnergies(U_prev, U, fi_prev, fi_curr, fe_prev, fe, fr_prev, fr_curr, m_system, V, energy_int_old, energy_int_new, energy_ext_old, energy_ext_new, energy_kin, energy_total, energy_max);
 
@@ -150,6 +145,18 @@ fe_mainEXPLICIT()
 
             /*print current frame, current time, and energy to individual .txt files*/
             fe_energyWrite_append(internal_energy, external_energy, kinetic_energy, total_energy, plot_state_counter, t, energy_int_new, energy_ext_new, energy_kin, energy_total);
+
+
+            fe_reactionForceWrite_append(reaction_forces, plot_state_counter, t, fr_curr[5], fr_curr[8], fr_curr[17], fr_curr[20]);
+
+            // std::cout << "****************************************************\n";
+            // std::cout << "current time = " << t << std::endl;
+            // std::cout << "RF3 node #1 = " << fr_curr[5] << std::endl;
+            // std::cout << "RF3 node #2 = " << fr_curr[8] << std::endl;
+            // std::cout << "RF3 node #5 = " << fr_curr[17] << std::endl;
+            // std::cout << "RF3 node #6 = " << fr_curr[20] << std::endl;
+            // std::cout << "****************************************************\n";
+
         }
 
         s_prev = s;
