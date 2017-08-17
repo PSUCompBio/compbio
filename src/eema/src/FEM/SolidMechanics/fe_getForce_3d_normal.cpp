@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id)
+void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& fvd)
 {
 
     MatrixXd* nodes_host    = mesh[host_id].getNewNodesPointer();
@@ -38,11 +38,15 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
         VectorXd u_e = VectorXd::Zero(edof); // element displacements
         fe_gather_pbr(u, u_e, (*elements_host).block<1, 8>(i, 2), sdof);
 
+        VectorXd u_e_prev = VectorXd::Zero(edof); // previous element displacements
+        fe_gather_pbr(u_prev, u_e_prev, (*elements_host).block<1, 8>(i, 2), sdof);
+
         VectorXd f_ext_e = VectorXd::Zero(edof);
         fe_gather_pbr(fext, f_ext_e, (*elements_host).block<1, 8>(i, 2), sdof); // element external nodal forces
 
         VectorXd f_int_e = VectorXd::Zero(edof);
         VectorXd f_tot_e = VectorXd::Zero(edof);
+        VectorXd f_vd_e = VectorXd::Zero(edof);
 
         int nglx = 2;
         int ngly = 2;
@@ -59,6 +63,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
         MatrixXd jacobian(ndof, ndof);
         MatrixXd invJacobian(ndof, ndof);
         VectorXd sigma_e = VectorXd::Zero(6);
+        VectorXd pressure_e = VectorXd::Zero(6);
 
         // MatrixXd points_3d = guass_points_3d(nglx,ngly,nglz);
         // MatrixXd weights_3d = guass_weights_3d(ndof,nglx,ngly,nglz);
@@ -97,6 +102,10 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                         // std::cout<<k<<std::endl;
 
                         f_int_e = f_int_e + ((disp_mat.transpose()) * sigma_e * wtx * wty * wtz * detJacobian);
+
+                        fe_getPressure_lbv_pbr(pressure_e, dndx, dndy, dndz, u_e, u_e_prev, dT, xcoord, ycoord, zcoord, (*elements_host)(i, 1));
+
+                        f_vd_e = f_vd_e + ((disp_mat.transpose()) * (-1 * pressure_e) * wtx * wty * wtz * detJacobian);
                     }
                 }
             }
@@ -106,8 +115,10 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
             fe_calCentroidStrain_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e);
             element_strain_host_local.segment<9>(i * 9) = tmp_storage;
         }
-        f_tot_e = f_ext_e - f_int_e;
+        f_tot_e = f_ext_e - f_int_e - f_vd_e;
+
         fe_scatter_pbr(f_tot, f_tot_e, (*elements_host).block<1, 8>(i, 2), sdof);
+        fe_scatter_pbr(f_vd, f_vd_e, (*elements_host).block<1, 8>(i, 2), sdof);
     }
 
     mesh[host_id].readElementStressStrain(element_stress_host_local, element_strain_host_local);

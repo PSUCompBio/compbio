@@ -151,7 +151,7 @@ void fe_calculate_matlmat_pbr(MatrixXd& matl_mat, int n, double E, double nu);
 
 /** Updates the stress at each time step based on the material model */
 VectorXd fe_stressUpdate(VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, MatrixXd& disp_mat, VectorXd& u, int opt, int return_opt);
-void fe_stressUpdate_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, MatrixXd& disp_mat, VectorXd& u, int opt, int return_opt);
+void fe_stressUpdate_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, MatrixXd& disp_mat, VectorXd& u, int opt, int return_opt, VectorXd& u_e_prev, double dT, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord);
 
 /** Updates the stress at each time step based on the material model for a 1d element */
 VectorXd
@@ -233,7 +233,7 @@ void fe_insert_int2vector(VectorXi& A, int num, int b);
 /* FEM */
 /* =================================================================== */
 /** Calculates the resultant force vector - Box 6.1 of Belytschko */
-void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter);
+void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VecotrXd& u_prev, double dT, VectorXd& fvd);
 
 /** Find the index based on the DOF of a particular node */
 VectorXi
@@ -340,9 +340,11 @@ fe_calculateKE(MatrixXd mm, VectorXd V);
 VectorXd
 text2vector(std::string name);
 
-void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id);
+void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& fvd);
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map);
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& fvd);
+
+void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, VectorXd& u_prev, double dT, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, int material_id)
 
 VectorXd fe_calCentroidStress_3d(int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id);
 void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id);

@@ -30,10 +30,13 @@ fe_mainEXPLICIT()
     VectorXd fe           = VectorXd::Zero(sdof); // External Nodal force vector
     VectorXd fe_prev      = VectorXd::Zero(sdof);
 
-    VectorXd fr_prev      = VectorXd::Zero(sdof);
-    VectorXd fr_curr      = VectorXd::Zero(sdof);
-    VectorXd fi_prev      = VectorXd::Zero(sdof); // Internal nodal force vector at previous timestep
+    VectorXd fr_prev      = VectorXd::Zero(sdof); // Reaction Nodal force vector at previous timestep
+    VectorXd fr_curr      = VectorXd::Zero(sdof); // Reaction Nodal force vector at current timestep
+    VectorXd fi_prev      = VectorXd::Zero(sdof); // Internal Nodal force vector at previous timestep
     VectorXd fi_curr      = VectorXd::Zero(sdof); // Internal Nodal force vector at current timestep
+    VectorXd fvd          = VectorXd::Zero(sdof); // Viscous Dissipation Nodal force vector
+    VectorXd fvd_prev     = VectorXd::Zero(sdof); // Viscous Dissipation Nodal force vector at previous timestep
+
     VectorXd U_prev       = VectorXd::Zero(sdof);
 
     double energy_int_old = 0;
@@ -66,7 +69,7 @@ fe_mainEXPLICIT()
 
     // ----------------------------------------------------------------------------
     // Step-2: getforce step from Belytschko
-    fe_getforce(F_net, ndof, U, fe, time_step_counter);
+    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, fvd);
 
     mesh[0].readNodalKinematics(U, V, A);
 
@@ -105,7 +108,7 @@ fe_mainEXPLICIT()
         fe_apply_bc_load(fe, t);
 
         /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
-        fe_getforce(F_net, ndof, U, fe, time_step_counter); // Calculating the force term.
+        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, fvd); // Calculating the force term.
 
         /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
         fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.

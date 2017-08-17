@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map)
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& fvd)
 {
 
     MatrixXd* nodes_host     = mesh[host_id].getNewNodesPointer();
@@ -55,11 +55,15 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
         VectorXd u_e = VectorXd::Zero(edof); // element displacements
         fe_gather_pbr(u, u_e, (*elements_host).block<1, 8>(i, 2), sdof);
 
+        VectorXd u_e_prev = VectorXd::Zero(edof); // previous element displacements
+        fe_gather_pbr(u_prev, u_e_prev, (*elements_host).block<1, 8>(i, 2), sdof);
+
         VectorXd f_ext_e = VectorXd::Zero(edof);
         fe_gather_pbr(fext, f_ext_e, (*elements_host).block<1, 8>(i, 2), sdof); // element external nodal forces
 
         VectorXd f_int_e = VectorXd::Zero(edof);
         VectorXd f_tot_e = VectorXd::Zero(edof);
+        VectorXd f_vd_e = VectorXd::Zero(edof);
 
         int nglx = 2;
         int ngly = 2;
@@ -76,6 +80,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
         MatrixXd jacobian(ndof, ndof);
         MatrixXd invJacobian(ndof, ndof);
         VectorXd sigma_e = VectorXd::Zero(6);
+        VectorXd pressure_e = VectorXd::Zero(6);
 
 
         // MatrixXd points_3d = guass_points_3d(nglx,ngly,nglz);
