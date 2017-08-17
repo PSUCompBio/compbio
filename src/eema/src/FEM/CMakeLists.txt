@@ -1,4 +1,4 @@
-SET(FEM_src 
+SET(FEM_src
     SolidMechanics/fe_update.cpp
     SolidMechanics/fe_getforce.cpp
     SolidMechanics/fe_calculateMass.cpp
@@ -11,6 +11,7 @@ SET(FEM_src
     SolidMechanics/fe_calculateIE.cpp
     SolidMechanics/fe_calculateEW.cpp
     SolidMechanics/fe_checkEnergies.cpp
+    SolidMechanics/fe_getPressure_lbv.cpp
     Explicit/fe_mainEXPLICIT.cpp
     Explicit/fe_timeUpdate.cpp
     BioElectroPhysics/fe_bioElectroPhysics.cpp

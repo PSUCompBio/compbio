@@ -118,7 +118,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
         f_tot_e = f_ext_e - f_int_e - f_vd_e;
 
         fe_scatter_pbr(f_tot, f_tot_e, (*elements_host).block<1, 8>(i, 2), sdof);
-        fe_scatter_pbr(f_vd, f_vd_e, (*elements_host).block<1, 8>(i, 2), sdof);
+        fe_scatter_pbr(fvd, f_vd_e, (*elements_host).block<1, 8>(i, 2), sdof);
     }
 
     mesh[host_id].readElementStressStrain(element_stress_host_local, element_strain_host_local);
