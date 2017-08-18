@@ -34,8 +34,8 @@ fe_mainEXPLICIT()
     VectorXd fr_curr      = VectorXd::Zero(sdof); // Reaction Nodal force vector at current timestep
     VectorXd fi_prev      = VectorXd::Zero(sdof); // Internal Nodal force vector at previous timestep
     VectorXd fi_curr      = VectorXd::Zero(sdof); // Internal Nodal force vector at current timestep
-    VectorXd fvd          = VectorXd::Zero(sdof); // Viscous Dissipation Nodal force vector
-    VectorXd fvd_prev     = VectorXd::Zero(sdof); // Viscous Dissipation Nodal force vector at previous timestep
+    VectorXd f_damp       = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector
+    VectorXd f_damp_prev  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector at previous timestep
 
     VectorXd U_prev       = VectorXd::Zero(sdof);
 
@@ -51,6 +51,7 @@ fe_mainEXPLICIT()
     std::string external_energy = home_path + "/" + "results/external_energy_system.txt";
     std::string kinetic_energy = home_path + "/" + "results/kinetic_energy_system.txt";
     std::string total_energy = home_path + "/" + "results/total_energy_system.txt";
+    std::string viscous_energy = home_path + "/" + "results/viscous_energy_system.txt";
     fe_energyWrite_new(internal_energy, external_energy, kinetic_energy, total_energy, plot_state_counter, t, energy_int_new, energy_ext_new, energy_kin, energy_total);
 
     std::string reaction_forces = home_path + "/" + "results/reaction_forces.txt";
@@ -69,7 +70,7 @@ fe_mainEXPLICIT()
 
     // ----------------------------------------------------------------------------
     // Step-2: getforce step from Belytschko
-    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, fvd);
+    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp);
 
     mesh[0].readNodalKinematics(U, V, A);
 
@@ -90,8 +91,9 @@ fe_mainEXPLICIT()
     clock_t s, s_prev, ds;
     s = clock();
 
-    while (t < t_end) {
+    int jg_counter = 0;
 
+    while (t < t_end) {
 
         if ((t + dT) >= t_end) {
             dT = t_end - t;
@@ -100,7 +102,6 @@ fe_mainEXPLICIT()
             }
         }
 
-
         /** Steps - 4,5,6 and 7 from Belytschko Box 6.1 - Update time, velocity and displacements */
         fe_timeUpdate(U, V, V_half, A, t, dT, "newmark-beta-central-difference");
 
@@ -108,7 +109,7 @@ fe_mainEXPLICIT()
         fe_apply_bc_load(fe, t);
 
         /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
-        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, fvd); // Calculating the force term.
+        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp); // Calculating the force term.
 
         /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
         fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.
@@ -141,24 +142,11 @@ fe_mainEXPLICIT()
                       << "\n CPU Time = " << std::setw(5) << std::setprecision(1)
                       << ((float) ds / CLOCKS_PER_SEC) << "s \n";
             std::cout << std::setw(5) << std::scientific << std::setprecision(5) << "Z Displacement: " << U(20) << "\n";
-            //std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Current Precise Time: " << t << "\n";
-            // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Internal Energy: " << energy_int_new << "\n";
-            // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"External Work: " << energy_ext_new << "\n";
-            // std::cout << std::setw(5)<<std::scientific<<std::setprecision(5) <<"Kinetic Energy: " << energy_kin << "\n";
 
             /*print current frame, current time, and energy to individual .txt files*/
             fe_energyWrite_append(internal_energy, external_energy, kinetic_energy, total_energy, plot_state_counter, t, energy_int_new, energy_ext_new, energy_kin, energy_total);
 
-
             fe_reactionForceWrite_append(reaction_forces, plot_state_counter, t, fr_curr[5], fr_curr[8], fr_curr[17], fr_curr[20]);
-
-            // std::cout << "****************************************************\n";
-            // std::cout << "current time = " << t << std::endl;
-            // std::cout << "RF3 node #1 = " << fr_curr[5] << std::endl;
-            // std::cout << "RF3 node #2 = " << fr_curr[8] << std::endl;
-            // std::cout << "RF3 node #5 = " << fr_curr[17] << std::endl;
-            // std::cout << "RF3 node #6 = " << fr_curr[20] << std::endl;
-            // std::cout << "****************************************************\n";
 
         }
 

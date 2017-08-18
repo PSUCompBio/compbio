@@ -5,6 +5,7 @@ using namespace Eigen;
 void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, VectorXd& u_prev, double dT, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, int material_id)
 {
     // Reference: "Getting Started with Abaqus," Section 9.5.1 "Bulk Viscosity"
+    // Linear bulk viscosity is always included to damp "ringing" in the highest element frequency.
 
     double b1 = 0.06; // damping coefficient, Abaqus default value = 0.06
 
@@ -66,6 +67,7 @@ void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, 
     MatrixXd I = MatrixXd::Identity(ndof, ndof);
 
     MatrixXd pressure_matrix = MatrixXd::Zero(ndof, ndof); // bulk viscosity pressure, matrix format
+
     pressure_matrix = pressure_scalar * I;
 
     pressure = fe_tensor2voigt(pressure_matrix); // bulk viscosity pressure, voigt format

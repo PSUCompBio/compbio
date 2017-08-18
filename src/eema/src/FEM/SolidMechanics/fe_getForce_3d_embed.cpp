@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& fvd)
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp)
 {
 
     MatrixXd* nodes_host     = mesh[host_id].getNewNodesPointer();
@@ -63,7 +63,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
         VectorXd f_int_e = VectorXd::Zero(edof);
         VectorXd f_tot_e = VectorXd::Zero(edof);
-        VectorXd f_vd_e = VectorXd::Zero(edof);
+        VectorXd f_damp_e = VectorXd::Zero(edof);
 
         int nglx = 2;
         int ngly = 2;
@@ -119,6 +119,12 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         // std::cout<<k<<std::endl;
 
                         f_int_e = f_int_e + ((disp_mat.transpose()) * sigma_e * wtx * wty * wtz * detJacobian);
+
+                        // calculate bulk viscosity pressure that is linear in the volumetric strain rate
+                        fe_getPressure_lbv_pbr(pressure_e, dndx, dndy, dndz, u_e, u_e_prev, dT, xcoord, ycoord, zcoord, (*elements_host)(i, 1));
+
+                        // calculate internal damping force resulting from bulk viscosity pressure
+                        f_damp_e = f_damp_e + ((disp_mat.transpose()) * pressure_e * wtx * wty * wtz * detJacobian);
                     }
                 }
             }
@@ -234,8 +240,10 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
         //std::cout << "Host Final - nodal force: " << f_int_e.maxCoeff() << "\n";
 
-        f_tot_e = f_ext_e - f_int_e;
+        f_tot_e = f_ext_e - f_int_e - f_damp_e;
+
         fe_scatter_pbr(f_tot, f_tot_e, (*elements_host).block<1, 8>(i, 2), sdof);
+        fe_scatter_pbr(f_damp, f_damp_e, (*elements_host).block<1, 8>(i, 2), sdof);
     }
 
     mesh[host_id].readElementStressStrain(element_stress_host_local, element_strain_host_local);
