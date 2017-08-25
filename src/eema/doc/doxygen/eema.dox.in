@@ -2,8 +2,8 @@
 # Project related configuration options
 #---------------------------------------------------------------------------
 DOXYFILE_ENCODING      = UTF-8
-PROJECT_NAME           = "Embedded Element Method Algorithms (EMMA)" 
-PROJECT_BRIEF          = "Finite element code with support for the embedded element method"
+PROJECT_NAME           = "compbio" 
+PROJECT_BRIEF          = "Codes and Algorithms of the Penn State Computational Biomechanics Group"
 PROJECT_NUMBER         = @EEMA_VERSION@
 OUTPUT_DIRECTORY       = .
 OUTPUT_LANGUAGE        = English
@@ -20,6 +20,7 @@ INPUT                  +=@CMAKE_SOURCE_DIR@/src/eema/doc/resources/mainpage.dox
 REPEAT_BRIEF           = YES
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
+IMAGE_PATH             =@CMAKE_SOURCE_DIR@/src/eema/doc/resources/images/PowerPoint
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
 #---------------------------------------------------------------------------
@@ -60,7 +61,7 @@ INCLUDE_PATH           = @CMAKE_SOURCE_DIR@/src/eema/src/TimeStep \
 			 @CMAKE_SOURCE_DIR@/src/eema/src/Elements/Mass \ 
  			 @CMAKE_SOURCE_DIR@/src/eema/src/Elements/ElementCalculations \ 
 			 @CMAKE_SOURCE_DIR@/src/eema/src/FEM/Explicit \ 
- 		         @CMAKE_SOURCE_DIR@/src/eema/src/FEM/Electromechanics \ 
+ 		         @CMAKE_SOURCE_DIR@/src/eema/src/FEM/BioElectroPhysics \ 
  			 @CMAKE_SOURCE_DIR@/src/eema/src/FEM/BoundaryConditions \ 
 			 @CMAKE_SOURCE_DIR@/src/eema/src/FEM/Assembly-Global-Local \
                          @CMAKE_SOURCE_DIR@/src/eema/include \
