@@ -24,7 +24,7 @@ MatrixXd fe_voigt2tensor(VectorXd B){
     A(0,1) = B(3);
     A(1,0) = B(3);
     A(1,2) = B(4);
-    A(2,1) = B(5);
+    A(2,1) = B(4);
     A(0,2) = B(5);
     A(2,0) = B(5);
   }

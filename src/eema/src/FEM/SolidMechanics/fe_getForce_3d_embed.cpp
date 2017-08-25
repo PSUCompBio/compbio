@@ -202,6 +202,9 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         // Procedure - 1: (Same Deformation Gradient - Because No Slip)
                         fe_stressUpdate_pbr(sigma_embed, dndx, dndy, dndz, disp_mat, u_e, (*elements_embed)(fib, 1), 0);
 
+                        // New concept that I am trying out...
+                        fe_stressModify(sigma_embed, xcoord_embed, ycoord_embed, zcoord_embed, 3);
+
                         VectorXd f_int_truss = (disp_mat.transpose() * sigma_embed * wtt * (length_embed / 2) * area_truss);
 
                         // Procedure - 2: (Same Displacements - Same Deformation Gradient - Transformation Matrix Inside)

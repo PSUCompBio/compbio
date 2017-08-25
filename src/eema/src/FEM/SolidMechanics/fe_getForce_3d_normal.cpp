@@ -114,6 +114,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
 
             fe_calCentroidStress_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e, (*elements_host)(i, 1));
             element_stress_host_local.segment<9>(i * 9) = tmp_storage;
+
             fe_calCentroidStrain_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e);
             element_strain_host_local.segment<9>(i * 9) = tmp_storage;
         }

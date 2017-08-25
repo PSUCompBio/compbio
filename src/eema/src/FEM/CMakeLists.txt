@@ -12,6 +12,7 @@ SET(FEM_src
     SolidMechanics/fe_calculateEW.cpp
     SolidMechanics/fe_checkEnergies.cpp
     SolidMechanics/fe_getPressure_lbv.cpp
+    SolidMechanics/fe_stressModify.cpp
     Explicit/fe_mainEXPLICIT.cpp
     Explicit/fe_timeUpdate.cpp
     BioElectroPhysics/fe_bioElectroPhysics.cpp
