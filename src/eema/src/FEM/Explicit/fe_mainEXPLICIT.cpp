@@ -91,8 +91,6 @@ fe_mainEXPLICIT()
     clock_t s, s_prev, ds;
     s = clock();
 
-    int jg_counter = 0;
-
     while (t < t_end) {
 
         if ((t + dT) >= t_end) {
@@ -156,7 +154,6 @@ fe_mainEXPLICIT()
         time_step_counter = time_step_counter + 1;
 
         dT = fe_getTimeStep();
-
 
     }
 } // fe_mainEXPLICIT
