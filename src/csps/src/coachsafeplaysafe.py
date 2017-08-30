@@ -1,5 +1,5 @@
 # Imports
-
+from kivy.graphics import Rectangle, Canvas, Translate, Fbo, ClearColor, ClearBuffers, Scale, Color
 from kivy.uix.screenmanager import ScreenManager, Screen, SwapTransition
 from kivy.uix.listview import ListItemButton
 from kivy.properties import ObjectProperty
@@ -7,11 +7,16 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.pagelayout import PageLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ListProperty
+from kivy.uix.image import Image
 from kivy.clock import Clock
 from kivy.app import App
 import threespace_api as ts_api
 import sqlite3
+import cv2
 import os
+import numpy as np
+import imageio
+imageio.plugins.ffmpeg.download()
 
 
 # Constants and global variables
@@ -26,23 +31,25 @@ notEstablished = True
 iterator = 0
 
 CONST_processingSlack = 0.7
-CONST_replayDuration = 3
+CONST_replayDuration = 2
 CONST_videoRateMs = 20
-CONST_slowDown = 4.0
+CONST_slowDown = 1.0
 
 replay_on = False
 record_on = False
 replay_frame = 0
 
 accelCacheReplay = []
+videoCacheReplay = []
 gyroCacheReplay = []
+videoCache = []
 accelCache = []
 gyroCache = []
 
 CONST_cacheLimit = 1000 / CONST_videoRateMs * CONST_replayDuration * CONST_processingSlack
 
 
-# Check if Operating System is Mac (Sensor doesn't support posix systems)
+# Check Operating System (Sensor doesn't support posix systems)
 
 if os.name == 'posix':
 	no_sensor_api = True
@@ -90,7 +97,7 @@ class ScreenOne(Screen):
 			self.student_list._trigger_reset_populate()
 
 
-# Live Feed with sensor data or demo data (only on Mac)
+# Live Feed with sensor data (only on Windows) or demo data 
 
 class ScreenTwo(Screen):
 	gyroX = ListProperty([])
@@ -157,7 +164,7 @@ class ScreenTwo(Screen):
 		Clock.schedule_interval(self.add_running_values, 0)
 
 	def add_running_values(self, dt):
-		global notEstablished, no_sensor, iterator, demoGyro, demoAccel, gyroCache, gyroCacheReplay, accelCache, accelCacheReplay, record_on, replay_frame, replay_on
+		global notEstablished, no_sensor, iterator, demoGyro, demoAccel, gyroCache, gyroCacheReplay, accelCache, accelCacheReplay, record_on, replay_frame, replay_on, videoCache, videoCacheReplay
 
 		if not no_sensor:
 			data = self.tssensor.getCorrectedGyroRate()
@@ -179,14 +186,17 @@ class ScreenTwo(Screen):
 			if len(gyroCache) > CONST_cacheLimit / 2:
 				gyroCache.pop(0)
 				accelCache.pop(0)
+				videoCache.pop(0)
 
 			gyroCache.append(data)
 			accelCache.append(data2)
+			videoCache.append(self.ids.camera.texture)
 
 			if record_on:
 				if len(gyroCacheReplay) < CONST_cacheLimit:
 					gyroCacheReplay.append(data)
 					accelCacheReplay.append(data2)
+					videoCacheReplay.append(self.ids.camera.texture)
 				else:
 					record_on = False
 					replay_on = True
@@ -196,6 +206,7 @@ class ScreenTwo(Screen):
 				record_on = True
 				gyroCacheReplay = gyroCache[:]
 				accelCacheReplay = accelCache[:]
+				videoCacheReplay = videoCache[:]
 				replay_frame = 0
 
 		else:
@@ -229,6 +240,8 @@ class ScreenTwo(Screen):
 
 class ScreenThree(Screen):
 	
+	start_replay = False
+
 	gyroX = ListProperty([])
 	gyroY = ListProperty([])
 	gyroZ = ListProperty([])
@@ -249,9 +262,14 @@ class ScreenThree(Screen):
 			Clock.unschedule(self.loop)
 
 	def add_cache_values(self, dt):
-		global gyroCacheReplay, accelCacheReplay, replay_frame, replay_on
+		global gyroCacheReplay, accelCacheReplay, replay_frame, replay_on, videoCacheReplay
 
-		if replay_on:
+		running_number = replay_frame + 34
+		
+		filename_graph = "./Images/Graph/frame" + str(int(replay_frame)) + ".png"
+		filename_simul = "./Images/Simulation/frame" + str(int(running_number)) + ".jpg"
+
+		if replay_on and self.start_replay:
 			data = gyroCacheReplay[int(replay_frame)]
 			self.gyroX.append(data[0])
 			self.gyroX = self.gyroX[-100:]
@@ -268,11 +286,24 @@ class ScreenThree(Screen):
 			self.accelZ.append(data[2])
 			self.accelZ = self.accelZ[-100:]
 
+			self.ids.replay_canvas.export_to_png(filename_graph)
+			
+			self.ids.camera_replay.canvas.clear()
+			with self.ids.camera_replay.canvas:
+				Color(1, 1, 1, 1)
+				Rectangle(texture=videoCacheReplay[replay_frame], pos=self.ids.camera_replay.pos, size=self.ids.camera_replay.size)
+
+			self.ids.simulation.canvas.clear()
+			with self.ids.simulation.canvas:
+				Color(1, 1, 1, 1)
+				Rectangle(source=filename_simul, pos=self.ids.simulation.pos, size=self.ids.simulation.size)
+			
 			replay_frame += 1
 
-			if len(gyroCacheReplay) == replay_frame:
+			if len(gyroCacheReplay) == replay_frame: 
 				replay_on = False
 				replay_frame = 0
+				self.start_replay = False
 
 
 # Main Application Window of the Kivy Application

@@ -1,4 +1,4 @@
-#:import Camera kivy.uix.camera
+#:import Camera kivy.core.camera
 #:import gauss random.gauss
 #:import chain itertools.chain
 #:import Animation kivy.animation.Animation
@@ -79,7 +79,7 @@
             cols: 2
 
             Camera:
-                id: 'Cam'
+                id: camera
                 index: 0
                 resolution: (1920, 1080)
             
@@ -220,72 +220,91 @@
             disabled: True
             on_press: root.manager.current = 'Replay'
 
+
 <ScreenThree>:
 
     GridLayout:
-        rows: 2
+        rows: 3
 
         GridLayout:
-            canvas:
-                Color:
-                    rgba: .4, .4, 1, 1
-                Line:
-                    points: 
-                        list(chain(*
-                        [[
-                        self.x + x * self.width / len(root.gyroZ),
-                        self.y + (self.height * 0.3) + y * self.height / 100
-                        ] for x, y in enumerate(root.gyroX)])) if root.gyroX else []
+            cols: 3
 
-                Color:
-                    rgba: 1, .4, .4, 1
-                Line:
-                    points:
-                        list(chain(*
-                        [[
-                        self.x + x * self.width / len(root.gyroY),
-                        self.y + (self.height * 0.3) + y * self.height / 100
-                        ] for x, y in enumerate(root.gyroY)])) if root.gyroY else []
+            Widget:
+                id: camera_replay
 
-                Color:
-                    rgba: .4, 1, .4, 1
-                Line:
-                    points:
-                        list(chain(*
-                        [[
-                        self.x + x * self.width / len(root.gyroZ),
-                        self.y + (self.height * 0.3) + y * self.height / 100
-                        ] for x, y in enumerate(root.gyroZ)])) if root.gyroZ else []
+            Widget:
+                id: replay_canvas
 
-                Color:
-                    rgba: .4, .4, 1, 1
-                Line:
-                    points:
-                        list(chain(*
-                        [[
-                        self.x + x * self.width / len(root.accelX),
-                        self.y + (self.height * 0.7) + y * self.height / 100
-                        ] for x, y in enumerate(root.accelX)])) if root.accelX else []
+                canvas:
 
-                Color:
-                    rgba: 1, .4, .4, 1
-                Line:
-                    points:
-                        list(chain(*
-                        [[
-                        self.x + x * self.width / len(root.accelY),
-                        self.y + (self.height * 0.7) + y * self.height / 100
-                        ] for x, y in enumerate(root.accelY)])) if root.accelY else []
+                    Color:
+                        rgba: .4, .4, 1, 1
+                    Line:
+                        points: 
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.gyroZ),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.gyroX)])) if root.gyroX else []
 
-                Color:
-                    rgba: .4, 1, .4, 1
-                Line:
-                    points:
-                        list(chain(*
-                        [[
-                        self.x + x * self.width / len(root.accelZ),
-                        self.y + (self.height * 0.7) + y * self.height / 100
-                        ] for x, y in enumerate(root.accelZ)])) if root.accelZ else []
+                    Color:
+                        rgba: 1, .4, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.gyroY),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.gyroY)])) if root.gyroY else []
+
+                    Color:
+                        rgba: .4, 1, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.gyroZ),
+                            self.y + (self.height * 0.3) + y * self.height / 100
+                            ] for x, y in enumerate(root.gyroZ)])) if root.gyroZ else []
+
+                    Color:
+                        rgba: .4, .4, 1, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.accelX),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.accelX)])) if root.accelX else []
+
+                    Color:
+                        rgba: 1, .4, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.accelY),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.accelY)])) if root.accelY else []
+
+                    Color:
+                        rgba: .4, 1, .4, 1
+                    Line:
+                        points:
+                            list(chain(*
+                            [[
+                            self.x + x * self.width / len(root.accelZ),
+                            self.y + (self.height * 0.7) + y * self.height / 100
+                            ] for x, y in enumerate(root.accelZ)])) if root.accelZ else []            
+
+            Widget:
+                id: simulation
+
+        Button:
+            text: "Start Replay"
+            size_hint: None, None
+            size: root.width, 75
+            on_press: root.start_replay = True
 
         Button:
             text: "Live Feed"
