@@ -233,7 +233,7 @@ void fe_insert_int2vector(VectorXi& A, int num, int b);
 /* FEM */
 /* =================================================================== */
 /** Calculates the resultant force vector - Box 6.1 of Belytschko */
-void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter);
+void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp);
 
 /** Find the index based on the DOF of a particular node */
 VectorXi
@@ -340,9 +340,13 @@ fe_calculateKE(MatrixXd mm, VectorXd V);
 VectorXd
 text2vector(std::string name);
 
-void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id);
+void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp);
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map);
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp);
+
+void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, VectorXd& u_prev, double dT, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, int material_id);
+
+void fe_stressModify(VectorXd& sigma_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed, int choice);
 
 VectorXd fe_calCentroidStress_3d(int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id);
 void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id);
@@ -379,6 +383,10 @@ void fe_checkEnergies(VectorXd& U_prev, VectorXd& U, VectorXd& fi_prev, VectorXd
 void fe_energyWrite_new(std::string& internal_energy, std::string& external_energy, std::string& kinetic_energy, std::string& total_energy, int plot_state_counter, double& t, double& energy_int_new, double& energy_ext_new, double& energy_kin, double& energy_total);
 
 void fe_energyWrite_append(std::string& internal_energy, std::string& external_energy, std::string& kinetic_energy, std::string& total_energy, int plot_state_counter, double& t, double& energy_int_new, double& energy_ext_new, double& energy_kin, double& energy_total);
+
+void fe_reactionForceWrite_new(std::string& reaction_forces, int plot_state_counter, double& t, double& fr_curr_1, double& fr_curr_2, double& fr_curr_3, double& fr_curr_4);
+
+void fe_reactionForceWrite_append(std::string& reaction_forces, int plot_state_counter, double& t, double& fr_curr_1, double& fr_curr_2, double& fr_curr_3, double& fr_curr_4);
 
 /* =================================================================== */
 /* BioElectroPhysics */

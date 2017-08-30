@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map)
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp)
 {
 
     MatrixXd* nodes_host     = mesh[host_id].getNewNodesPointer();
@@ -55,11 +55,15 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
         VectorXd u_e = VectorXd::Zero(edof); // element displacements
         fe_gather_pbr(u, u_e, (*elements_host).block<1, 8>(i, 2), sdof);
 
+        VectorXd u_e_prev = VectorXd::Zero(edof); // previous element displacements
+        fe_gather_pbr(u_prev, u_e_prev, (*elements_host).block<1, 8>(i, 2), sdof);
+
         VectorXd f_ext_e = VectorXd::Zero(edof);
         fe_gather_pbr(fext, f_ext_e, (*elements_host).block<1, 8>(i, 2), sdof); // element external nodal forces
 
         VectorXd f_int_e = VectorXd::Zero(edof);
         VectorXd f_tot_e = VectorXd::Zero(edof);
+        VectorXd f_damp_e = VectorXd::Zero(edof);
 
         int nglx = 2;
         int ngly = 2;
@@ -76,6 +80,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
         MatrixXd jacobian(ndof, ndof);
         MatrixXd invJacobian(ndof, ndof);
         VectorXd sigma_e = VectorXd::Zero(6);
+        VectorXd pressure_e = VectorXd::Zero(6);
 
 
         // MatrixXd points_3d = guass_points_3d(nglx,ngly,nglz);
@@ -114,6 +119,12 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         // std::cout<<k<<std::endl;
 
                         f_int_e = f_int_e + ((disp_mat.transpose()) * sigma_e * wtx * wty * wtz * detJacobian);
+
+                        // calculate bulk viscosity pressure that is linear in the volumetric strain rate
+                        fe_getPressure_lbv_pbr(pressure_e, dndx, dndy, dndz, u_e, u_e_prev, dT, xcoord, ycoord, zcoord, (*elements_host)(i, 1));
+
+                        // calculate internal damping force resulting from bulk viscosity pressure
+                        f_damp_e = f_damp_e + ((disp_mat.transpose()) * pressure_e * wtx * wty * wtz * detJacobian);
                     }
                 }
             }
@@ -191,6 +202,9 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         // Procedure - 1: (Same Deformation Gradient - Because No Slip)
                         fe_stressUpdate_pbr(sigma_embed, dndx, dndy, dndz, disp_mat, u_e, (*elements_embed)(fib, 1), 0);
 
+                        // New concept that I am trying out...
+                        // fe_stressModify(sigma_embed, xcoord_embed, ycoord_embed, zcoord_embed, 3);
+
                         VectorXd f_int_truss = (disp_mat.transpose() * sigma_embed * wtt * (length_embed / 2) * area_truss);
 
                         // Procedure - 2: (Same Displacements - Same Deformation Gradient - Transformation Matrix Inside)
@@ -229,8 +243,10 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
         //std::cout << "Host Final - nodal force: " << f_int_e.maxCoeff() << "\n";
 
-        f_tot_e = f_ext_e - f_int_e;
+        f_tot_e = f_ext_e - f_int_e - f_damp_e;
+
         fe_scatter_pbr(f_tot, f_tot_e, (*elements_host).block<1, 8>(i, 2), sdof);
+        fe_scatter_pbr(f_damp, f_damp_e, (*elements_host).block<1, 8>(i, 2), sdof);
     }
 
     mesh[host_id].readElementStressStrain(element_stress_host_local, element_strain_host_local);

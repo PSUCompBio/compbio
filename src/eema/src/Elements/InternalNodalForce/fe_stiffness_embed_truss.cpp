@@ -34,6 +34,10 @@ MatrixXd fe_stiffness_embed_truss(MatrixXd nodes_truss, MatrixXd elements_truss,
 	VectorXd truss_intg_points = guass_points(2);
 	VectorXd truss_intg_weights = guass_weights(2);
 
+
+/// @image html Slide1.png
+/// @image latex Slide1.eps "Image caption!" width=\textwidth
+
 	for(int i=0;i<truss_intg;i++){
 		double t = truss_intg_points(i);
 		//std::cout<<t<<"is t\n";

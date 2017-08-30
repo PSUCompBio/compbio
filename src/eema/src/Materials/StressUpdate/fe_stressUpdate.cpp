@@ -62,7 +62,6 @@ void fe_stressUpdate_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd& dndy, Vector
 
 	/** This block develops outputs the updated stress for a 3d ogden hyperelastic material */
 	if (model == "ogden_hyperelastic") {
-		/* TODO: Ogden - this material model needs work */
 		// n = number of coefficients - used a double type for consistency
 		fe_ogden_hyperelastic_pbr(sigma, dndx, dndy, dndz, u, opt, return_opt);
 	}
