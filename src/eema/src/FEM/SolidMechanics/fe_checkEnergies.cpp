@@ -12,8 +12,8 @@ void fe_checkEnergies(VectorXd& U_prev, VectorXd& U, VectorXd& fi_prev, VectorXd
 	/** Calculating the kinetic energy */
 	fe_calculateKE(energy_kin, m_system, V);
 	/* Calculating the total energy of the system */
-	energy_total = std::abs(energy_kin + energy_int_new + energy_vd_new - energy_ext_new);
-	energy_max   = std::max(std::max(energy_kin, std::max(energy_int_new, energy_vd_new)), energy_ext_new);
+	energy_total = std::abs(energy_kin + energy_int_new - energy_ext_new);
+	energy_max   = std::max(std::max(energy_kin, energy_int_new), energy_ext_new);
 	if (energy_total > (eps_energy * (energy_max))) {
 		std::cout << "**********************************************" << std::endl;
 		std::cout << "ALERT: INSTABILITIES IN THE SYSTEM DETECTED \n BASED ON THE ENERGY BALANCE CHECK \n";
