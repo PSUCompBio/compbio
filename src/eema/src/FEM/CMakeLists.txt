@@ -9,6 +9,7 @@ SET(FEM_src
     SolidMechanics/fe_findIntgPoints_1d.cpp
     SolidMechanics/fe_calculateFR.cpp
     SolidMechanics/fe_calculateIE.cpp
+    SolidMechanics/fe_calculateVDE.cpp
     SolidMechanics/fe_calculateEW.cpp
     SolidMechanics/fe_checkEnergies.cpp
     SolidMechanics/fe_getPressure_lbv.cpp
