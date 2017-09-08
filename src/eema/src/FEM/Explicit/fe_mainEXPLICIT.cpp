@@ -41,8 +41,8 @@ fe_mainEXPLICIT()
 
     double energy_int_old = 0;
     double energy_int_new = 0;
-    double energy_vd_old = 0;
-    double energy_vd_new = 0;
+    double energy_vd_old  = 0;
+    double energy_vd_new  = 0;
     double energy_ext_old = 0;
     double energy_ext_new = 0;
     double energy_kin     = 0;
