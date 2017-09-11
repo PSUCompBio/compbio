@@ -44,6 +44,8 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
         VectorXd f_ext_e = VectorXd::Zero(edof);
         fe_gather_pbr(fext, f_ext_e, (*elements_host).block<1, 8>(i, 2), sdof); // element external nodal forces
 
+        double f_ext_e_sum = f_ext_e.sum();
+
         VectorXd f_int_e = VectorXd::Zero(edof);
         VectorXd f_tot_e = VectorXd::Zero(edof);
         VectorXd f_damp_e = VectorXd::Zero(edof);
@@ -103,11 +105,15 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
 
                         f_int_e = f_int_e + ((disp_mat.transpose()) * sigma_e * wtx * wty * wtz * detJacobian);
 
-                        // calculate bulk viscosity pressure that is linear in the volumetric strain rate
-                        fe_getPressure_lbv_pbr(pressure_e, dndx, dndy, dndz, u_e, u_e_prev, dT, xcoord, ycoord, zcoord, (*elements_host)(i, 1));
+                        if (f_ext_e_sum < 1e-18) { // only include damping when no external forces act on the element
 
-                        // calculate internal damping force resulting from bulk viscosity pressure
-                        f_damp_e = f_damp_e + ((disp_mat.transpose()) * pressure_e * wtx * wty * wtz * detJacobian);
+                          // calculate bulk viscosity pressure that is linear in the volumetric strain rate
+                          fe_getPressure_lbv_pbr(pressure_e, dndx, dndy, dndz, u_e, u_e_prev, dT, xcoord, ycoord, zcoord, (*elements_host)(i, 1));
+
+                          // calculate internal damping force resulting from bulk viscosity pressure
+                          f_damp_e = f_damp_e + ((disp_mat.transpose()) * pressure_e * wtx * wty * wtz * detJacobian);
+
+                        }
                     }
                 }
             }
