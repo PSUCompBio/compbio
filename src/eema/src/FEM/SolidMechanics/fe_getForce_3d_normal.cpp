@@ -88,8 +88,10 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                         fe_dniso_8(dndr, dnds, dndt, x, y, z);
 
                         jacobian = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-                        double detJacobian = jacobian.determinant();
-                        invJacobian = jacobian.inverse();
+                        // double detJacobian = jacobian.determinant();
+                        double detJacobian = fe_detMatrix_pbr(jacobian);
+                        // invJacobian = jacobian.inverse();
+                        fe_invMatrix_pbr(invJacobian, jacobian);
 
                         fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
                         fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);

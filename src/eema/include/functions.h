@@ -229,6 +229,11 @@ void fe_insert_double2vector(VectorXd& A, double b);
 void fe_insert_int2vector(VectorXi& A, int b);
 void fe_insert_int2vector(VectorXi& A, int num, int b);
 
+/** Linear Algebra functions */
+double
+fe_detMatrix_pbr(MatrixXd& A);
+void fe_invMatrix_pbr(MatrixXd& A_inv, MatrixXd& A);
+
 /* =================================================================== */
 /* FEM */
 /* =================================================================== */

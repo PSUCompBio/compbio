@@ -13,7 +13,8 @@ void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, 
     fe_calDefGrad_pbr(F_curr, dndx, dndy, dndz, u);
 
     MatrixXd F_inv = MatrixXd::Zero(ndof, ndof); // inverse deformation gradient
-    F_inv = F_curr.inverse();
+    // F_inv = F_curr.inverse();
+    fe_invMatrix_pbr(F_inv, F_curr);
 
     MatrixXd F_invT = MatrixXd::Zero(ndof, ndof); // inverse deformation gradient, transposed
     F_invT = F_inv.transpose();

@@ -86,7 +86,8 @@ void fe_ogden_hyperelastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& 
   MatrixXd F = MatrixXd::Zero(ndof, ndof); // deformation gradient
   fe_calDefGrad_pbr(F, dndx, dndy, dndz, u);
 
-  double defJacobian = F.determinant(); // Jacobian - determinant of deformation gradient
+  // double defJacobian = F.determinant(); // Jacobian - determinant of deformation gradient
+  double defJacobian = fe_detMatrix_pbr(F); // Jacobian - determinant of deformation gradient
 
 	MatrixXd b = MatrixXd::Zero(ndof, ndof);
 	b = F * F.transpose();
@@ -141,7 +142,10 @@ void fe_ogden_hyperelastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& 
 		tau = (l_1 * dW_1 * I);
 	}
 
-	MatrixXd F_inv = F.inverse();
+	MatrixXd F_inv = MatrixXd::Zero(ndof, ndof); // inverse of deformation gradient
+	// MatrixXd F_inv = F.inverse();
+	fe_invMatrix_pbr(F_inv, F);
+
 	pk_S = F_inv * tau * F_inv.transpose();
 
 	sigma_local = fe_tensor2voigt(pk_S);
