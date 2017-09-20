@@ -76,18 +76,25 @@ void fe_mooneyrivlin_hyperelastic_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd&
     MatrixXd C = MatrixXd::Zero(ndof, ndof);
     C = F.transpose() * F;
 
+    MatrixXd C_inv = MatrixXd::Zero(ndof, ndof);
+    fe_invMatrix_pbr(C_inv, C);
+
     double I1         = C.trace();// First Invariant
     MatrixXd C_square = C * C; // Second Invariant
     double tmp1       = C_square.trace();
     double I2         = (((pow(I1, 2) - (tmp1)) * (one_half)));
     // double I3 = B.determinant(); // Third Invariant
 
-    double defJacobian      = F.determinant(); // Jacobian - determinant of deformation gradient
+    // double defJacobian      = F.determinant(); // Jacobian - determinant of deformation gradient
+    double defJacobian      = fe_detMatrix_pbr(F); // Jacobian - determinant of deformation gradient
     double defJacobian_frac = (1 / defJacobian);
 
     double I1_bar  = I1 * (pow(defJacobian, (-1 * two_third)));
     double I2_bar  = I2 * (pow(defJacobian, (-1 * four_third)));
     MatrixXd C_bar = C * (pow(defJacobian, (-1 * two_third)));
+
+    MatrixXd C_bar_inv = MatrixXd::Zero(ndof, ndof);
+    fe_invMatrix_pbr(C_bar_inv, C_bar);
 
     MatrixXd cauchy_sigma = MatrixXd::Zero(ndof, ndof);
     MatrixXd pk_S  = MatrixXd::Zero(ndof, ndof);
@@ -102,7 +109,8 @@ void fe_mooneyrivlin_hyperelastic_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd&
     //MatrixXd F_inv = F.inverse();
     //pk_S = defJacobian * F_inv * cauchy_sigma * F_inv.transpose();
 
-    pk_S = (-p * defJacobian * C.inverse()) + ( (2 * (pow(defJacobian, (-1 * two_third)))) * ( ((c1 + (c2 * I1_bar)) * I) - (c2 * C_bar) - ((one_third) * ((c1 * I1_bar) + (2 * c2 * I2_bar)) * (C_bar.inverse())  )));
+    // pk_S = (-p * defJacobian * C.inverse()) + ( (2 * (pow(defJacobian, (-1 * two_third)))) * ( ((c1 + (c2 * I1_bar)) * I) - (c2 * C_bar) - ((one_third) * ((c1 * I1_bar) + (2 * c2 * I2_bar)) * (C_bar.inverse())  )));
+    pk_S = (-p * defJacobian * C_inv) + ( (2 * (pow(defJacobian, (-1 * two_third)))) * ( ((c1 + (c2 * I1_bar)) * I) - (c2 * C_bar) - ((one_third) * ((c1 * I1_bar) + (2 * c2 * I2_bar)) * (C_bar_inv)  )));
 
     sigma = fe_tensor2voigt(pk_S); /** outputs 2nd cauchy stress tensor in vector form */
 

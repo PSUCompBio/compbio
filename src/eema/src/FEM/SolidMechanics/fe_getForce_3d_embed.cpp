@@ -105,8 +105,10 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         fe_dniso_8(dndr, dnds, dndt, x, y, z);
 
                         jacobian = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-                        double detJacobian = jacobian.determinant();
-                        invJacobian = jacobian.inverse();
+                        // double detJacobian = jacobian.determinant();
+                        double detJacobian = fe_detMatrix_pbr(jacobian);
+                        // invJacobian = jacobian.inverse();
+                        fe_invMatrix_pbr(invJacobian, jacobian);
 
                         fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
                         fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
@@ -199,7 +201,8 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         fe_dniso_8(dndr, dnds, dndt, global_intg_points(0), global_intg_points(1), global_intg_points(2));
 
                         jacobian    = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-                        invJacobian = jacobian.inverse();
+                        // invJacobian = jacobian.inverse();
+                        fe_invMatrix_pbr(invJacobian, jacobian);
                         fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
                         fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
                         fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);

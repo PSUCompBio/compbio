@@ -1,46 +1,30 @@
+#include "functions.h"
 
+using namespace Eigen;
 
-#include"functions.h"
+double fe_detMatrix_pbr(MatrixXd& A)
+{
 
-using namespace std;
+  int size = A.rows();
+  double detA;
 
-typedef vector<double> Vec;
-typedef vector<Vec> Mat;
+  if (size == 2) {
+    detA = A(0,0)*A(1,1) - A(0,1)*A(1,0);
+    return detA;
+  }
 
-double d = 0;
+  if (size == 3) {
+    double tmp1 = A(0,0)*(A(1,1)*A(2,2) - A(1,2)*A(2,1));
+    double tmp2 = A(0,1)*(A(1,0)*A(2,2) - A(1,2)*A(2,0));
+    double tmp3 = A(0,2)*(A(1,0)*A(2,1) - A(1,1)*A(2,0));
+    detA = tmp1 - tmp2 + tmp3;
+    return detA;
+  }
 
-double fe_detMatrix(Mat matrix){
-
-	int rows = matrix.size();
-
-	if(rows==2){
-		return ((matrix[0][0]*matrix[1][1])-(matrix[0][1]*matrix[1][0]));
-	}
-	else
-	{
-		Mat submat;
-		Vec Row(rows-1);
-		for(int i=0;i<rows;i++){
-			int subi = 0;
-			for(int j=1;j<rows;j++){
-				int subj = 0;
-				for (int k=0;k<rows;k++){
-					if(k==i){continue;}
-					Row[subj] = matrix[j][k];
-					subj++;
-				}
-			submat.push_back(Row);
-			subi++;
-			}
-		d = d + (pow(-1,i)*matrix[0][i]*fe_detMatrix(submat));
-		//cout<<"submat size and d are: "<<submat.size()<<"\t"<<d<<endl;
-		Mat empty;
-		submat.swap(empty);
-		//cout<<"i is: "<<i<<endl;
-		//cout<<"submat size is: "<<submat.size()<<endl;
-		}
-	}
-	
-	return d;
+  else {
+    std::cout << "ALERT: PROBLEM CALCULATING DETERMINANT OF MATRIX." << '\n';
+    std::cout << "MATRIX SIZE IS NOT 2X2 OR 3X3. SIMULATION CANCELLED." << '\n';
+    std::exit(1);
+  }
 
 }

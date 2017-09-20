@@ -66,7 +66,8 @@ void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, int nnel, VectorXd& x
 
     fe_dniso_8(dndr, dnds, dndt, zero, zero, zero);
     jacobian    = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-    invJacobian = jacobian.inverse();
+    // invJacobian = jacobian.inverse();
+    fe_invMatrix_pbr(invJacobian, jacobian);
     fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
     fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
     fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
@@ -162,7 +163,8 @@ void fe_calCentroidStrain_3d_pbr(VectorXd& element_strain, int nnel, VectorXd& x
 
     fe_dniso_8(dndr, dnds, dndt, zero, zero, zero);
     jacobian    = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-    invJacobian = jacobian.inverse();
+    // invJacobian = jacobian.inverse();
+    fe_invMatrix_pbr(invJacobian, jacobian);
     fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
     fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
     fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
@@ -290,7 +292,8 @@ void fe_calCentroidStress_embed_3d_pbr(VectorXd& element_stress, int material_id
 
         fe_dniso_8(dndr, dnds, dndt, global_intg_points(0), global_intg_points(1), global_intg_points(2));
         jacobian    = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-        invJacobian = jacobian.inverse();
+        // invJacobian = jacobian.inverse();
+        fe_invMatrix_pbr(invJacobian, jacobian);
         fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
         fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
         fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
