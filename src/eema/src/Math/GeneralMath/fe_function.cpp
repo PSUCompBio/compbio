@@ -10,7 +10,7 @@ double fe_function(double a, std::string b, double time){
   }
 
   if(b=="SIN"){
-    result = a*sin(time);
+    result = a*sin((2*M_PI/0.1)*time);
   }
 
   if(b=="COS"){
@@ -32,7 +32,7 @@ double fe_function_derivative(double a, std::string b, double time){
   }
 
   if(b=="SIN"){
-    result = a*cos(time);
+    result = a*(2*M_PI/0.1)*cos((2*M_PI/0.1)*time);
   }
 
   if(b=="COS"){
@@ -54,7 +54,7 @@ double fe_function_d_derivative(double a, std::string b, double time){
   }
 
   if(b=="SIN"){
-    result = a*-1.0*sin(time);
+    result = a*-1.0*pow((2*M_PI/0.1),2)*sin((2*M_PI/0.1)*time);
   }
 
   if(b=="COS"){
