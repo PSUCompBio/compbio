@@ -43,8 +43,9 @@ fe_mainEXPLICIT()
 
     VectorXd d            = VectorXd::Zero(nel_truss); // damage variable representing damage due to single most severe stretch experienced
     VectorXd delta_d      = VectorXd::Zero(nel_truss); // damage variable representing accumulated damage due to repeated loading
-    VectorXd lambda_min   = VectorXd::Zero(nel_truss); // minimum stretch experienced during current load cycle
-    VectorXd lambda_max   = VectorXd::Zero(nel_truss); // maximum stretch experienced during current load cycle
+    VectorXd lambda_min   = VectorXd::Ones(nel_truss); // minimum stretch experienced during current load cycle
+    VectorXd lambda_max   = VectorXd::Ones(nel_truss); // maximum stretch experienced during current load cycle
+    double d_tot          = 0;                         // combined total damage variable, maximum value is d_tot = 1
 
     double energy_int_old = 0;
     double energy_int_new = 0;
@@ -65,6 +66,9 @@ fe_mainEXPLICIT()
 
     std::string reaction_forces = home_path + "/" + "results/reaction_forces.txt";
     fe_reactionForceWrite_new(reaction_forces, plot_state_counter, t, fr_curr[5], fr_curr[8], fr_curr[17], fr_curr[20]);
+
+    std::string damage_variables = home_path + "/" + "results/damage_variables.txt";
+    fe_damageVariableWrite_new(damage_variables, plot_state_counter, t, d[1], delta_d[1], d_tot);
 
     // Loading Conditions
     fe_apply_bc_load(fe, t_start);
@@ -155,9 +159,21 @@ fe_mainEXPLICIT()
 
             fe_reactionForceWrite_append(reaction_forces, plot_state_counter, t, fr_curr[5], fr_curr[8], fr_curr[17], fr_curr[20]);
 
-            std::cout << "d = " << '\n' << d << '\n';
-            std::cout << "delta_d = " << '\n' << delta_d << '\n';
-            // std::exit(1);
+            d_tot = d[1] + delta_d[1];
+
+            // if (plot_state_counter >= 11) {
+            //   std::exit(1);
+            // }
+
+            // if (d_tot > 1) {
+            //   d_tot = 1;
+            // }
+
+            fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d[1], delta_d[1], d_tot);
+
+            // std::cout << "d = " << '\n' << d << '\n';
+            // std::cout << "delta_d = " << '\n' << delta_d << '\n';
+            // // std::exit(1);
 
         }
 

@@ -402,6 +402,10 @@ void fe_reactionForceWrite_new(std::string& reaction_forces, int plot_state_coun
 
 void fe_reactionForceWrite_append(std::string& reaction_forces, int plot_state_counter, double& t, double& fr_curr_1, double& fr_curr_2, double& fr_curr_3, double& fr_curr_4);
 
+void fe_damageVariableWrite_new(std::string& damage_variables, int plot_state_counter, double& t, double& d_curr, double& delta_d_curr, double& d_tot);
+
+void fe_damageVariableWrite_append(std::string& damage_variables, int plot_state_counter, double& t, double& d_curr, double& delta_d_curr, double& d_tot);
+
 /* =================================================================== */
 /* BioElectroPhysics */
 /* =================================================================== */

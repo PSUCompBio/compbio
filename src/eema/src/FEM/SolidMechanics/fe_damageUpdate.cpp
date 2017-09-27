@@ -6,7 +6,7 @@ void fe_damageUpdate_pbr(VectorXd& d, int fib, double lambda)
 {
 
   double lambda_LL = 0.5;  // lower limit for stretch, d = 1 for lower values
-  double lambda_UL = 2;  // upper limit for stretch, d = 1 for higher values
+  double lambda_UL = 1.5;  // upper limit for stretch, d = 1 for higher values
   double tmp = 0;  // d for current value of stretch
 
   if (lambda == 1) {
@@ -40,13 +40,18 @@ void fe_damageUpdate_pbr(VectorXd& d, int fib, double lambda)
 void fe_deltaDamageUpdate_pbr(VectorXd& delta_d, int fib, double lambda, VectorXd& lambda_min, VectorXd& lambda_max)
 {
 
-  double tol = pow(10, -3);  // tolerance used to determine if lambda = 1
+  double tol = pow(10, -4);  // tolerance used to determine if lambda = 1
   double delta_d_add = 0;
 
   double lambda_LL = 0.5;    // lower limit for stretch, d = 1 for lower values
-  double lambda_UL = 2;      // upper limit for stretch, d = 1 for higher values
+  double lambda_UL = 1.5;    // upper limit for stretch, d = 1 for higher values
   double delta_d_CUL = 0.1;  // upper limit for delta_d during compressive stretch, occurs at lambda_LL
   double delta_d_TUL = 0.1;  // upper limit for delta_d during tensile stretch, occurs at lambda_UL
+
+  if (fib == 1) {
+    std::cout << "lambda_min(fib) = " << lambda_min(fib) << '\n';
+    std::cout << "lambda_max(fib) = " << lambda_max(fib) << '\n';
+  }
 
   if (lambda < lambda_min(fib)) {
     lambda_min(fib) = lambda;
@@ -59,19 +64,28 @@ void fe_deltaDamageUpdate_pbr(VectorXd& delta_d, int fib, double lambda, VectorX
   if (abs(lambda - 1) < tol) {
     if (lambda_min(fib) < 1) {
       delta_d_add = (-delta_d_CUL/(1 - lambda_LL))*lambda_min(fib) + (delta_d_CUL/(1 - lambda_LL));
+      if(fib == 1){
+        std::cout << "check 1" << '\n';
+      }
     }
     if (lambda_max(fib) > 1) {
       delta_d_add = (delta_d_TUL/(lambda_UL - 1))*lambda_max(fib) - (delta_d_TUL/(lambda_UL - 1));
+      if(fib == 1){
+        std::cout << "check 2" << '\n';
+      }
     }
-    lambda_min(fib) = 0;
-    lambda_max(fib) = 0;
+    lambda_min(fib) = 1;
+    lambda_max(fib) = 1;
   }
 
   delta_d(fib) = delta_d(fib) + delta_d_add;
 
-  // std::cout << "lambda = " << lambda << '\n';
-  // std::cout << "delta_d_add = " << delta_d_add << '\n';
-  // std::cout << "delta_d = " << '\n' << delta_d << '\n';
-  // // std::exit(1);
+  if (fib == 1){
+    std::cout << "fib = " << fib << '\n';
+    std::cout << "lambda = " << lambda << '\n';
+    std::cout << "delta_d_add = " << delta_d_add << '\n';
+    std::cout << "delta_d = " << '\n' << delta_d << '\n';
+    // // std::exit(1);
+  }
 
 }
