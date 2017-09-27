@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp)
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& delta_d, VectorXd& lambda_min, VectorXd& lambda_max)
 {
 
     MatrixXd* nodes_host     = mesh[host_id].getNewNodesPointer();
@@ -186,6 +186,23 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
                     double length_embed = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed);
 
+                    double length_embed_curr = fe_calCurrLength_pbr(u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed);
+
+                    double lambda = length_embed_curr/length_embed;
+
+                    fe_damageUpdate_pbr(d, fib, lambda);
+
+                    fe_deltaDamageUpdate_pbr(delta_d, fib, lambda, lambda_min, lambda_max);
+
+                    double d_tot = d(fib) + delta_d(fib);
+
+                    if (d_tot > 1) {
+                      d_tot = 1;
+                    }
+
+                    // std::cout << "d = " << d << '\n';
+                    // std::exit(1);
+
                     for (int embed_intg = 0; embed_intg < ngl_embed; embed_intg++) {
 
                         VectorXd local_intg_points = fe_findIntgPoints_1d(xcoord_embed, ycoord_embed, zcoord_embed, points_embed(embed_intg), length_embed);
@@ -214,7 +231,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         // New concept that I am trying out...
                         // fe_stressModify(sigma_embed, xcoord_embed, ycoord_embed, zcoord_embed, 3);
 
-                        VectorXd f_int_truss = (disp_mat.transpose() * sigma_embed * wtt * (length_embed / 2) * area_truss);
+                        VectorXd f_int_truss = (disp_mat.transpose() * (1 - d_tot) * sigma_embed * wtt * (length_embed / 2) * area_truss);
 
                         // Procedure - 2: (Same Displacements - Same Deformation Gradient - Transformation Matrix Inside)
                         /* sigma_truss = fe_stressUpdate_1d(elements_embed(fib, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, dndx, dndy, dndz, u_e, 0);

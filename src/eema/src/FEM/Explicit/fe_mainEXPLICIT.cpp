@@ -26,6 +26,7 @@ fe_mainEXPLICIT()
     VectorXd V            = VectorXd::Zero(sdof); // Velocity Vector
     VectorXd V_half       = VectorXd::Zero(sdof); // Velocity Vector at n+1/2
     VectorXd U            = VectorXd::Zero(sdof); // Displacement Vector
+    VectorXd U_prev       = VectorXd::Zero(sdof); // Displacement Vector used to calculate strain rate for damping force calculation
     VectorXd F_net        = VectorXd::Zero(sdof); // Total Nodal force vector
     VectorXd fe           = VectorXd::Zero(sdof); // External Nodal force vector
     VectorXd fe_prev      = VectorXd::Zero(sdof);
@@ -37,7 +38,13 @@ fe_mainEXPLICIT()
     VectorXd f_damp_curr  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector
     VectorXd f_damp_prev  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector at previous timestep
 
-    VectorXd U_prev       = VectorXd::Zero(sdof);
+    // Following variables - Only for Truss Element
+    int nel_truss = mesh[1].getNumElements();          // number of truss elements
+
+    VectorXd d            = VectorXd::Zero(nel_truss); // damage variable representing damage due to single most severe stretch experienced
+    VectorXd delta_d      = VectorXd::Zero(nel_truss); // damage variable representing accumulated damage due to repeated loading
+    VectorXd lambda_min   = VectorXd::Zero(nel_truss); // minimum stretch experienced during current load cycle
+    VectorXd lambda_max   = VectorXd::Zero(nel_truss); // maximum stretch experienced during current load cycle
 
     double energy_int_old = 0;
     double energy_int_new = 0;
@@ -72,7 +79,7 @@ fe_mainEXPLICIT()
 
     // ----------------------------------------------------------------------------
     // Step-2: getforce step from Belytschko
-    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr);
+    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, delta_d, lambda_min, lambda_max);
 
     mesh[0].readNodalKinematics(U, V, A);
 
@@ -109,7 +116,7 @@ fe_mainEXPLICIT()
         fe_apply_bc_load(fe, t);
 
         /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
-        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr); // Calculating the force term.
+        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, delta_d, lambda_min, lambda_max); // Calculating the force term.
 
         /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
         fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.
@@ -147,6 +154,10 @@ fe_mainEXPLICIT()
             fe_energyWrite_append(internal_energy, viscous_dissipation_energy, external_energy, kinetic_energy, total_energy, plot_state_counter, t, energy_int_new, energy_vd_new, energy_ext_new, energy_kin, energy_total);
 
             fe_reactionForceWrite_append(reaction_forces, plot_state_counter, t, fr_curr[5], fr_curr[8], fr_curr[17], fr_curr[20]);
+
+            std::cout << "d = " << '\n' << d << '\n';
+            std::cout << "delta_d = " << '\n' << delta_d << '\n';
+            // std::exit(1);
 
         }
 
