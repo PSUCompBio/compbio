@@ -48,11 +48,6 @@ void fe_deltaDamageUpdate_pbr(VectorXd& delta_d, int fib, double lambda, VectorX
   double delta_d_CUL = 0.1;  // upper limit for delta_d during compressive stretch, occurs at lambda_LL
   double delta_d_TUL = 0.1;  // upper limit for delta_d during tensile stretch, occurs at lambda_UL
 
-  if (fib == 1) {
-    std::cout << "lambda_min(fib) = " << lambda_min(fib) << '\n';
-    std::cout << "lambda_max(fib) = " << lambda_max(fib) << '\n';
-  }
-
   if (lambda < lambda_min(fib)) {
     lambda_min(fib) = lambda;
   }
@@ -64,28 +59,14 @@ void fe_deltaDamageUpdate_pbr(VectorXd& delta_d, int fib, double lambda, VectorX
   if (abs(lambda - 1) < tol) {
     if (lambda_min(fib) < 1) {
       delta_d_add = (-delta_d_CUL/(1 - lambda_LL))*lambda_min(fib) + (delta_d_CUL/(1 - lambda_LL));
-      if(fib == 1){
-        std::cout << "check 1" << '\n';
-      }
     }
     if (lambda_max(fib) > 1) {
       delta_d_add = (delta_d_TUL/(lambda_UL - 1))*lambda_max(fib) - (delta_d_TUL/(lambda_UL - 1));
-      if(fib == 1){
-        std::cout << "check 2" << '\n';
-      }
     }
     lambda_min(fib) = 1;
     lambda_max(fib) = 1;
   }
 
   delta_d(fib) = delta_d(fib) + delta_d_add;
-
-  if (fib == 1){
-    std::cout << "fib = " << fib << '\n';
-    std::cout << "lambda = " << lambda << '\n';
-    std::cout << "delta_d_add = " << delta_d_add << '\n';
-    std::cout << "delta_d = " << '\n' << delta_d << '\n';
-    // // std::exit(1);
-  }
 
 }

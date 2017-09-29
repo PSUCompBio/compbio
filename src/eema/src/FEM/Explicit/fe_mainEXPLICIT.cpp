@@ -39,6 +39,9 @@ fe_mainEXPLICIT()
     VectorXd f_damp_prev  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector at previous timestep
 
     // Following variables - Only for Truss Element
+    std::cout << "embedded_constraint = " << embedded_constraint << '\n';
+    std::exit(1);
+    
     int nel_truss = mesh[1].getNumElements();          // number of truss elements
 
     VectorXd d            = VectorXd::Zero(nel_truss); // damage variable representing damage due to single most severe stretch experienced
@@ -161,19 +164,7 @@ fe_mainEXPLICIT()
 
             d_tot = d[1] + delta_d[1];
 
-            // if (plot_state_counter >= 11) {
-            //   std::exit(1);
-            // }
-
-            // if (d_tot > 1) {
-            //   d_tot = 1;
-            // }
-
             fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d[1], delta_d[1], d_tot);
-
-            // std::cout << "d = " << '\n' << d << '\n';
-            // std::cout << "delta_d = " << '\n' << delta_d << '\n';
-            // // std::exit(1);
 
         }
 

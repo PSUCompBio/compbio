@@ -105,9 +105,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         fe_dniso_8(dndr, dnds, dndt, x, y, z);
 
                         jacobian = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-                        // double detJacobian = jacobian.determinant();
                         double detJacobian = fe_detMatrix_pbr(jacobian);
-                        // invJacobian = jacobian.inverse();
                         fe_invMatrix_pbr(invJacobian, jacobian);
 
                         fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
@@ -120,7 +118,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         fe_stressUpdate_pbr(sigma_e, dndx, dndy, dndz, disp_mat, u_e, (*elements_host)(i, 1), 0);
 
                         // f_int_e = f_int_e + ((disp_mat.transpose())*sigma_e*wtx*wty*wtz*detJacobian); (previous correct)
-                        // std::cout<<k<<std::endl;
 
                         f_int_e = f_int_e + ((disp_mat.transpose()) * sigma_e * wtx * wty * wtz * detJacobian);
 
@@ -200,9 +197,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                       d_tot = 1;
                     }
 
-                    // std::cout << "d = " << d << '\n';
-                    // std::exit(1);
-
                     for (int embed_intg = 0; embed_intg < ngl_embed; embed_intg++) {
 
                         VectorXd local_intg_points = fe_findIntgPoints_1d(xcoord_embed, ycoord_embed, zcoord_embed, points_embed(embed_intg), length_embed);
@@ -218,7 +212,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         fe_dniso_8(dndr, dnds, dndt, global_intg_points(0), global_intg_points(1), global_intg_points(2));
 
                         jacobian    = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-                        // invJacobian = jacobian.inverse();
                         fe_invMatrix_pbr(invJacobian, jacobian);
                         fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
                         fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
@@ -262,7 +255,8 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                     fe_calCentroidStrain_embed_3d_pbr(tmp_storage, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed);
                     element_strain_embed_local.segment<9>(fib * 9) = tmp_storage;
                     fe_calCentroidStress_embed_3d_pbr(tmp_storage, (*elements_embed)(fib, 1), u_e, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, xcoord, ycoord, zcoord);
-                    element_stress_embed_local.segment<9>(fib * 9) = tmp_storage;
+                    element_stress_embed_local.segment<9>(fib * 9) = (1 - d_tot) * tmp_storage;
+
                 }
             }
         }
