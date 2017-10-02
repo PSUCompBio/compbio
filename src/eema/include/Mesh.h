@@ -64,6 +64,10 @@ class Mesh
   VectorXd element_strain;
   VectorXd* element_strain_pointer;
 
+  /** Mesh - Element-wise damage scalar */
+  VectorXd damage;
+  VectorXd* damage_pointer;
+
   VectorXd element_charateristic;
   VectorXd* element_charateristic_pointer;
 
@@ -75,6 +79,7 @@ public:
   void readNodalKinematics(VectorXd& Usystem, VectorXd& Vsystem, VectorXd& Asystem);
   void readNodalStressStrain(VectorXd& stress_tmp, VectorXd& strain_tmp);
   void readElementStressStrain(VectorXd& stress_tmp, VectorXd& strain_tmp);
+  void readDamage(VectorXd& d_tot);
   void readNodalElectroPhysics(VectorXd& VP);
 
   MatrixXd getNodes();
@@ -109,6 +114,10 @@ public:
   /** Ouputs element-wise strain of the entire mesh */
   VectorXd getCellStrain();
   VectorXd* getCellStrainPointer();
+
+  /** Ouputs element-wise damage of the entire mesh */
+  VectorXd getCellDamage();
+  VectorXd* getCellDamagePointer();
 
   /** Outputs Nodal Stress of the entire mesh */
   VectorXd getNodalStress();

@@ -103,6 +103,11 @@ void Mesh::readElementStressStrain(VectorXd& stress_tmp, VectorXd& strain_tmp)
     element_strain = strain_tmp;
 }
 
+void Mesh::readDamage(VectorXd& d_tot)
+{
+    damage = d_tot;
+}
+
 VectorXd Mesh::getCellStress()
 {
     return element_stress;
@@ -119,6 +124,15 @@ VectorXd Mesh::getCellStrain()
 
 VectorXd* Mesh::getCellStrainPointer() {
     return element_strain_pointer;
+}
+
+VectorXd Mesh::getCellDamage()
+{
+    return damage;
+}
+
+VectorXd* Mesh::getCellDamagePointer() {
+    return damage_pointer;
 }
 
 VectorXd Mesh::getNodalStress()
@@ -191,6 +205,7 @@ void Mesh::preprocessMesh(std::string choice)
     A_pointer = &A;
     element_stress_pointer = &element_stress;
     element_strain_pointer = &element_strain;
+    damage_pointer = &damage;
     element_charateristic_pointer = &element_charateristic;
     nodal_electric_potential_pointer = &nodal_electric_potential;
 }
