@@ -236,14 +236,17 @@ void fe_calCentroidStrain_embed_3d_pbr(VectorXd& element_strain, VectorXd& u_emb
         int counter = 0;
         for (int i = 0; i < xcoord_embed.size(); i++) {
             xcoord_embed_new(i) = xcoord_embed(i) + u_embed(counter);
-            ycoord_embed_new(i) = xcoord_embed(i) + u_embed(counter + 1);
+            ycoord_embed_new(i) = ycoord_embed(i) + u_embed(counter + 1);
             zcoord_embed_new(i) = zcoord_embed(i) + u_embed(counter + 2);
             counter = counter + 3;
         }
 
         double length_new = fe_calVolume(xcoord_embed_new, ycoord_embed_new, zcoord_embed_new);
+
         double lambda = length_new / length_old;
+
         element_strain(0) = log(lambda);
+
     }
 
 }

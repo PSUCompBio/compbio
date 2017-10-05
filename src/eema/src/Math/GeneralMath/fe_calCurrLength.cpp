@@ -17,7 +17,7 @@ double fe_calCurrLength_pbr(VectorXd& u_embed, VectorXd& xcoord_embed, VectorXd&
 
     for (int i = 0; i < size; i++) {
         xcoord_embed_curr(i) = xcoord_embed(i) + u_embed(counter);
-        ycoord_embed_curr(i) = xcoord_embed(i) + u_embed(counter + 1);
+        ycoord_embed_curr(i) = ycoord_embed(i) + u_embed(counter + 1);
         zcoord_embed_curr(i) = zcoord_embed(i) + u_embed(counter + 2);
         counter = counter + 3;
     }
@@ -26,6 +26,12 @@ double fe_calCurrLength_pbr(VectorXd& u_embed, VectorXd& xcoord_embed, VectorXd&
 
     return length_curr;
 
+  }
+
+  else {
+    std::cout << "ALERT: PROBLEM CALCULATING NEW LENGTH OF TRUSS ELEMENT." << '\n';
+    std::cout << "COORDINATE VECTORS ARE NOT 2X1. SIMULATION CANCELLED." << '\n';
+    std::exit(1);
   }
 
 }

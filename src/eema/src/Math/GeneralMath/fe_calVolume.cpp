@@ -53,6 +53,7 @@ fe_calVolume(VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord)
     if (xcoord.size() == 2) { // Return length for a 1D element
         Vector3d vec;
         vec << (xcoord(1) - xcoord(0)), (ycoord(1) - ycoord(0)), (zcoord(1) - zcoord(0));
+        
         volume = vec.norm();
     }
 
