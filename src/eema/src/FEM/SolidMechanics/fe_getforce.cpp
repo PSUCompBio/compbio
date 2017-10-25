@@ -10,7 +10,7 @@ using namespace Eigen;
  * the resultant vectors are scattered into global vectors.
  */
 
-void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp)
+void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& delta_d, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max)
 {
 
     if (ndof == 3 && embedded_constraint == true) {
@@ -35,7 +35,7 @@ void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int tim
                 VectorXi* embed_map = cons[i].get_EmbedMapPointer();
 
                 f_tot = VectorXd::Zero((mesh[host_id].getNumNodes() * ndof));
-                fe_getForce_3d_embed(f_tot, u, fext, time_step_counter, host_id, embed_id, correct_vr, (*embed_map), u_prev, dT, f_damp);
+                fe_getForce_3d_embed(f_tot, u, fext, time_step_counter, host_id, embed_id, correct_vr, (*embed_map), u_prev, dT, f_damp, d, delta_d, d_tot, lambda_min, lambda_max);
             }
         }
     }

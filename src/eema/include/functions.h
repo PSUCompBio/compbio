@@ -196,6 +196,9 @@ fe_calArea_4(double a1, double a2, double a3, double a4, double b1, double b2, d
 /** Calculates the volume of a 3d element */
 double fe_calVolume(VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord);
 
+/** Calculates current length of truss element */
+double fe_calCurrLength_pbr(VectorXd& u_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed);
+
 /** find the poistion index of a double value in a vector -- analogous to 'find' function in MATLAB */
 int
 fe_find(VectorXd& A, double a);
@@ -238,7 +241,7 @@ void fe_invMatrix_pbr(MatrixXd& A_inv, MatrixXd& A);
 /* FEM */
 /* =================================================================== */
 /** Calculates the resultant force vector - Box 6.1 of Belytschko */
-void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp);
+void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& delta_d, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max);
 
 /** Find the index based on the DOF of a particular node */
 VectorXi
@@ -347,11 +350,15 @@ text2vector(std::string name);
 
 void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp);
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp);
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& delta_d, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max);
 
 void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, VectorXd& u_prev, double dT, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, int material_id);
 
 void fe_stressModify(VectorXd& sigma_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed, int choice);
+
+void fe_damageUpdate_pbr(VectorXd& d, int fib, double lambda);
+
+void fe_deltaDamageUpdate_pbr(VectorXd& delta_d, int fib, double lambda, VectorXd& lambda_min, VectorXd& lambda_max);
 
 VectorXd fe_calCentroidStress_3d(int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id);
 void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id);
@@ -394,6 +401,10 @@ void fe_energyWrite_append(std::string& internal_energy, std::string& viscous_di
 void fe_reactionForceWrite_new(std::string& reaction_forces, int plot_state_counter, double& t, double& fr_curr_1, double& fr_curr_2, double& fr_curr_3, double& fr_curr_4);
 
 void fe_reactionForceWrite_append(std::string& reaction_forces, int plot_state_counter, double& t, double& fr_curr_1, double& fr_curr_2, double& fr_curr_3, double& fr_curr_4);
+
+void fe_damageVariableWrite_new(std::string& damage_variables, int plot_state_counter, double& t, double& d_curr, double& delta_d_curr, double& d_tot);
+
+void fe_damageVariableWrite_append(std::string& damage_variables, int plot_state_counter, double& t, double& d_curr, double& delta_d_curr, double& d_tot);
 
 /* =================================================================== */
 /* BioElectroPhysics */

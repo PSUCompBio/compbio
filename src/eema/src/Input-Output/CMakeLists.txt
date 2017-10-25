@@ -12,5 +12,6 @@ SET(Input_Output_src
     Output/fe_display.cpp
     Output/fe_energyWrite.cpp
     Output/fe_reactionForceWrite.cpp
+    Output/fe_damageVariableWrite.cpp
      )
 ADD_LIBRARY(Input-Output OBJECT ${Input_Output_src})

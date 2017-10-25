@@ -9,5 +9,6 @@ SET(Math_src
     GeneralMath/fe_calArea_4.cpp
     GeneralMath/fe_crossProduct.cpp
     GeneralMath/fe_sort.cpp
+    GeneralMath/fe_calCurrLength.cpp
      )
 ADD_LIBRARY(Math OBJECT ${Math_src})

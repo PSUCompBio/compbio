@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp)
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& delta_d, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max)
 {
 
     MatrixXd* nodes_host     = mesh[host_id].getNewNodesPointer();
@@ -105,9 +105,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         fe_dniso_8(dndr, dnds, dndt, x, y, z);
 
                         jacobian = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-                        // double detJacobian = jacobian.determinant();
                         double detJacobian = fe_detMatrix_pbr(jacobian);
-                        // invJacobian = jacobian.inverse();
                         fe_invMatrix_pbr(invJacobian, jacobian);
 
                         fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
@@ -120,7 +118,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         fe_stressUpdate_pbr(sigma_e, dndx, dndy, dndz, disp_mat, u_e, (*elements_host)(i, 1), 0);
 
                         // f_int_e = f_int_e + ((disp_mat.transpose())*sigma_e*wtx*wty*wtz*detJacobian); (previous correct)
-                        // std::cout<<k<<std::endl;
 
                         f_int_e = f_int_e + ((disp_mat.transpose()) * sigma_e * wtx * wty * wtz * detJacobian);
 
@@ -186,6 +183,20 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
                     double length_embed = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed);
 
+                    double length_embed_curr = fe_calCurrLength_pbr(u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed);
+
+                    double lambda = length_embed_curr/length_embed;
+
+                    fe_damageUpdate_pbr(d, fib, lambda);
+
+                    fe_deltaDamageUpdate_pbr(delta_d, fib, lambda, lambda_min, lambda_max);
+
+                    d_tot(fib) = d(fib) + delta_d(fib);
+
+                    if (d_tot(fib) > 1) {
+                      d_tot(fib) = 1;
+                    }
+
                     for (int embed_intg = 0; embed_intg < ngl_embed; embed_intg++) {
 
                         VectorXd local_intg_points = fe_findIntgPoints_1d(xcoord_embed, ycoord_embed, zcoord_embed, points_embed(embed_intg), length_embed);
@@ -201,7 +212,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         fe_dniso_8(dndr, dnds, dndt, global_intg_points(0), global_intg_points(1), global_intg_points(2));
 
                         jacobian    = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-                        // invJacobian = jacobian.inverse();
                         fe_invMatrix_pbr(invJacobian, jacobian);
                         fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
                         fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
@@ -214,7 +224,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         // New concept that I am trying out...
                         // fe_stressModify(sigma_embed, xcoord_embed, ycoord_embed, zcoord_embed, 3);
 
-                        VectorXd f_int_truss = (disp_mat.transpose() * sigma_embed * wtt * (length_embed / 2) * area_truss);
+                        VectorXd f_int_truss = (disp_mat.transpose() * (1 - d_tot(fib)) * sigma_embed * wtt * (length_embed / 2) * area_truss);
 
                         // Procedure - 2: (Same Displacements - Same Deformation Gradient - Transformation Matrix Inside)
                         /* sigma_truss = fe_stressUpdate_1d(elements_embed(fib, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, dndx, dndy, dndz, u_e, 0);
@@ -245,7 +255,8 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                     fe_calCentroidStrain_embed_3d_pbr(tmp_storage, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed);
                     element_strain_embed_local.segment<9>(fib * 9) = tmp_storage;
                     fe_calCentroidStress_embed_3d_pbr(tmp_storage, (*elements_embed)(fib, 1), u_e, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, xcoord, ycoord, zcoord);
-                    element_stress_embed_local.segment<9>(fib * 9) = tmp_storage;
+                    element_stress_embed_local.segment<9>(fib * 9) = (1 - d_tot(fib)) * tmp_storage;
+
                 }
             }
         }
@@ -260,6 +271,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
     mesh[host_id].readElementStressStrain(element_stress_host_local, element_strain_host_local);
     mesh[embed_id].readElementStressStrain(element_stress_embed_local, element_strain_embed_local);
+    mesh[embed_id].readDamage(d_tot);
     mesh[embed_id].readNodalKinematics(u_embed, v_embed, a_embed);
 
     nodes_host = NULL;
