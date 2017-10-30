@@ -31,7 +31,8 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
     VectorXd* electric_potential = mesh1.getNodalEPotentialPointer();
 
     /** determine if damage should be printed */
-    bool print_damage = 0;
+    bool print_fiber_damage = 0;
+    bool print_host_damage = 0;
     std::string mesh_name = mesh1.getName();
 
     if (embedded_constraint == 1) {
@@ -40,7 +41,11 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
         if (constraint_name == "embedded") {
           std::string constraint_slave = cons[i].get_EmbedSlave();
           if (constraint_slave == mesh_name) {
-            print_damage = 1;
+            print_fiber_damage = 1;
+          }
+          std::string constraint_master = cons[i].get_EmbedMaster();
+          if (constraint_master == mesh_name) {
+            print_host_damage = 1;
           }
         }
       }
@@ -209,9 +214,21 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
         myfile << "\t\t\t\t</DataArray>\n";
     }
 
-    if (print_damage == 1) {
+    if (print_fiber_damage == 1) {
         VectorXd* damage = mesh1.getCellDamagePointer();
-        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Damage\" NumberOfComponents=\"1\" ComponentName0=\"D\" format=\"ascii\">\n";
+        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Fiber Damage\" NumberOfComponents=\"1\" ComponentName0=\"D\" format=\"ascii\">\n";
+
+        for (int i = 0; i < (*damage).size(); i++)
+        {
+            myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*damage)(i) << "\n";
+        }
+        myfile << "\t\t\t\t</DataArray>\n";
+        damage = NULL;
+    }
+
+    if (print_host_damage == 1) {
+        VectorXd* damage = mesh1.getCellDamagePointer();
+        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Average Fiber Damage\" NumberOfComponents=\"1\" ComponentName0=\"D\" format=\"ascii\">\n";
 
         for (int i = 0; i < (*damage).size(); i++)
         {

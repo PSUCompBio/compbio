@@ -13,8 +13,9 @@ void
 fe_mainEXPLICIT()
 {
     // Following variables - Only for Hex Element
-    int nnode = mesh[0].getNumNodes();          // number of nodes
-    int sdof  = nnode * ndof;          // system degrees of freedom
+    int nnode = mesh[0].getNumNodes();            // number of nodes
+    int sdof  = nnode * ndof;                     // system degrees of freedom
+    int nel   = mesh[0].getNumElements();         // number of elements
 
     // Initialization
     double dT             = dt_initial;
@@ -37,6 +38,8 @@ fe_mainEXPLICIT()
     VectorXd fi_curr      = VectorXd::Zero(sdof); // Internal Nodal force vector at current timestep
     VectorXd f_damp_curr  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector
     VectorXd f_damp_prev  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector at previous timestep
+
+    VectorXd d_avg        = VectorXd::Zero(nel);  // Average d_tot of truss elements associated with each hex element
 
     // Following variables - Only for Truss Element
     int nel_truss = 1;                            // number of truss elements
@@ -87,7 +90,7 @@ fe_mainEXPLICIT()
 
     // ----------------------------------------------------------------------------
     // Step-2: getforce step from Belytschko
-    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, delta_d, d_tot, lambda_min, lambda_max);
+    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, delta_d, d_tot, lambda_min, lambda_max, d_avg);
 
     mesh[0].readNodalKinematics(U, V, A);
 
@@ -124,7 +127,7 @@ fe_mainEXPLICIT()
         fe_apply_bc_load(fe, t);
 
         /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
-        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, delta_d, d_tot, lambda_min, lambda_max); // Calculating the force term.
+        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, delta_d, d_tot, lambda_min, lambda_max, d_avg); // Calculating the force term.
 
         /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
         fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.

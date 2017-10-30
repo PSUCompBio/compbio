@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& delta_d, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max)
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& delta_d, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& d_avg)
 {
 
     MatrixXd* nodes_host     = mesh[host_id].getNewNodesPointer();
@@ -35,6 +35,9 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
     VectorXd u_embed_local = VectorXd::Zero(((*elements_embed).cols() - 2) * ndof);
     VectorXd v_embed       = VectorXd::Zero(((*nodes_embed).rows()) * ndof);
     VectorXd a_embed       = VectorXd::Zero(((*nodes_embed).rows()) * ndof);
+
+    double nfib_el      = 0; // number of fibers associated with an individual host element
+    double d_tot_sum_el = 0; // sum of d_tot for all fibers associated with an individual host element
 
     for (int i = 0; i < nel; i++) {
         for (int j = 0; j < nnel; j++) {
@@ -90,7 +93,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
         VectorXd points  = guass_points(nglx);
         VectorXd weights = guass_weights(nglx);
         int node_counter = 0;
-
         if (time_step_counter != 0) { // if this is not the first time step the go into the loop
             for (int intx = 0; intx < nglx; intx++) {
                 double x   = points(intx);
@@ -134,8 +136,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                 }
             }
 
-
-
             fe_calCentroidStress_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e, (*elements_host)(i, 1));
             element_stress_host_local.segment<9>(i * 9) = tmp_storage;
             fe_calCentroidStrain_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e);
@@ -154,10 +154,14 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
             VectorXd sigma_embed = VectorXd::Zero(6);
             VectorXd sigma_correction = VectorXd::Zero(6);
 
-
+            d_tot_sum_el = 0;
+            nfib_el = 0;
 
             for (int fib = 0; fib < (*elements_embed).rows(); fib++) {
                 if (embed_map(fib) == (*elements_host)(i, 0)) {
+
+                    nfib_el = nfib_el + 1; // count number of fibers associated with current host elment
+
                     for (int j = 0; j < ((*elements_embed).cols() - 2); j++) {
                         int g = (*elements_embed)(fib, j + 2);
                         xcoord_embed(j)      = (*nodes_embed)(g, 1);
@@ -196,6 +200,8 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                     if (d_tot(fib) > 1) {
                       d_tot(fib) = 1;
                     }
+
+                    d_tot_sum_el = d_tot_sum_el + d_tot(fib); // calculate sum of d_tot for fibers associated with current host element
 
                     for (int embed_intg = 0; embed_intg < ngl_embed; embed_intg++) {
 
@@ -259,6 +265,9 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
                 }
             }
+
+            d_avg(i) = d_tot_sum_el/nfib_el; // calculate avg damage in current host element
+
         }
 
         //std::cout << "Host Final - nodal force: " << f_int_e.maxCoeff() << "\n";
@@ -270,6 +279,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
     }
 
     mesh[host_id].readElementStressStrain(element_stress_host_local, element_strain_host_local);
+    mesh[host_id].readDamage(d_avg);
     mesh[embed_id].readElementStressStrain(element_stress_embed_local, element_strain_embed_local);
     mesh[embed_id].readDamage(d_tot);
     mesh[embed_id].readNodalKinematics(u_embed, v_embed, a_embed);
