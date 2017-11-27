@@ -230,7 +230,8 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         // New concept that I am trying out...
                         // fe_stressModify(sigma_embed, xcoord_embed, ycoord_embed, zcoord_embed, 3);
 
-                        VectorXd f_int_truss = (disp_mat.transpose() * (1 - d_tot(fib)) * sigma_embed * wtt * (length_embed / 2) * area_truss);
+                        VectorXd f_int_truss = (disp_mat.transpose() * (1 - d_tot(fib)) * sigma_embed * wtt * (length_embed / 2) * area_truss); // correct formula
+                        // VectorXd f_int_truss = (disp_mat.transpose() * sigma_embed * wtt * (length_embed / 2) * area_truss); // temporary bypass to turn damage off
 
                         // Procedure - 2: (Same Displacements - Same Deformation Gradient - Transformation Matrix Inside)
                         /* sigma_truss = fe_stressUpdate_1d(elements_embed(fib, 1), u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, dndx, dndy, dndz, u_e, 0);
