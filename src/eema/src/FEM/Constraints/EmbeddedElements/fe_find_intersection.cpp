@@ -9,7 +9,7 @@ void fe_find_intersection(VectorXd& intersection, VectorXi& common_face, MatrixX
 
 	for (int i = 0; i < common_face.size(); i++) {
 		VectorXd node_list = nodes_embed.col(0);
-		ids(i) = fe_find(node_list, common_face(i));
+		ids(i) = fe_find(node_list, common_face(i)); // Potential future problem. Looking for host node id in list of fiber nodes.
 	}
 
 	MatrixXi traingles(2, 3);

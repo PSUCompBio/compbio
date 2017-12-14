@@ -19,14 +19,14 @@ double fe_calArea_4(double a1, double a2, double a3, double a4, double b1, doubl
 	tr1_side2(2) = c1 - c3;
 
 	Vector3d tr2_side1(3);
-	tr1_side1(0) = a1 - a3;
-	tr1_side1(1) = b1 - b3;
-	tr1_side1(2) = c1 - c3;
+	tr2_side1(0) = a1 - a3;
+	tr2_side1(1) = b1 - b3;
+	tr2_side1(2) = c1 - c3;
 
 	Vector3d tr2_side2(3);
-	tr1_side2(0) = a1 - a4;
-	tr1_side2(1) = b1 - b4;
-	tr1_side2(2) = c1 - c4;
+	tr2_side2(0) = a1 - a4;
+	tr2_side2(1) = b1 - b4;
+	tr2_side2(2) = c1 - c4;
 
 	Vector3d area_tr1(3);
 	area_tr1 = tr1_side1.cross(tr1_side2);

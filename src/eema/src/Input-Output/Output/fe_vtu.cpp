@@ -65,7 +65,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
 
     /** Points Data */
     myfile << "\t\t\t<Points>\n";
-    myfile << "\t\t\t\t<DataArray type=\"Float32\" NumberOfComponents=\"3\" format=\"ascii\">\n";
+    myfile << "\t\t\t\t<DataArray type=\"Float64\" NumberOfComponents=\"3\" format=\"ascii\">\n";
     for (int i = 0; i < (*nodes).rows(); i++)
     {
         myfile << "\t\t\t\t\t" << std::setw(10) << std::scientific << std::setprecision(8)
@@ -119,7 +119,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
     myfile << "\t\t\t<PointData>\n";
 
     if ((*U_mesh).size() != 0) {
-        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Displacement\" "
+        myfile << "\t\t\t\t<DataArray type=\"Float64\" Name=\"Displacement\" "
                << "NumberOfComponents=\"3\" ComponentName0=\"X\" "
                << "ComponentName1=\"Y\" ComponentName2=\"Z\" format=\"ascii\">\n";
         int num = 0;
@@ -136,7 +136,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
 
     /** Point Vector Data - Velocities */
     if ((*V_mesh).size() != 0) {
-        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Velocity\" "
+        myfile << "\t\t\t\t<DataArray type=\"Float64\" Name=\"Velocity\" "
                << "NumberOfComponents=\"3\" ComponentName0=\"X\" "
                << "ComponentName1=\"Y\" ComponentName2=\"Z\" format=\"ascii\">\n";
         int num = 0;
@@ -153,7 +153,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
 
     /** Point Vector Data - Accelerations */
     if ((*A_mesh).size() != 0) {
-        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Acceleration\" "
+        myfile << "\t\t\t\t<DataArray type=\"Float64\" Name=\"Acceleration\" "
                << "NumberOfComponents=\"3\" ComponentName0=\"X\" "
                << "ComponentName1=\"Y\" ComponentName2=\"Z\" format=\"ascii\">\n";
         int num = 0;
@@ -171,7 +171,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
 
     /** Point Scalar Data - Electric Potential */
     if ((*electric_potential).size() != 0) {
-        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Electric-Potential\" "
+        myfile << "\t\t\t\t<DataArray type=\"Float64\" Name=\"Electric-Potential\" "
                << "format=\"ascii\">\n";
         int num = 0;
         for (int i = 0; i < (*nodes).rows(); i++)
@@ -189,7 +189,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
     myfile << "\t\t\t<CellData>\n";
 
     if ((*element_stress).rows() != 0 && (*element_stress).cols() != 0) {
-        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Stress (Cauchy)\" NumberOfComponents=\"9\" ComponentName0=\"XX\" ComponentName1=\"XY\" ComponentName2=\"XZ\" ComponentName3=\"YX\" ComponentName4=\"YY\" ComponentName5=\"YZ\" ComponentName6=\"ZX\" ComponentName7=\"ZY\" ComponentName8=\"ZZ\" format=\"ascii\">\n";
+        myfile << "\t\t\t\t<DataArray type=\"Float64\" Name=\"Stress (Cauchy)\" NumberOfComponents=\"9\" ComponentName0=\"XX\" ComponentName1=\"XY\" ComponentName2=\"XZ\" ComponentName3=\"YX\" ComponentName4=\"YY\" ComponentName5=\"YZ\" ComponentName6=\"ZX\" ComponentName7=\"ZY\" ComponentName8=\"ZZ\" format=\"ascii\">\n";
         for (int i = 0; i < (*element_stress).size();)
         {
             myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_stress)(i + 0) << " " << (*element_stress)(i + 1) << " " << (*element_stress)(i + 2) << "\n";
@@ -202,7 +202,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
     }
 
     if ((*element_strain).rows() != 0 && (*element_strain).cols() != 0) {
-        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Strain (Logarithmic)\" NumberOfComponents=\"9\" ComponentName0=\"XX\" ComponentName1=\"XY\" ComponentName2=\"XZ\" ComponentName3=\"YX\" ComponentName4=\"YY\" ComponentName5=\"YZ\" ComponentName6=\"ZX\" ComponentName7=\"ZY\" ComponentName8=\"ZZ\" format=\"ascii\">\n";
+        myfile << "\t\t\t\t<DataArray type=\"Float64\" Name=\"Strain (Logarithmic)\" NumberOfComponents=\"9\" ComponentName0=\"XX\" ComponentName1=\"XY\" ComponentName2=\"XZ\" ComponentName3=\"YX\" ComponentName4=\"YY\" ComponentName5=\"YZ\" ComponentName6=\"ZX\" ComponentName7=\"ZY\" ComponentName8=\"ZZ\" format=\"ascii\">\n";
         for (int i = 0; i < (*element_strain).size();)
         {
             myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*element_strain)(i + 0) << " " << (*element_strain)(i + 1) << " " << (*element_strain)(i + 2) << "\n";
@@ -216,7 +216,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
 
     if (print_fiber_damage == 1) {
         VectorXd* damage = mesh1.getCellDamagePointer();
-        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Fiber Damage\" NumberOfComponents=\"1\" ComponentName0=\"D\" format=\"ascii\">\n";
+        myfile << "\t\t\t\t<DataArray type=\"Float64\" Name=\"Fiber Damage\" NumberOfComponents=\"1\" ComponentName0=\"D\" format=\"ascii\">\n";
 
         for (int i = 0; i < (*damage).size(); i++)
         {
@@ -228,7 +228,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
 
     if (print_host_damage == 1) {
         VectorXd* damage = mesh1.getCellDamagePointer();
-        myfile << "\t\t\t\t<DataArray type=\"Float32\" Name=\"Average Fiber Damage\" NumberOfComponents=\"1\" ComponentName0=\"D\" format=\"ascii\">\n";
+        myfile << "\t\t\t\t<DataArray type=\"Float64\" Name=\"Average Fiber Damage\" NumberOfComponents=\"1\" ComponentName0=\"D\" format=\"ascii\">\n";
 
         for (int i = 0; i < (*damage).size(); i++)
         {
