@@ -49,12 +49,11 @@ void Constraint::preprocess() {
 			}
 		}
 
-		std::cout << "Here - Constraint.cpp \n";
-
 		embed_map = fe_embed_preprocessing(mesh[host_id], mesh[embed_id]);
-		embed_map_pointer = &embed_map;
 
-		std::cout << "EMBED MAP: \n" << embed_map << "\n";
+		std::cout << "embed_map = " << '\n' << embed_map << '\n';
+
+		embed_map_pointer = &embed_map;
 	}
 
 }

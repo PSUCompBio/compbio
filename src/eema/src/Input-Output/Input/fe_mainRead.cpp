@@ -276,9 +276,23 @@ void fe_mainRead(std::string file) {
     mesh[i].preprocessMesh("default");
   }
 
+  // std::cout << '\n' << "******************************************" << '\n';
+  // std::cout << "Before Preprocessing:" << '\n' << '\n';
+  // std::cout << "mesh[1].getNewNodes()" << '\n' << mesh[1].getNewNodes() << '\n' << '\n';
+  // std::cout << "mesh[1].getNewElements() " << '\n' << mesh[1].getNewElements() << '\n';
+  // std::cout << "******************************************" << '\n' << '\n';
+
   for (int i = 0; i < num_constraints; i++) {
     cons[i].preprocess();
   }
+
+  // std::cout << '\n' << "******************************************" << '\n';
+  // std::cout << "After Preprocessing:" << '\n' << '\n';
+  // std::cout << "mesh[1].getNewNodes()" << '\n' << mesh[1].getNewNodes() << '\n' << '\n';
+  // std::cout << "mesh[1].getNewElements() " << '\n' << mesh[1].getNewElements() << '\n';
+  // std::cout << "******************************************" << '\n' << '\n';
+
+  // std::exit(1);
 
   std::cout << "EEMA: Mesh Preprocessing --> Completed !!" << "\n";
 

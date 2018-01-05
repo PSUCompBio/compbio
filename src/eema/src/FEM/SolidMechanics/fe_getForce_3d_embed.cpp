@@ -262,7 +262,8 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                     fe_calCentroidStrain_embed_3d_pbr(tmp_storage, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed);
                     element_strain_embed_local.segment<9>(fib * 9) = tmp_storage;
                     fe_calCentroidStress_embed_3d_pbr(tmp_storage, (*elements_embed)(fib, 1), u_e, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, xcoord, ycoord, zcoord);
-                    element_stress_embed_local.segment<9>(fib * 9) = (1 - d_tot(fib)) * tmp_storage;
+                    element_stress_embed_local.segment<9>(fib * 9) = (1 - d_tot(fib)) * tmp_storage; // correct formula
+                    // element_stress_embed_local.segment<9>(fib * 9) = tmp_storage; // temporary bypass to turn damage off
 
                 }
             }
