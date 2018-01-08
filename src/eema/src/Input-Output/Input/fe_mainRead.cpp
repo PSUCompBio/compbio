@@ -216,6 +216,7 @@ void fe_mainRead(std::string file) {
         std::string master;
         std::string slave;
         bool address_vr;
+        bool include_d;
 
         while (line != "*END_CONSTRAINT")
         {
@@ -228,11 +229,12 @@ void fe_mainRead(std::string file) {
             myfile1 >> master;
             myfile1 >> slave;
             myfile1 >> address_vr;
+            myfile1 >> include_d;
           }
           myfile1 >> line;
         }
         if (num_constraints_counter < num_constraints) {
-          cons[num_constraints_counter].readConstraints(type, id, master, slave, address_vr);
+          cons[num_constraints_counter].readConstraints(type, id, master, slave, address_vr, include_d);
           num_constraints_counter = num_constraints_counter + 1;
         }
       }

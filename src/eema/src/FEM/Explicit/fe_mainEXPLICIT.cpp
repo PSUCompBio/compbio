@@ -2,7 +2,7 @@
 using namespace Eigen;
 
 double eps_energy = 0.01;
-double area_truss = 2.5e-7; // default 7.85398e-7
+double area_truss = 5.0e-7; // default 7.85398e-7
 double failure_time_step = 1e-8;
 
 /*! \brief

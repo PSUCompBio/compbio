@@ -19,6 +19,7 @@ void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int tim
                 std::string host = cons[i].get_EmbedMaster();
                 std::string slave = cons[i].get_EmbedSlave();
                 bool correct_vr = cons[i].get_EmbedAddressVR();
+                bool include_d = cons[i].get_EmbedIncludeDamage();
                 int host_id, embed_id;
 
                 for (int i = 0; i < num_meshes; ++i) {
@@ -35,7 +36,7 @@ void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int tim
                 VectorXi* embed_map = cons[i].get_EmbedMapPointer();
 
                 f_tot = VectorXd::Zero((mesh[host_id].getNumNodes() * ndof));
-                fe_getForce_3d_embed(f_tot, u, fext, time_step_counter, host_id, embed_id, correct_vr, (*embed_map), u_prev, dT, f_damp, d, delta_d, d_tot, lambda_min, lambda_max, d_avg);
+                fe_getForce_3d_embed(f_tot, u, fext, time_step_counter, host_id, embed_id, correct_vr, include_d, (*embed_map), u_prev, dT, f_damp, d, delta_d, d_tot, lambda_min, lambda_max, d_avg);
             }
         }
     }
