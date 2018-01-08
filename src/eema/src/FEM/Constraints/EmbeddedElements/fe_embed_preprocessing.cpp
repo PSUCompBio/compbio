@@ -29,8 +29,12 @@ VectorXi fe_embed_preprocessing(Mesh& host, Mesh& embed) {
       }
     }
 
+    int counter = 0;
+
     // Run sub-routine until all embedded elements have been assigned host ids.
     while (host_id_check == 1) {
+
+      std::cout << "counter = " << counter << '\n';
 
       embed_map = fe_embed_preprocessing_host_map(embed_map, host, embed);
       embed_map_size = embed_map.size();
@@ -39,9 +43,13 @@ VectorXi fe_embed_preprocessing(Mesh& host, Mesh& embed) {
       for (int i = 0; i < embed_map_size; i++) {
         if (embed_map(i) == 0) {
           host_id_check = 1;
+
           break;
         }
       }
+
+      counter = counter + 1;
+
     }
 
     return embed_map;

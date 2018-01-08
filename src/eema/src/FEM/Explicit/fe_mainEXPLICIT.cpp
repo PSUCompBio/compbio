@@ -2,7 +2,7 @@
 using namespace Eigen;
 
 double eps_energy = 0.01;
-double area_truss = 7.85398e-7; // default 7.85398e-7
+double area_truss = 2.5e-7; // default 7.85398e-7
 double failure_time_step = 1e-8;
 
 /*! \brief
@@ -45,7 +45,8 @@ fe_mainEXPLICIT()
     int nel_truss = 1;                            // number of truss elements
 
     if (embedded_constraint == 1) {
-      nel_truss = mesh[1].getNumElements();       // number of truss elements
+      nel_truss = mesh[1].getNumElements();              // number of truss elements
+      fe_checkFiberVolumeFraction(mesh[0], mesh[1]);     // Check to confirm that maximum fiber volume fraction is not too large.
     }
 
     VectorXd d            = VectorXd::Zero(nel_truss); // damage variable representing damage due to single most severe stretch experienced

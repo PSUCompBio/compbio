@@ -284,6 +284,8 @@ VectorXi fe_embed_preprocessing_host_map(VectorXi embed_map, Mesh& host, Mesh& e
 
 VectorXi fe_embed_preprocessing(Mesh& host, Mesh& embed);
 
+void fe_checkFiberVolumeFraction(Mesh& host, Mesh& embed);
+
 // void fe_embed_preprocessing_length(Mesh& host, Mesh& embed);
 
 // int fe_compute_host(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_host_tmp);

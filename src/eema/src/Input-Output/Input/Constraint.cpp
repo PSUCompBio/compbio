@@ -54,6 +54,10 @@ void Constraint::preprocess() {
 		std::cout << "embed_map = " << '\n' << embed_map << '\n';
 
 		embed_map_pointer = &embed_map;
+
+		// As a result of preprocessing, the truss mesh may have changed.
+		// We must re-calculate the element characteristic for each element; which is the truss element length.
+		mesh[embed_id].calculateElementCharateristic();
 	}
 
 }

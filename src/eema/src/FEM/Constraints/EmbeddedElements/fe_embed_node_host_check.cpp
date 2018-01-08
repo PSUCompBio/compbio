@@ -93,8 +93,9 @@ int fe_embed_node_host_check(int host_row, int embed_node, Mesh& host, Mesh& emb
 
       // This means the embedded node is outside of the triangle.
       // Note that if angle = 0, the embedded node is on the triangle surface.
+      // Note that there were numerical issues when we used "angle < 0".
       // Embedded nodes on the host element surface are considered to be inside the host element.
-      if (angle < 0) {
+      if (angle < -1e-9) {
         embed_node_check = 0;
         break;
       }

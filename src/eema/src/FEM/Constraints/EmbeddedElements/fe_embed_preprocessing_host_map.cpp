@@ -25,7 +25,7 @@ VectorXi fe_embed_preprocessing_host_map(VectorXi embed_map, Mesh& host, Mesh& e
         // If so, move on to next embedded element.
         if (embed_map(embed_row) == 0) {
 
-          // Extract node ids that for the embedded element.
+          // Extract node ids for the embedded element.
           int embed_node_1 = (*elements_embed)(embed_row, 2);
           int embed_node_2 = (*elements_embed)(embed_row, 3);
 

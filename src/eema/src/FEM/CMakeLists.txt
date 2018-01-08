@@ -31,5 +31,6 @@ SET(FEM_src
     Constraints/EmbeddedElements/fe_embed_node_host_check.cpp
     Constraints/EmbeddedElements/fe_embed_element_intersection_point.cpp
     Constraints/EmbeddedElements/fe_embed_preprocessing_host_map.cpp
+    Constraints/EmbeddedElements/fe_checkFiberVolumeFraction.cpp
      )
 ADD_LIBRARY(FEM OBJECT ${FEM_src})

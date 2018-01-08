@@ -96,8 +96,6 @@ VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& 
         // If infinite line intersects plane, but line segment does not, do not continue. Move on to next triangle.
         if (t > 0 && t < 1) {
 
-          // std::cout << "check point (line segment intersects the plane)" << '\n';
-
           // Calculate the intersection point of line segment and plane.
           VectorXd intersection_tmp = VectorXd::Zero(ndof);
           intersection_tmp(0) = embed_node_coord_1(0) + t*( embed_node_coord_2(0) - embed_node_coord_1(0) );
