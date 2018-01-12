@@ -28,9 +28,10 @@ private:
 	VectorXi* embed_map_pointer;
 
 	bool address_volume_redundancy;
+	bool include_damage;
 
 public:
-	void readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR);
+	void readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR, bool include_d);
 	void preprocess();
 	void printInfo();
 
@@ -40,6 +41,7 @@ public:
 	std::string get_EmbedMaster();
 	std::string get_EmbedSlave();
 	bool get_EmbedAddressVR();
+	bool get_EmbedIncludeDamage();
 	VectorXi* get_EmbedMapPointer();
 };
 

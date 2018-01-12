@@ -39,7 +39,7 @@ Fiber
 # Material-1
 *MATERIAL
 1
-mechanical mooney-rivlin_hyperelastic 5 
+mechanical mooney-rivlin_hyperelastic 5
 500 4e5 0.5 1000 1000
 *END_MATERIAL
 # -------------------------------
@@ -97,9 +97,10 @@ RAMP
 # 3. if "embedded" is the constraint name - Host Matrix
 # 4. if "embedded" is the constraint name - Slave Matrix
 # 5. Do you want to address volume redundancy - "0" for No and "1" for Yes
+# 6. Do you want to include damage - "0" for No and "1" for Yes
 # ------------------------------
 *CONSTRAINT
-1 embedded Matrix Fiber 0
+1 embedded Matrix Fiber 0 1
 *END_CONSTRAINT
 # ------------------------------
 *END

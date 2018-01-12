@@ -2,7 +2,7 @@
 using namespace Eigen;
 
 double eps_energy = 0.01;
-double area_truss = 7.85398e-7;
+double area_truss = 5.0e-7; // default 7.85398e-7
 double failure_time_step = 1e-8;
 
 /*! \brief
@@ -45,7 +45,8 @@ fe_mainEXPLICIT()
     int nel_truss = 1;                            // number of truss elements
 
     if (embedded_constraint == 1) {
-      nel_truss = mesh[1].getNumElements();       // number of truss elements
+      nel_truss = mesh[1].getNumElements();              // number of truss elements
+      fe_checkFiberVolumeFraction(mesh[0], mesh[1]);     // Check to confirm that maximum fiber volume fraction is not too large.
     }
 
     VectorXd d            = VectorXd::Zero(nel_truss); // damage variable representing damage due to single most severe stretch experienced
@@ -75,7 +76,7 @@ fe_mainEXPLICIT()
     fe_reactionForceWrite_new(reaction_forces, plot_state_counter, t, fr_curr[5], fr_curr[8], fr_curr[17], fr_curr[20]);
 
     std::string damage_variables = home_path + "/" + "results/damage_variables.txt";
-    fe_damageVariableWrite_new(damage_variables, plot_state_counter, t, d[1], delta_d[1], d_tot[1]);
+    fe_damageVariableWrite_new(damage_variables, plot_state_counter, t, d[0], delta_d[0], d_tot[0]);
 
     // Loading Conditions
     fe_apply_bc_load(fe, t_start);
@@ -166,7 +167,7 @@ fe_mainEXPLICIT()
 
             fe_reactionForceWrite_append(reaction_forces, plot_state_counter, t, fr_curr[5], fr_curr[8], fr_curr[17], fr_curr[20]);
 
-            fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d[1], delta_d[1], d_tot[1]);
+            fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d[0], delta_d[0], d_tot[0]);
 
         }
 

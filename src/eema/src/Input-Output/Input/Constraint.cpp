@@ -3,12 +3,13 @@
 
 using namespace Eigen;
 
-void Constraint::readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR) {
+void Constraint::readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR, bool include_d) {
 	constraint_name = name;
 	constraint_id = id;
 	master_name = master;
 	slave_name = slave;
 	address_volume_redundancy = address_VR;
+	include_damage = include_d;
 }
 
 void Constraint::printInfo() {
@@ -35,6 +36,10 @@ bool Constraint::get_EmbedAddressVR() {
 	return address_volume_redundancy;
 }
 
+bool Constraint::get_EmbedIncludeDamage() {
+	return include_damage;
+}
+
 void Constraint::preprocess() {
 
 	if (constraint_name == "embedded") {
@@ -49,12 +54,15 @@ void Constraint::preprocess() {
 			}
 		}
 
-		std::cout << "Here - Constraint.cpp \n";
-
 		embed_map = fe_embed_preprocessing(mesh[host_id], mesh[embed_id]);
+
+		std::cout << "embed_map = " << '\n' << embed_map << '\n';
+
 		embed_map_pointer = &embed_map;
 
-		std::cout << "EMBED MAP: \n" << embed_map << "\n";
+		// As a result of preprocessing, the truss mesh may have changed.
+		// We must re-calculate the element characteristic for each element; which is the truss element length.
+		mesh[embed_id].calculateElementCharateristic();
 	}
 
 }

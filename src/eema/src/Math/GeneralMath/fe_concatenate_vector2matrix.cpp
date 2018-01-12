@@ -161,14 +161,33 @@ void fe_insert_int2vector(VectorXi& A, int b) {
 
 void fe_insert_int2vector(VectorXi& A, int num, int b) {
 	if (A.size() != 0) {
-		VectorXi tmp = VectorXi::Zero(A.size());
+
+		int size_old = A.size();
+		int size_new = 0;
+
+		if (num < size_old) {
+			size_new = size_old;
+		}
+		if (num > (size_old - 1) ) {
+			size_new = num + 1;
+		}
+
+		VectorXi tmp = VectorXi::Zero(size_old);
 		tmp = A;
-		A = VectorXi::Zero(tmp.size() + 1);
+
+		A = VectorXi::Zero(size_new);
+
 		int counter = 0;
-		for (int i = 0; i < A.size(); i++) {
+
+		for (int i = 0; i < size_new; i++) {
 			if (i != num) {
-				A(i) = tmp(counter);
-				counter = counter + 1;
+				if (counter > (size_old - 1) ) {
+					A(i) = 0;
+				}
+				if (counter < size_old) {
+					A(i) = tmp(i);
+					counter = counter + 1;
+				}
 			}
 			else {
 				A(i) = b;
@@ -179,4 +198,25 @@ void fe_insert_int2vector(VectorXi& A, int num, int b) {
 		A = VectorXi::Zero(1);
 		A(0) = b;
 	}
+
+	// if (A.size() != 0) {
+	// 	VectorXi tmp = VectorXi::Zero(A.size());
+	// 	tmp = A;
+	// 	A = VectorXi::Zero(tmp.size() + 1);
+	// 	int counter = 0;
+	// 	for (int i = 0; i < A.size(); i++) {
+	// 		if (i != num) {
+	// 			A(i) = tmp(counter);
+	// 			counter = counter + 1;
+	// 		}
+	// 		else {
+	// 			A(i) = b;
+	// 		}
+	// 	}
+	// }
+	// else {
+	// 	A = VectorXi::Zero(1);
+	// 	A(0) = b;
+	// }
+
 }

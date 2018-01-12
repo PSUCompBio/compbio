@@ -274,15 +274,23 @@ void fe_scatter_pbr(VectorXd& global_vec, VectorXd& local_vec, VectorXi node_lis
 MatrixXd
 fe_updateNodes(MatrixXd nodes, VectorXd displacements);
 
-void fe_embed_preprocessing_mapping(VectorXi& host_elements_embed_nodes, Mesh& host, Mesh& embed);
+// void fe_embed_preprocessing_mapping(VectorXi& host_elements_embed_nodes, Mesh& host, Mesh& embed);
+
+int fe_embed_node_host_check(int host_row, int embed_node, Mesh& host, Mesh& embed);
+
+VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& host, Mesh& embed);
+
+VectorXi fe_embed_preprocessing_host_map(VectorXi embed_map, Mesh& host, Mesh& embed);
 
 VectorXi fe_embed_preprocessing(Mesh& host, Mesh& embed);
 
-void fe_embed_preprocessing_length(Mesh& host, Mesh& embed);
+void fe_checkFiberVolumeFraction(Mesh& host, Mesh& embed);
 
-int fe_compute_host(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_host_tmp);
+// void fe_embed_preprocessing_length(Mesh& host, Mesh& embed);
 
-MatrixXi fe_create_bbox(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_host, double length);
+// int fe_compute_host(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_host_tmp);
+
+// MatrixXi fe_create_bbox(VectorXd& A, MatrixXd& nodes_host, MatrixXi& elements_host, double length);
 
 /* =================================================================== */
 /* TimeStep */
@@ -350,7 +358,7 @@ text2vector(std::string name);
 
 void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp);
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& delta_d, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& d_avg);
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, bool include_d, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& delta_d, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& d_avg);
 
 void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, VectorXd& u_prev, double dT, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, int material_id);
 

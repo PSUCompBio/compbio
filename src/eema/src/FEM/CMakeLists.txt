@@ -28,11 +28,9 @@ SET(FEM_src
     Assembly-Global-Local/fe_assemble.cpp
     Constraints/EmbeddedElements/fe_compute_host.cpp
     Constraints/EmbeddedElements/fe_embed_preprocessing.cpp
-    Constraints/EmbeddedElements/fe_embed_preprocessing_length.cpp
-    Constraints/EmbeddedElements/fe_embed_preprocessing_mapping.cpp
-    Constraints/EmbeddedElements/fe_create_bbox.cpp
-    Constraints/EmbeddedElements/fe_find_common_face.cpp
-    Constraints/EmbeddedElements/fe_form_face_matrix.cpp
-    Constraints/EmbeddedElements/fe_find_intersection.cpp
+    Constraints/EmbeddedElements/fe_embed_node_host_check.cpp
+    Constraints/EmbeddedElements/fe_embed_element_intersection_point.cpp
+    Constraints/EmbeddedElements/fe_embed_preprocessing_host_map.cpp
+    Constraints/EmbeddedElements/fe_checkFiberVolumeFraction.cpp
      )
 ADD_LIBRARY(FEM OBJECT ${FEM_src})
