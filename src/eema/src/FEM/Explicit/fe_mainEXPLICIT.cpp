@@ -2,7 +2,7 @@
 using namespace Eigen;
 
 double eps_energy = 0.01;
-double area_truss = 5.0e-7; // default 7.85398e-7
+double area_truss = 7.85398e-7; // default 7.85398e-7
 double failure_time_step = 1e-8;
 
 /*! \brief
@@ -42,7 +42,7 @@ fe_mainEXPLICIT()
     VectorXd d_avg        = VectorXd::Zero(nel);  // Average d_tot of truss elements associated with each hex element
 
     // Following variables - Only for Truss Element
-    int nel_truss = 1;                            // number of truss elements
+    int nel_truss = 1;                                   // number of truss elements
 
     if (embedded_constraint == 1) {
       nel_truss = mesh[1].getNumElements();              // number of truss elements
@@ -54,6 +54,18 @@ fe_mainEXPLICIT()
     VectorXd d_tot        = VectorXd::Zero(nel_truss); // damage variable representing total damage, d_tot = d + delta_d, maximum value is d_tot = 1
     VectorXd lambda_min   = VectorXd::Ones(nel_truss); // minimum stretch experienced during current load cycle
     VectorXd lambda_max   = VectorXd::Ones(nel_truss); // maximum stretch experienced during current load cycle
+
+    bool import_damage = 0;                            // toggle indicating whether or no the user would like to import initial damage values
+
+    if (embedded_constraint == 1) {
+      import_damage = cons[0].get_EmbedImportDamage();
+
+      if (import_damage == 1) {
+        std::string damage_variables_import = home_path + "/" + "fiber_damage_input.txt";
+        fe_damageVariableImport(damage_variables_import, d, delta_d, d_tot);
+      }
+
+    }
 
     double energy_int_old = 0;
     double energy_int_new = 0;
@@ -179,4 +191,10 @@ fe_mainEXPLICIT()
         dT = fe_getTimeStep();
 
     }
+
+    if (embedded_constraint == 1) {
+      std::string damage_variables_export = home_path + "/" + "results/fiber_damage_output.txt";
+      fe_damageVariableExport(damage_variables_export, d, delta_d, d_tot);
+    }
+
 } // fe_mainEXPLICIT

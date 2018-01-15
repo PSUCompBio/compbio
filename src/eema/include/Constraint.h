@@ -29,9 +29,10 @@ private:
 
 	bool address_volume_redundancy;
 	bool include_damage;
+	bool import_damage;
 
 public:
-	void readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR, bool include_d);
+	void readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR, bool include_d, bool import_d);
 	void preprocess();
 	void printInfo();
 
@@ -42,6 +43,7 @@ public:
 	std::string get_EmbedSlave();
 	bool get_EmbedAddressVR();
 	bool get_EmbedIncludeDamage();
+	bool get_EmbedImportDamage();
 	VectorXi* get_EmbedMapPointer();
 };
 

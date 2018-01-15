@@ -47,7 +47,8 @@ void fe_checkFiberVolumeFraction(Mesh& host, Mesh& embed) {
     if (max_fiber_volume_fraction > 0.785) {
 
       std::cout << "\n" << "Simulation Failed - Max Fiber Volume Fraction is Too Large" << "\n";
-      std::cout << "Max Fiber Volume Fraction is: " << max_fiber_volume_fraction << "\n" << "\n";
+      std::cout << "Max Fiber Volume Fraction is: " << max_fiber_volume_fraction << "\n";
+      std::cout << "Need to Reduce Truss Area. " << "\n" << "\n";
       std::exit(1);
 
     }

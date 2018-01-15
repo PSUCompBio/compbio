@@ -5,6 +5,7 @@ SET(Input_Output_src
     Input/Materials.cpp
     Input/BC.cpp
     Input/Constraint.cpp
+    Input/fe_damageVariableImport.cpp
     Output/fe_vtu.cpp
     Output/fe_vector2text.cpp
     Output/fe_simulationTime.cpp
@@ -13,5 +14,6 @@ SET(Input_Output_src
     Output/fe_energyWrite.cpp
     Output/fe_reactionForceWrite.cpp
     Output/fe_damageVariableWrite.cpp
+    Output/fe_damageVariableExport.cpp
      )
 ADD_LIBRARY(Input-Output OBJECT ${Input_Output_src})
