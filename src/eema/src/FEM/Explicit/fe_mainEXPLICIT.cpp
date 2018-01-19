@@ -2,7 +2,6 @@
 using namespace Eigen;
 
 double eps_energy = 0.01;
-double area_truss = 7.85398e-7; // default 7.85398e-7
 double failure_time_step = 1e-8;
 
 /*! \brief
@@ -39,6 +38,8 @@ fe_mainEXPLICIT()
     VectorXd f_damp_curr  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector
     VectorXd f_damp_prev  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector at previous timestep
 
+    double d_mesh_avg;                            // Average of d_avg values for entire host mesh
+    double d_avg_tot;                             // Sum of d_tot values for entire host mesh
     VectorXd d_avg        = VectorXd::Zero(nel);  // Average d_tot of truss elements associated with each hex element
 
     // Following variables - Only for Truss Element
@@ -77,6 +78,8 @@ fe_mainEXPLICIT()
     double energy_total   = 0;
     double energy_max     = 0;
 
+    double total_applied_fr = 0;
+
     std::string internal_energy = home_path + "/" + "results/internal_energy_system.txt";
     std::string external_energy = home_path + "/" + "results/external_energy_system.txt";
     std::string kinetic_energy = home_path + "/" + "results/kinetic_energy_system.txt";
@@ -84,11 +87,14 @@ fe_mainEXPLICIT()
     std::string viscous_dissipation_energy = home_path + "/" + "results/viscous_dissipation_energy_system.txt";
     fe_energyWrite_new(internal_energy, viscous_dissipation_energy, external_energy, kinetic_energy, total_energy, plot_state_counter, t, energy_int_new, energy_vd_new, energy_ext_new, energy_kin, energy_total);
 
-    std::string reaction_forces = home_path + "/" + "results/reaction_forces.txt";
-    fe_reactionForceWrite_new(reaction_forces, plot_state_counter, t, fr_curr[5], fr_curr[8], fr_curr[17], fr_curr[20]);
+    std::string reaction_forces = home_path + "/" + "results/total_reaction_force.txt";
+    fe_singleDoubleWrite_new(reaction_forces, plot_state_counter, t, total_applied_fr);
 
-    std::string damage_variables = home_path + "/" + "results/damage_variables.txt";
+    std::string damage_variables = home_path + "/" + "results/damage_variables_single_fiber.txt";
     fe_damageVariableWrite_new(damage_variables, plot_state_counter, t, d[0], delta_d[0], d_tot[0]);
+
+    std::string average_damage = home_path + "/" + "results/average_damage_full_model.txt";
+    fe_singleDoubleWrite_new(average_damage, plot_state_counter, t, d_mesh_avg);
 
     // Loading Conditions
     fe_apply_bc_load(fe, t_start);
@@ -150,7 +156,7 @@ fe_mainEXPLICIT()
         fe_timeUpdate_velocity(V, V_half, A, t, dT, "newmark-beta-central-difference");
 
         fi_curr = fe - F_net;
-        fe_calculateFR(fr_curr, sdof, fi_curr, m_system, A);
+        fe_calculateFR(fr_curr, fi_curr, m_system, A);
 
         /** Step - 11 from Belytschko Box 6.1 - Calculating energies and Checking Energy Balance */
         fe_checkEnergies(U_prev, U, fi_prev, fi_curr, f_damp_prev, f_damp_curr, fe_prev, fe, fr_prev, fr_curr, m_system, V, energy_int_old, energy_int_new, energy_vd_old, energy_vd_new, energy_ext_old, energy_ext_new, energy_kin, energy_total, energy_max);
@@ -172,14 +178,23 @@ fe_mainEXPLICIT()
                       << "\n Plot State = " << (plot_state_counter - 1)
                       << "\n CPU Time = " << std::setw(5) << std::setprecision(1)
                       << ((float) ds / CLOCKS_PER_SEC) << "s \n";
-            std::cout << std::setw(5) << std::scientific << std::setprecision(5) << "Z Displacement: " << U(20) << "\n";
+            // std::cout << std::setw(5) << std::scientific << std::setprecision(5) << "Z Displacement: " << U(20) << "\n";
 
             /*print current frame, current time, and energy to individual .txt files*/
             fe_energyWrite_append(internal_energy, viscous_dissipation_energy, external_energy, kinetic_energy, total_energy, plot_state_counter, t, energy_int_new, energy_vd_new, energy_ext_new, energy_kin, energy_total);
 
-            fe_reactionForceWrite_append(reaction_forces, plot_state_counter, t, fr_curr[5], fr_curr[8], fr_curr[17], fr_curr[20]);
+            total_applied_fr = fe_calculateTotalAppliedFR(fr_curr);
+
+            fe_singleDoubleWrite_append(reaction_forces, plot_state_counter, t, total_applied_fr);
+
+            d_avg_tot = 0;
+            for (int i = 0; i < nel; i++) {
+              d_avg_tot = d_avg_tot + d_avg(i);
+            }
+            d_mesh_avg = d_avg_tot / nel;
 
             fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d[0], delta_d[0], d_tot[0]);
+            fe_singleDoubleWrite_append(average_damage, plot_state_counter, t, d_mesh_avg);
 
         }
 

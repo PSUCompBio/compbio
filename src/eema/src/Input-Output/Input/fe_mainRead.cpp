@@ -32,6 +32,7 @@ BC *bc;
 int num_constraints;
 Constraint *cons;
 bool embedded_constraint;
+double area_truss = 0; // default 7.85398e-7
 
 void fe_mainRead(std::string file) {
 
@@ -232,6 +233,7 @@ void fe_mainRead(std::string file) {
             myfile1 >> address_vr;
             myfile1 >> include_d;
             myfile1 >> import_d;
+            myfile1 >> area_truss;
           }
           myfile1 >> line;
         }

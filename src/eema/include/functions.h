@@ -388,7 +388,9 @@ fe_calCentroidStrain_embed_3d(VectorXd& u_embed, VectorXd& xcoord_embed, VectorX
                               double length_old);
 void fe_calCentroidStrain_embed_3d_pbr(VectorXd& element_strain, VectorXd& u_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed, double length_old);
 
-void fe_calculateFR(VectorXd& fr, int& sdof, VectorXd& fi_curr, VectorXd& mm, VectorXd& A);
+void fe_calculateFR(VectorXd& fr, VectorXd& fi_curr, VectorXd& mm, VectorXd& A);
+
+double fe_calculateTotalAppliedFR(VectorXd& fr);
 
 void fe_timeUpdate(VectorXd& U, VectorXd& V, VectorXd& V_half, VectorXd& A, double& t, double& dT, std::string time_integration_method);
 
@@ -406,9 +408,9 @@ void fe_energyWrite_new(std::string& internal_energy, std::string& viscous_dissi
 
 void fe_energyWrite_append(std::string& internal_energy, std::string& viscous_dissipation_energy, std::string& external_energy, std::string& kinetic_energy, std::string& total_energy, int plot_state_counter, double& t, double& energy_int_new, double& energy_vd_new, double& energy_ext_new, double& energy_kin, double& energy_total);
 
-void fe_reactionForceWrite_new(std::string& reaction_forces, int plot_state_counter, double& t, double& fr_curr_1, double& fr_curr_2, double& fr_curr_3, double& fr_curr_4);
+void fe_singleDoubleWrite_new(std::string& filename, int plot_state_counter, double& t, double& variable);
 
-void fe_reactionForceWrite_append(std::string& reaction_forces, int plot_state_counter, double& t, double& fr_curr_1, double& fr_curr_2, double& fr_curr_3, double& fr_curr_4);
+void fe_singleDoubleWrite_append(std::string& filename, int plot_state_counter, double& t, double& variable);
 
 void fe_damageVariableWrite_new(std::string& damage_variables, int plot_state_counter, double& t, double& d_curr, double& delta_d_curr, double& d_tot);
 
