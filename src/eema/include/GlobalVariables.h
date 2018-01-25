@@ -109,7 +109,7 @@ extern int num_constraints;
 extern Constraint *cons;
 extern bool embedded_constraint;
 extern double area_truss;
-extern bool correct_volume_redundancy;
+// extern bool correct_volume_redundancy; // I do not think this is being used. Delete later on. -JG
 
 /** Convergence Criteria for Newton Rhapson Method */
 extern double eps_nr;

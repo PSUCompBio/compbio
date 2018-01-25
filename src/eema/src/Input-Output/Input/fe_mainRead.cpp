@@ -32,6 +32,7 @@ BC *bc;
 int num_constraints;
 Constraint *cons;
 bool embedded_constraint;
+double area_truss = 0; // default 7.85398e-7
 
 void fe_mainRead(std::string file) {
 
@@ -217,6 +218,7 @@ void fe_mainRead(std::string file) {
         std::string slave;
         bool address_vr;
         bool include_d;
+        bool import_d;
 
         while (line != "*END_CONSTRAINT")
         {
@@ -230,11 +232,13 @@ void fe_mainRead(std::string file) {
             myfile1 >> slave;
             myfile1 >> address_vr;
             myfile1 >> include_d;
+            myfile1 >> import_d;
+            myfile1 >> area_truss;
           }
           myfile1 >> line;
         }
         if (num_constraints_counter < num_constraints) {
-          cons[num_constraints_counter].readConstraints(type, id, master, slave, address_vr, include_d);
+          cons[num_constraints_counter].readConstraints(type, id, master, slave, address_vr, include_d, import_d);
           num_constraints_counter = num_constraints_counter + 1;
         }
       }
@@ -283,6 +287,8 @@ void fe_mainRead(std::string file) {
   // std::cout << "mesh[1].getNewNodes()" << '\n' << mesh[1].getNewNodes() << '\n' << '\n';
   // std::cout << "mesh[1].getNewElements() " << '\n' << mesh[1].getNewElements() << '\n';
   // std::cout << "******************************************" << '\n' << '\n';
+
+  // std::exit(1);
 
   for (int i = 0; i < num_constraints; i++) {
     cons[i].preprocess();

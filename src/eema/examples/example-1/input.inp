@@ -98,9 +98,12 @@ RAMP
 # 4. if "embedded" is the constraint name - Slave Matrix
 # 5. Do you want to address volume redundancy - "0" for No and "1" for Yes
 # 6. Do you want to include damage - "0" for No and "1" for Yes
+# 7. Do you want to import initial damage values - "0" for No and "1" for Yes
+# 8. Truss area
 # ------------------------------
 *CONSTRAINT
-1 embedded Matrix Fiber 0 1
+1 embedded Matrix Fiber 0 1 0
+7.85398e-7
 *END_CONSTRAINT
 # ------------------------------
 *END

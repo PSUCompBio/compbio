@@ -3,13 +3,14 @@
 
 using namespace Eigen;
 
-void Constraint::readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR, bool include_d) {
+void Constraint::readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR, bool include_d, bool import_d) {
 	constraint_name = name;
 	constraint_id = id;
 	master_name = master;
 	slave_name = slave;
 	address_volume_redundancy = address_VR;
 	include_damage = include_d;
+	import_damage = import_d;
 }
 
 void Constraint::printInfo() {
@@ -38,6 +39,10 @@ bool Constraint::get_EmbedAddressVR() {
 
 bool Constraint::get_EmbedIncludeDamage() {
 	return include_damage;
+}
+
+bool Constraint::get_EmbedImportDamage() {
+	return import_damage;
 }
 
 void Constraint::preprocess() {
