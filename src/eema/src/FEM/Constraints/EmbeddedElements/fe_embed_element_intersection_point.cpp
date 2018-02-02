@@ -114,7 +114,7 @@ VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& 
           double dp = cp_point.dot(cp_ref);
 
           // Test 1.
-          if (dp > 0 || abs(dp) < 1e-18) {
+          if (dp > 0 || std::abs(dp) < 1e-18) {
             v_edge = triangle_node_coord_3 - triangle_node_coord_2;
             v_ref = triangle_node_coord_1 - triangle_node_coord_2;
             v_point = intersection_tmp - triangle_node_coord_2;
@@ -123,7 +123,7 @@ VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& 
             double dp = cp_point.dot(cp_ref);
 
             // Test 2.
-            if (dp > 0 || abs(dp) < 1e-18) {
+            if (dp > 0 || std::abs(dp) < 1e-18) {
               v_edge = triangle_node_coord_1 - triangle_node_coord_3;
               v_ref = triangle_node_coord_2 - triangle_node_coord_3;
               v_point = intersection_tmp - triangle_node_coord_3;
@@ -133,7 +133,7 @@ VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& 
               // std::cout << "dp = " << dp << '\n';
 
               // Test 3.
-              if (dp > 0 || abs(dp) < 1e-18) {
+              if (dp > 0 || std::abs(dp) < 1e-18) {
                 intersection = intersection_tmp;
                 // We prefer an intersection with 0 < t < 1, not t = 0 or t = 1.
                 // Therefore, we will break the loop here and return the current intersection point.
@@ -162,7 +162,7 @@ VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& 
           fe_crossProduct(cp_ref, v_edge, v_ref);
           double dp = cp_point.dot(cp_ref);
           // Test 1.
-          if (dp > 0 || abs(dp) < 1e-18) {
+          if (dp > 0 || std::abs(dp) < 1e-18) {
             v_edge = triangle_node_coord_3 - triangle_node_coord_2;
             v_ref = triangle_node_coord_1 - triangle_node_coord_2;
             v_point = intersection_tmp - triangle_node_coord_2;
@@ -170,7 +170,7 @@ VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& 
             fe_crossProduct(cp_ref, v_edge, v_ref);
             double dp = cp_point.dot(cp_ref);
             // Test 2.
-            if (dp > 0 || abs(dp) < 1e-18) {
+            if (dp > 0 || std::abs(dp) < 1e-18) {
               v_edge = triangle_node_coord_1 - triangle_node_coord_3;
               v_ref = triangle_node_coord_2 - triangle_node_coord_3;
               v_point = intersection_tmp - triangle_node_coord_3;
@@ -178,7 +178,7 @@ VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& 
               fe_crossProduct(cp_ref, v_edge, v_ref);
               double dp = cp_point.dot(cp_ref);
               // Test 3.
-              if (dp > 0 || abs(dp) < 1e-18) {
+              if (dp > 0 || std::abs(dp) < 1e-18) {
                 intersection = intersection_tmp;
               }
             }

@@ -56,7 +56,7 @@ void fe_deltaDamageUpdate_pbr(VectorXd& delta_d, int fib, double lambda, VectorX
     lambda_max(fib) = lambda;
   }
 
-  if (abs(lambda - 1) < tol) {
+  if (std::abs(lambda - 1) < tol) {
     if (lambda_min(fib) < 1) {
       delta_d_add = (-delta_d_CUL/(1 - lambda_LL))*lambda_min(fib) + (delta_d_CUL/(1 - lambda_LL));
     }

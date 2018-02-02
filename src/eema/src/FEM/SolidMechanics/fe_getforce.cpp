@@ -22,14 +22,14 @@ void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int tim
                 bool include_d = cons[i].get_EmbedIncludeDamage();
                 int host_id, embed_id;
 
-                for (int i = 0; i < num_meshes; ++i) {
-                    std::string name = mesh[i].getName();
+                for (int j = 0; j < num_meshes; ++j) {
+                    std::string name = mesh[j].getName();
 
                     if (name == host) {
-                        host_id = i;
+                        host_id = j;
                     }
                     if (name == slave) {
-                        embed_id = i;
+                        embed_id = j;
                     }
                 }
 

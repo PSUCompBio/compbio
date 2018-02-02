@@ -11,13 +11,13 @@ void fe_calculateMass(VectorXd& m_system, std::string type) {
         std::string slave = cons[i].get_EmbedSlave();
         bool correct_vr = cons[i].get_EmbedAddressVR();
         int host_id, embed_id;
-        for (int i = 0; i < num_meshes; ++i) {
-          std::string name = mesh[i].getName();
+        for (int j = 0; j < num_meshes; ++j) {
+          std::string name = mesh[j].getName();
           if (name == host) {
-            host_id = i;
+            host_id = j;
           }
           if (name == slave) {
-            embed_id = i;
+            embed_id = j;
           }
         }
         VectorXi* embed_map = cons[i].get_EmbedMapPointer();
