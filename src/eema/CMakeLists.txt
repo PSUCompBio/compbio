@@ -4,6 +4,14 @@ include_directories(include)
 add_subdirectory(src)
 
 #===============================================================================
+# Add Parallel Capabilties
+#===============================================================================
+option(EEMA_PARALLEL "Activate parallelization" OFF)
+if(EEMA_PARALLEL)
+#  add_subdirectory(examples)
+endif()
+
+#===============================================================================
 # Examples and tests
 #===============================================================================
 option(EEMA_EXAMPLES "Activate examples" OFF)
