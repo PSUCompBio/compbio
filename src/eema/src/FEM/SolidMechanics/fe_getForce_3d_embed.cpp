@@ -2,13 +2,15 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, bool include_d, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& delta_d, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& d_avg)
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, bool include_d, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& d_avg, int& n_load_cycle_full, int& n_load_cycle_partial, double t)
 {
 
     MatrixXd* nodes_host     = mesh[host_id].getNewNodesPointer();
     MatrixXi* elements_host  = mesh[host_id].getNewElementsPointer();
     MatrixXd* nodes_embed    = mesh[embed_id].getNewNodesPointer();
     MatrixXi* elements_embed = mesh[embed_id].getNewElementsPointer();
+
+    VectorXd* element_characteristic_embed = mesh[embed_id].getElementCharacteristicPointer(); // These are the original lengths of the fibers.
 
     // Variables - Mesh Details
     int nel   = mesh[host_id].getNumElements();       /*! number of elements */
@@ -188,16 +190,15 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
                     if (include_d == 1) {
 
+                      double length_embed_orig = (*element_characteristic_embed)(fib);
                       double length_embed_curr = fe_calCurrLength_pbr(u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed);
-
                       double lambda = length_embed_curr/length_embed;
 
-                      fe_damageUpdate_pbr(d, fib, lambda);
+                      // fe_damageUpdate_pbr(d, fib, lambda); // This was the original definition of overload damage (similar to the Mullins effect). We are not using this anymore. However, I will leave the code in place for now. The structure might be useful later on. -JG, 2/8/2018
 
-                      fe_deltaDamageUpdate_pbr(delta_d, fib, lambda, lambda_min, lambda_max);
+                      fe_fatigueDamageUpdate_pbr((*elements_embed)(fib, 1), d_fatigue, fib, lambda, lambda_min, lambda_max, n_load_cycle_full, n_load_cycle_partial, t);
 
-                      d_tot(fib) = d(fib) + delta_d(fib);
-
+                      d_tot(fib) = d(fib) + d_fatigue(fib);
                       if (d_tot(fib) > 1) {
                         d_tot(fib) = 1;
                       }

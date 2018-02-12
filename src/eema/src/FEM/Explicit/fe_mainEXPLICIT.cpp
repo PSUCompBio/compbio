@@ -51,19 +51,24 @@ fe_mainEXPLICIT()
     }
 
     VectorXd d            = VectorXd::Zero(nel_truss); // damage variable representing damage due to single most severe stretch experienced
-    VectorXd delta_d      = VectorXd::Zero(nel_truss); // damage variable representing accumulated damage due to repeated loading
-    VectorXd d_tot        = VectorXd::Zero(nel_truss); // damage variable representing total damage, d_tot = d + delta_d, maximum value is d_tot = 1
+    VectorXd d_fatigue    = VectorXd::Zero(nel_truss); // damage variable representing accumulated damage due to repeated loading
+    VectorXd d_tot        = VectorXd::Zero(nel_truss); // damage variable representing total damage, d_tot = d + d_fatigue, maximum value is d_tot = 1
     VectorXd lambda_min   = VectorXd::Ones(nel_truss); // minimum stretch experienced during current load cycle
     VectorXd lambda_max   = VectorXd::Ones(nel_truss); // maximum stretch experienced during current load cycle
 
-    bool import_damage = 0;                            // toggle indicating whether or no the user would like to import initial damage values
+    int n_load_cycle_full    = 0;                      // number of recognized full load cycles
+    int n_load_cycle_partial = 0;                      // number of recognized partial load cycles
+
+    bool import_damage = 0;                            // toggle indicating whether or not the user would like to import initial damage values
+    bool include_d = 0;                                // toggle indicating whether or not the user would like to include damage in simulation
 
     if (embedded_constraint == 1) {
       import_damage = cons[0].get_EmbedImportDamage();
+      include_d = cons[0].get_EmbedIncludeDamage();
 
       if (import_damage == 1) {
         std::string damage_variables_import = home_path + "/" + "fiber_damage_input.txt";
-        fe_damageVariableImport(damage_variables_import, d, delta_d, d_tot);
+        fe_damageVariableImport(damage_variables_import, d, d_fatigue, d_tot);
       }
 
     }
@@ -91,7 +96,7 @@ fe_mainEXPLICIT()
     fe_singleDoubleWrite_new(reaction_forces, plot_state_counter, t, total_applied_fr);
 
     std::string damage_variables = home_path + "/" + "results/damage_variables_single_fiber.txt";
-    fe_damageVariableWrite_new(damage_variables, plot_state_counter, t, d[0], delta_d[0], d_tot[0]);
+    fe_damageVariableWrite_new(damage_variables, plot_state_counter, t, d[0], d_fatigue[0], d_tot[0]);
 
     std::string average_damage = home_path + "/" + "results/average_damage_full_model.txt";
     fe_singleDoubleWrite_new(average_damage, plot_state_counter, t, d_mesh_avg);
@@ -109,7 +114,7 @@ fe_mainEXPLICIT()
 
     // ----------------------------------------------------------------------------
     // Step-2: getforce step from Belytschko
-    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, delta_d, d_tot, lambda_min, lambda_max, d_avg);
+    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, d_avg, n_load_cycle_full, n_load_cycle_partial, t);
 
     mesh[0].readNodalKinematics(U, V, A);
 
@@ -146,7 +151,7 @@ fe_mainEXPLICIT()
         fe_apply_bc_load(fe, t);
 
         /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
-        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, delta_d, d_tot, lambda_min, lambda_max, d_avg); // Calculating the force term.
+        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, d_avg, n_load_cycle_full, n_load_cycle_partial, t); // Calculating the force term.
 
         /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
         fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.
@@ -177,8 +182,13 @@ fe_mainEXPLICIT()
                       << "\n Timestep Number = " << (time_step_counter)
                       << "\n Plot State = " << (plot_state_counter - 1)
                       << "\n CPU Time = " << std::setw(5) << std::setprecision(1)
-                      << ((float) ds / CLOCKS_PER_SEC) << "s \n";
+                      << ((float) ds / CLOCKS_PER_SEC) << "s" << "\n";
             // std::cout << std::setw(5) << std::scientific << std::setprecision(5) << "Z Displacement: " << U(20) << "\n";
+
+            if (include_d == 1) {
+              std::cout << " Number of Full Load Cycles = " << n_load_cycle_full << "\n";
+              std::cout << " Number of Partial Load Cycles = " << n_load_cycle_partial << "\n";
+            }
 
             /*print current frame, current time, and energy to individual .txt files*/
             fe_energyWrite_append(internal_energy, viscous_dissipation_energy, external_energy, kinetic_energy, total_energy, plot_state_counter, t, energy_int_new, energy_vd_new, energy_ext_new, energy_kin, energy_total);
@@ -193,7 +203,7 @@ fe_mainEXPLICIT()
             }
             d_mesh_avg = d_avg_tot / nel;
 
-            fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d[0], delta_d[0], d_tot[0]);
+            fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d[0], d_fatigue[0], d_tot[0]);
             fe_singleDoubleWrite_append(average_damage, plot_state_counter, t, d_mesh_avg);
 
         }
@@ -209,7 +219,7 @@ fe_mainEXPLICIT()
 
     if (embedded_constraint == 1) {
       std::string damage_variables_export = home_path + "/" + "results/fiber_damage_output.txt";
-      fe_damageVariableExport(damage_variables_export, d, delta_d, d_tot);
+      fe_damageVariableExport(damage_variables_export, d, d_fatigue, d_tot);
     }
 
 } // fe_mainEXPLICIT

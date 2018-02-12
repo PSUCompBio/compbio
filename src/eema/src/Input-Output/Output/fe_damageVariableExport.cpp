@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_damageVariableExport(std::string& damage_variables_export, VectorXd& d, VectorXd& delta_d, VectorXd& d_tot) {
+void fe_damageVariableExport(std::string& damage_variables_export, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot) {
 
 	int num_elements_embed = d.size();
 
@@ -15,10 +15,10 @@ void fe_damageVariableExport(std::string& damage_variables_export, VectorXd& d, 
 		for (int embed_row = 0; embed_row < num_elements_embed; embed_row++) {
 
 			double tmp_d = d(embed_row);
-			double tmp_delta_d = delta_d(embed_row);
+			double tmp_d_fatigue = d_fatigue(embed_row);
 			double tmp_d_tot = d_tot(embed_row);
 
-			myfile << std::setprecision(12) << tmp_d << "\t" << tmp_delta_d << "\t" << tmp_d_tot << std::endl;
+			myfile << std::setprecision(12) << tmp_d << "\t" << tmp_d_fatigue << "\t" << tmp_d_tot << std::endl;
 
 		}
 
