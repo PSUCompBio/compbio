@@ -8,6 +8,11 @@ if (2-ELT-HEX-EXAMPLE)
    add_subdirectory(2-elt-hex)
 endif (2-ELT-HEX-EXAMPLE)
 
+option (PARALLEL-TEST  "Non FEM test for MPI testing" OFF)
+if (PARALLEL-TEST)
+   add_subdirectory(parallel-test)
+endif (PARALLEL-TEST)
+
 option (EXAMPLE2  "Multiphysics Simulation" OFF)
 if (EXAMPLE2)
    add_subdirectory(example-2)
