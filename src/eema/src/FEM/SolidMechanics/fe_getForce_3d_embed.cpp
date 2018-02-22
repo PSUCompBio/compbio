@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, bool include_d, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& d_avg, int& n_load_cycle_full, int& n_load_cycle_partial, double t)
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, bool include_d, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t)
 {
 
     MatrixXd* nodes_host     = mesh[host_id].getNewNodesPointer();
@@ -77,6 +77,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
         int nglz = 2;
 
         MatrixXd disp_mat(6, edof);
+        MatrixXd disp_mat_fiber(6, edof); // testing a concept...
 
         VectorXd dndr(nnel);
         VectorXd dnds(nnel);
@@ -154,8 +155,11 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
             VectorXd points_embed  = guass_points(ngl_embed);
             VectorXd weights_embed = guass_weights(ngl_embed);
             VectorXd sigma_embed = VectorXd::Zero(6);
+            VectorXd fiber_stress_cauchy = VectorXd::Zero(6);   // Cauchy fiber stress with respect to the fiber coordinate system in voigt notation
+            VectorXd fiber_stress_PK2 = VectorXd::Zero(6);  // PK2 fiber stress with respect to the reference coordinate system in voigt notation
+            VectorXd fiber_stress_cauchy_damaged = VectorXd::Zero(6);   // stress softened Cauchy fiber stress with respect to the fiber coordinate system in voigt notation
+            VectorXd fiber_stress_PK2_damaged = VectorXd::Zero(6);  // stress softened PK2 fiber stress with respect to the reference coordinate system in voigt notation
             VectorXd sigma_correction = VectorXd::Zero(6);
-
             d_tot_sum_el = 0;
             nfib_el = 0;
 
@@ -181,22 +185,27 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         u_embed_local.segment<3>(j * ndof) = u_embed.segment<3>(g * ndof);
                     }
 
-
-
                     //std::cout << "Embedded Displacements: \n" << u_embed << "\n";
                     //std::cout << "Local Embed Displacement: \n" << u_embed_local << "\n";
 
                     double length_embed = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed);
+                    double length_embed_orig = (*element_characteristic_embed)(fib);
+                    double length_embed_curr = fe_calCurrLength_pbr(u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed);
+                    double lambda = length_embed_curr/length_embed;
+                    MatrixXd F_fiber = MatrixXd::Zero(ndof, ndof);
+                    MatrixXd T_fiber = fe_calTransformation(xcoord_embed, ycoord_embed, zcoord_embed, 3); // transformation matrix from reference coordinate system to fiber coordinate system
+                    MatrixXd T_fiber_inv = MatrixXd::Zero(ndof, ndof);
+                    fe_invMatrix_pbr(T_fiber_inv, T_fiber);
 
                     if (include_d == 1) {
 
-                      double length_embed_orig = (*element_characteristic_embed)(fib);
-                      double length_embed_curr = fe_calCurrLength_pbr(u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed);
-                      double lambda = length_embed_curr/length_embed;
+                      // length_embed_orig = (*element_characteristic_embed)(fib);
+                      // length_embed_curr = fe_calCurrLength_pbr(u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed);
+                      // lambda = length_embed_curr/length_embed;
 
                       // fe_damageUpdate_pbr(d, fib, lambda); // This was the original definition of overload damage (similar to the Mullins effect). We are not using this anymore. However, I will leave the code in place for now. The structure might be useful later on. -JG, 2/8/2018
 
-                      fe_fatigueDamageUpdate_pbr((*elements_embed)(fib, 1), d_fatigue, fib, lambda, lambda_min, lambda_max, n_load_cycle_full, n_load_cycle_partial, t);
+                      fe_fatigueDamageUpdate_pbr((*elements_embed)(fib, 1), d_fatigue, fib, lambda, lambda_min_cycle, lambda_max_cycle, n_load_cycle_full, n_load_cycle_partial, t);
 
                       d_tot(fib) = d(fib) + d_fatigue(fib);
                       if (d_tot(fib) > 1) {
@@ -204,6 +213,8 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                       }
 
                       d_tot_sum_el = d_tot_sum_el + d_tot(fib); // calculate sum of d_tot for fibers associated with current host element
+
+                      fe_stressUpdateDamage_pbr(fiber_stress_PK2_damaged, (*elements_embed)(fib, 1), fib, xcoord_embed, ycoord_embed, zcoord_embed, lambda, lambda_min, lambda_max, 0);
 
                     }
 
@@ -227,6 +238,11 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
                         fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
                         fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
+
+                        fe_calDefGrad_fiber_pbr(F_fiber, T_fiber, T_fiber_inv, lambda); // testing a concept...
+                        fe_strDispMatrix_totalLagrangian_fiber_pbr(disp_mat_fiber, edof, nnel, dndx, dndy, dndz, u_e, F_fiber); // testing a concept...
+                        fe_stressUpdate_fiber_pbr(fiber_stress_PK2, (*elements_embed)(fib, 1), lambda, T_fiber, T_fiber_inv, 0); // testing a concept...
+
                         fe_strDispMatrix_totalLagrangian_pbr(disp_mat, edof, nnel, dndx, dndy, dndz, u_e);
 
                         // Procedure - 1: (Same Deformation Gradient - Because No Slip)
@@ -236,13 +252,14 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         // fe_stressModify(sigma_embed, xcoord_embed, ycoord_embed, zcoord_embed, 3);
 
                         if (include_d == 0) {
-                          VectorXd f_int_truss = (disp_mat.transpose() * sigma_embed * wtt * (length_embed / 2) * area_truss);
+                          // VectorXd f_int_truss = (disp_mat.transpose() * sigma_embed * wtt * (length_embed / 2) * area_truss); // Official version. 2/18/2018
+                          VectorXd f_int_truss = (disp_mat_fiber.transpose() * fiber_stress_PK2 * wtt * (length_embed / 2) * area_truss); // testing a concept...
                           f_int_e = f_int_e + f_int_truss;
                         }
-
                         if (include_d == 1) {
-                          VectorXd f_int_truss = (disp_mat.transpose() * (1 - d_tot(fib)) * sigma_embed * wtt * (length_embed / 2) * area_truss);
-                          f_int_e = f_int_e + f_int_truss;
+                          // VectorXd f_int_truss = (disp_mat.transpose() * (1 - d_tot(fib)) * fiber_stress_PK2_damaged * wtt * (length_embed / 2) * area_truss); // Official version. 2/18/2018
+                          VectorXd f_int_truss = (disp_mat_fiber.transpose() * (1 - d_tot(fib)) * fiber_stress_PK2_damaged * wtt * (length_embed / 2) * area_truss);
+                          f_int_e = f_int_e + f_int_truss; // testing a concept...
                         }
 
                         // Procedure - 2: (Same Displacements - Same Deformation Gradient - Transformation Matrix Inside)
@@ -274,10 +291,16 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                     fe_calCentroidStress_embed_3d_pbr(tmp_storage, (*elements_embed)(fib, 1), u_e, u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed, length_embed, xcoord, ycoord, zcoord);
 
                     if (include_d == 0) {
-                      element_stress_embed_local.segment<9>(fib * 9) = tmp_storage;
+                      // element_stress_embed_local.segment<9>(fib * 9) = tmp_storage;  // Official version. 2/18/2018
+                      fe_stressUpdate_fiber_pbr(fiber_stress_cauchy, (*elements_embed)(fib, 1), lambda, T_fiber, T_fiber_inv, 1); // testing a concept...
+                      tmp_storage = VectorXd::Zero(ndof * ndof); // testing a concept...
+                      tmp_storage(0) = fiber_stress_cauchy(0,0); // testing a concept...
+                      element_stress_embed_local.segment<9>(fib * 9) = (1 - d_tot(fib)) * tmp_storage; // testing a concept...
                     }
-
                     if (include_d == 1) {
+                      fe_stressUpdateDamage_pbr(fiber_stress_cauchy_damaged, (*elements_embed)(fib, 1), fib, xcoord_embed, ycoord_embed, zcoord_embed, lambda, lambda_min, lambda_max, 1);
+                      tmp_storage = VectorXd::Zero(ndof * ndof);
+                      tmp_storage(0) = fiber_stress_cauchy_damaged(0,0);
                       element_stress_embed_local.segment<9>(fib * 9) = (1 - d_tot(fib)) * tmp_storage;
                     }
 
@@ -287,7 +310,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
             if (nfib_el == 0) {
               d_avg(i) = 0;
             }
-
             if (nfib_el != 0) {
               d_avg(i) = d_tot_sum_el/nfib_el; // calculate avg damage in current host element
             }
@@ -306,6 +328,8 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
     mesh[host_id].readDamage(d_avg);
     mesh[embed_id].readElementStressStrain(element_stress_embed_local, element_strain_embed_local);
     mesh[embed_id].readDamage(d_tot);
+    mesh[embed_id].readStretchMin(lambda_min);
+    mesh[embed_id].readStretchMax(lambda_max);
     mesh[embed_id].readNodalKinematics(u_embed, v_embed, a_embed);
 
     nodes_host = NULL;

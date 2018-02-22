@@ -108,6 +108,16 @@ void Mesh::readDamage(VectorXd& d_tot)
     damage = d_tot;
 }
 
+void Mesh::readStretchMin(VectorXd& lambda_min)
+{
+    stretch_min = lambda_min;
+}
+
+void Mesh::readStretchMax(VectorXd& lambda_max)
+{
+    stretch_max = lambda_max;
+}
+
 VectorXd Mesh::getCellStress()
 {
     return element_stress;
@@ -133,6 +143,24 @@ VectorXd Mesh::getCellDamage()
 
 VectorXd* Mesh::getCellDamagePointer() {
     return damage_pointer;
+}
+
+VectorXd Mesh::getCellStretchMin()
+{
+    return stretch_min;
+}
+
+VectorXd* Mesh::getCellStretchMinPointer() {
+    return stretch_min_pointer;
+}
+
+VectorXd Mesh::getCellStretchMax()
+{
+    return stretch_max;
+}
+
+VectorXd* Mesh::getCellStretchMaxPointer() {
+    return stretch_max_pointer;
 }
 
 VectorXd Mesh::getNodalStress()
@@ -206,6 +234,8 @@ void Mesh::preprocessMesh(std::string choice)
     element_stress_pointer = &element_stress;
     element_strain_pointer = &element_strain;
     damage_pointer = &damage;
+    stretch_min_pointer = &stretch_min;
+    stretch_max_pointer = &stretch_max;
     element_charateristic_pointer = &element_charateristic;
     nodal_electric_potential_pointer = &nodal_electric_potential;
 }

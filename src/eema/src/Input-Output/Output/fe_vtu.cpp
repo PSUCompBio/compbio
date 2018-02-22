@@ -196,7 +196,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
             tmp << (*element_stress)(i + 0), (*element_stress)(i + 1), (*element_stress)(i + 2), (*element_stress)(i + 3), (*element_stress)(i + 4), (*element_stress)(i + 5), (*element_stress)(i + 6), (*element_stress)(i + 7), (*element_stress)(i + 8);
 
             for (int j = 0; j < 9; j++) {
-              if (tmp(j) < 1e-30) {
+              if (std::abs(tmp(j)) < 1e-30) {
                 tmp(j) = 0;
               }
             }
@@ -222,7 +222,7 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
             tmp << (*element_strain)(i + 0), (*element_strain)(i + 1), (*element_strain)(i + 2), (*element_strain)(i + 3), (*element_strain)(i + 4), (*element_strain)(i + 5), (*element_strain)(i + 6), (*element_strain)(i + 7), (*element_strain)(i + 8);
 
             for (int j = 0; j < 9; j++) {
-              if (tmp(j) < 1e-30) {
+              if (std::abs(tmp(j)) < 1e-30) {
                 tmp(j) = 0;
               }
             }
@@ -247,6 +247,26 @@ void fe_vtuWrite(int time_step, double time, Mesh& mesh1)
         for (int i = 0; i < (*damage).size(); i++)
         {
             myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*damage)(i) << "\n";
+        }
+        myfile << "\t\t\t\t</DataArray>\n";
+        damage = NULL;
+
+        VectorXd* stretch_min = mesh1.getCellStretchMinPointer();
+        myfile << "\t\t\t\t<DataArray type=\"Float64\" Name=\"Minimum Stretch\" NumberOfComponents=\"1\" ComponentName0=\"Minimum Stretch\" format=\"ascii\">\n";
+
+        for (int i = 0; i < (*stretch_min).size(); i++)
+        {
+            myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*stretch_min)(i) << "\n";
+        }
+        myfile << "\t\t\t\t</DataArray>\n";
+        damage = NULL;
+
+        VectorXd* stretch_max = mesh1.getCellStretchMaxPointer();
+        myfile << "\t\t\t\t<DataArray type=\"Float64\" Name=\"Maximum Stretch\" NumberOfComponents=\"1\" ComponentName0=\"Maximum Stretch\" format=\"ascii\">\n";
+
+        for (int i = 0; i < (*stretch_max).size(); i++)
+        {
+            myfile << "\t\t\t\t\t" << std::scientific << std::setprecision(10) << (*stretch_max)(i) << "\n";
         }
         myfile << "\t\t\t\t</DataArray>\n";
         damage = NULL;

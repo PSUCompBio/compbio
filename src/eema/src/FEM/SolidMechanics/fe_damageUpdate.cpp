@@ -37,7 +37,7 @@ void fe_damageUpdate_pbr(VectorXd& d, int fib, double lambda)
 
 }
 
-void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double lambda, VectorXd& lambda_min, VectorXd& lambda_max, int& n_load_cycle_full, int& n_load_cycle_partial, double t)
+void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double lambda, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t)
 {
 
   // Function actions:
@@ -50,10 +50,8 @@ void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double la
   // We want the tolerance to be small, so that lambda will be close to 1; which marks the true end of the load cycle. However, the tolerance cannot be too small because we need lambda to fall within the tolerance at one of the discrete time steps. This is what triggers the calculation of additional fatigue damage. If we make the tolerance too small, we might jump over lambda = 1 and not recognize that the load cycle is complete.
 
   double d_fatigue_additional = 0;
-
   std::string model;
   model = fe_get_model(opt, "mechanical");
-
   double alpha_fatigue = 0; // material constant governing the amount of damage incurred by a single cycle
   double beta_fatigue = 0;  // material constant governing the amount of damage incurred by a single cycle
   double psi_min = 0;       // minimum equivalent strain to elicit the accumulation of fatigue damage
@@ -72,39 +70,29 @@ void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double la
     std::exit(1);
   }
 
-  // This was the original definition of fatigue damage. We are not using this anymore. However, I will leave the code in place for now. The structure might be useful later on. -JG, 2/8/2018
-  // double lambda_LL = 0.5;    // lower limit for stretch, d = 1 for lower values
-  // double lambda_UL = 1.5;    // upper limit for stretch, d = 1 for higher values
-  // double d_fatigue_CUL = 0.1;  // upper limit for d_fatigue during compressive stretch, occurs at lambda_LL
-  // double d_fatigue_TUL = 0.1;  // upper limit for d_fatigue during tensile stretch, occurs at lambda_UL
-
   if (std::abs(lambda - 1) > tol) {
-    if (lambda < lambda_min(fib)) {
-      lambda_min(fib) = lambda;
+    if (lambda < lambda_min_cycle(fib)) {
+      lambda_min_cycle(fib) = lambda;
     }
-    if (lambda > lambda_max(fib)) {
-      lambda_max(fib) = lambda;
+    if (lambda > lambda_max_cycle(fib)) {
+      lambda_max_cycle(fib) = lambda;
     }
   }
 
   if (std::abs(lambda - 1) <= tol) {
-    if (lambda_min(fib) != 1 || lambda_max(fib) != 1) {
-
-      double equivalent_strain_lambda_min = fe_calEquivalentStrain(opt, lambda_min(fib));
-      double equivalent_strain_lambda_max = fe_calEquivalentStrain(opt, lambda_max(fib));
+    if (lambda_min_cycle(fib) != 1 || lambda_max_cycle(fib) != 1) {
+      double equivalent_strain_lambda_min_cycle = fe_calEquivalentStrain(opt, lambda_min_cycle(fib));
+      double equivalent_strain_lambda_max_cycle = fe_calEquivalentStrain(opt, lambda_max_cycle(fib));
       double equivalent_strain_peak = 0;
-
-      if (equivalent_strain_lambda_min >= equivalent_strain_lambda_max) {
-        equivalent_strain_peak = equivalent_strain_lambda_min;
+      if (equivalent_strain_lambda_min_cycle >= equivalent_strain_lambda_max_cycle) {
+        equivalent_strain_peak = equivalent_strain_lambda_min_cycle;
       }
-      if (equivalent_strain_lambda_min < equivalent_strain_lambda_max) {
-        equivalent_strain_peak = equivalent_strain_lambda_max;
+      if (equivalent_strain_lambda_min_cycle < equivalent_strain_lambda_max_cycle) {
+        equivalent_strain_peak = equivalent_strain_lambda_max_cycle;
       }
-
       if (equivalent_strain_peak < psi_min) {
         d_fatigue_additional = 0;
       }
-
       if (psi_min <= equivalent_strain_peak <= psi_max) {
         double tmp1 = (beta_fatigue*(n_max - 1)) / (equivalent_strain_peak - psi_min + beta_fatigue);
         double tmp2 = 1 - exp( alpha_fatigue*(1 - equivalent_strain_peak/psi_max) );
@@ -112,42 +100,34 @@ void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double la
         double n_tot = tmp1*tmp2/tmp3 + 1;
         d_fatigue_additional = 1/n_tot;
       }
-
       if (equivalent_strain_peak > psi_max) {
         d_fatigue_additional = 1;
       }
-
       d_fatigue(fib) = d_fatigue(fib) + d_fatigue_additional;
       if (d_fatigue(fib) > 1) {
         d_fatigue(fib) = 1;
       }
-
-      n_load_cycle_full = n_load_cycle_full + 1;
-
-      lambda_min(fib) = 1;
-      lambda_max(fib) = 1;
+      n_load_cycle_full(fib) = n_load_cycle_full(fib) + 1;
+      lambda_min_cycle(fib) = 1;
+      lambda_max_cycle(fib) = 1;
     }
   }
 
   if (t == t_end) {
     if (std::abs(lambda - 1) > tol) {
-      if (lambda_min(fib) != 1 || lambda_max(fib) != 1) {
-
-        double equivalent_strain_lambda_min = fe_calEquivalentStrain(opt, lambda_min(fib));
-        double equivalent_strain_lambda_max = fe_calEquivalentStrain(opt, lambda_max(fib));
+      if (lambda_min_cycle(fib) != 1 || lambda_max_cycle(fib) != 1) {
+        double equivalent_strain_lambda_min_cycle = fe_calEquivalentStrain(opt, lambda_min_cycle(fib));
+        double equivalent_strain_lambda_max_cycle = fe_calEquivalentStrain(opt, lambda_max_cycle(fib));
         double equivalent_strain_peak = 0;
-
-        if (equivalent_strain_lambda_min >= equivalent_strain_lambda_max) {
-          equivalent_strain_peak = equivalent_strain_lambda_min;
+        if (equivalent_strain_lambda_min_cycle >= equivalent_strain_lambda_max_cycle) {
+          equivalent_strain_peak = equivalent_strain_lambda_min_cycle;
         }
-        if (equivalent_strain_lambda_min < equivalent_strain_lambda_max) {
-          equivalent_strain_peak = equivalent_strain_lambda_max;
+        if (equivalent_strain_lambda_min_cycle < equivalent_strain_lambda_max_cycle) {
+          equivalent_strain_peak = equivalent_strain_lambda_max_cycle;
         }
-
         if (equivalent_strain_peak < psi_min) {
           d_fatigue_additional = 0;
         }
-
         if (psi_min <= equivalent_strain_peak <= psi_max) {
           double tmp1 = (beta_fatigue*(n_max - 1)) / (equivalent_strain_peak - psi_min + beta_fatigue);
           double tmp2 = 1 - exp( alpha_fatigue*(1 - equivalent_strain_peak/psi_max) );
@@ -155,31 +135,19 @@ void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double la
           double n_tot = tmp1*tmp2/tmp3 + 1;
           d_fatigue_additional = 1/n_tot;
         }
-
         if (equivalent_strain_peak > psi_max) {
           d_fatigue_additional = 1;
         }
-
         d_fatigue(fib) = d_fatigue(fib) + d_fatigue_additional;
         if (d_fatigue(fib) > 1) {
           d_fatigue(fib) = 1;
         }
-
-        n_load_cycle_partial = n_load_cycle_partial + 1;
-
-        lambda_min(fib) = 1;
-        lambda_max(fib) = 1;
+        n_load_cycle_partial(fib) = n_load_cycle_partial(fib) + 1;
+        lambda_min_cycle(fib) = 1;
+        lambda_max_cycle(fib) = 1;
       }
     }
   }
-
-  // This was the original definition of fatigue damage. We are not using this anymore. However, I will leave the code in place for now. The structure might be useful later on. -JG, 2/8/2018
-  // if (lambda_min(fib) < 1) {
-  //   d_fatigue_additional = (-d_fatigue_CUL/(1 - lambda_LL))*lambda_min(fib) + (d_fatigue_CUL/(1 - lambda_LL));
-  // }
-  // if (lambda_max(fib) > 1) {
-  //   d_fatigue_additional = (d_fatigue_TUL/(lambda_UL - 1))*lambda_max(fib) - (d_fatigue_TUL/(lambda_UL - 1));
-  // }
 
 }
 
@@ -189,7 +157,6 @@ double fe_calEquivalentStrain(int opt, double lambda)
   // Here we assume the fiber is incompressible and subjected only to applied axial stretch.
   double U_density = 0;
   double equivalent_strain = 0;
-
   std::string model;
   model = fe_get_model(opt, "mechanical");
 

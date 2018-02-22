@@ -69,3 +69,15 @@ void fe_calDefGrad_pbr(MatrixXd& F, VectorXd& dndx, VectorXd& dndy, VectorXd& dn
 
 	F = I + H;
 }
+
+void fe_calDefGrad_fiber_pbr(MatrixXd& F_fiber_ref, MatrixXd& T_fiber, MatrixXd& T_fiber_inv, double lambda) {
+
+	MatrixXd F_fiber_fib = MatrixXd::Zero(ndof, ndof);
+
+	F_fiber_fib(0,0) = lambda;
+	F_fiber_fib(1,1) = 1/sqrt(lambda);
+	F_fiber_fib(2,2) = 1/sqrt(lambda);
+
+	F_fiber_ref = T_fiber_inv.transpose()*F_fiber_fib*T_fiber_inv;
+
+}
