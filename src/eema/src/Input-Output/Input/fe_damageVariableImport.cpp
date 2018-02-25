@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_damageVariableImport(std::string& damage_variables_import, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max) {
+void fe_damageVariableImport(std::string& damage_variables_import, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, double t_healing) {
 
 	int num_elements_embed = d.size();
 
@@ -18,6 +18,29 @@ void fe_damageVariableImport(std::string& damage_variables_import, VectorXd& d, 
 				myfile >> d_tot(embed_row);
 				myfile >> lambda_min(embed_row);
 				myfile >> lambda_max(embed_row);
+				if (t_healing > 0) {
+					double healing_rate = 0.01; // constant healing rate per day (i.e., 0.01 = 1 %/day)
+					lambda_max(embed_row) = (lambda_max(embed_row) - 1)*pow((1 - healing_rate), t_healing) + 1;
+					lambda_min(embed_row) = 1 - (1 - lambda_min(embed_row))*pow((1 - healing_rate), t_healing);
+					d(embed_row) = d(embed_row)*pow((1 - healing_rate), t_healing);
+					d_fatigue(embed_row) = d_fatigue(embed_row)*pow((1 - healing_rate), t_healing);
+					if (lambda_max(embed_row) < 1) {
+						lambda_max(embed_row) = 1;
+					}
+					if (lambda_min(embed_row) > 1) {
+						lambda_min(embed_row) = 1;
+					}
+					if (d(embed_row) < 0) {
+						d(embed_row) = 0;
+					}
+					if (d_fatigue(embed_row) < 0) {
+						d_fatigue(embed_row) = 0;
+					}
+					d_tot(embed_row) = d(embed_row) + d_fatigue(embed_row);
+					if (d_tot(embed_row) > 1) {
+						d_tot(embed_row) = 1;
+					}
+				}
 			}
 		}
 		else {

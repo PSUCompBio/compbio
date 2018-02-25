@@ -219,6 +219,7 @@ void fe_mainRead(std::string file) {
         bool address_vr;
         bool include_d;
         bool import_d;
+        double t_healing;
 
         while (line != "*END_CONSTRAINT")
         {
@@ -234,11 +235,12 @@ void fe_mainRead(std::string file) {
             myfile1 >> include_d;
             myfile1 >> import_d;
             myfile1 >> area_truss;
+            myfile1 >> t_healing;
           }
           myfile1 >> line;
         }
         if (num_constraints_counter < num_constraints) {
-          cons[num_constraints_counter].readConstraints(type, id, master, slave, address_vr, include_d, import_d);
+          cons[num_constraints_counter].readConstraints(type, id, master, slave, address_vr, include_d, import_d, t_healing);
           num_constraints_counter = num_constraints_counter + 1;
         }
       }

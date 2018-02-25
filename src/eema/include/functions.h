@@ -427,7 +427,7 @@ void fe_damageVariableWrite_append(std::string& damage_variables, int plot_state
 
 void fe_damageVariableExport(std::string& damage_variables_export, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max);
 
-void fe_damageVariableImport(std::string& damage_variables_import, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max);
+void fe_damageVariableImport(std::string& damage_variables_import, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, double t_healing);
 
 /* =================================================================== */
 /* BioElectroPhysics */
