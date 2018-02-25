@@ -71,8 +71,6 @@ void fe_mooneyrivlin_hyperelastic_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd&
     MatrixXd F = MatrixXd::Zero(ndof, ndof); // deformation gradient
     fe_calDefGrad_pbr(F, dndx, dndy, dndz, u);
 
-    MatrixXd I = MatrixXd::Identity(ndof, ndof);
-
     MatrixXd C = MatrixXd::Zero(ndof, ndof);
     C = F.transpose() * F;
 

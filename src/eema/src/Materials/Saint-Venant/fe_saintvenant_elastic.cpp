@@ -46,7 +46,6 @@ void fe_saintvenant_elastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd&
 	MatrixXd F = MatrixXd::Zero(3, 3); // deformation gradient
 	F = fe_calDefGrad(dndx, dndy, dndz, u);
 	double defJacobian = F.determinant();
-	MatrixXd I = MatrixXd::Identity(3, 3);
 
 	MatrixXd GE = ((F.transpose() * F) - I) * (0.5);
 	MatrixXd cauchy_sigma = MatrixXd::Zero(3, 3);

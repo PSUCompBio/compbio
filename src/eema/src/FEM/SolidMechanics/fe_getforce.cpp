@@ -10,7 +10,7 @@ using namespace Eigen;
  * the resultant vectors are scattered into global vectors.
  */
 
-void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t)
+void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t, int t_plot)
 {
 
     if (ndof == 3 && embedded_constraint == true) {
@@ -36,7 +36,7 @@ void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int tim
                 VectorXi* embed_map = cons[i].get_EmbedMapPointer();
 
                 f_tot = VectorXd::Zero((mesh[host_id].getNumNodes() * ndof));
-                fe_getForce_3d_embed(f_tot, u, fext, time_step_counter, host_id, embed_id, correct_vr, include_d, (*embed_map), u_prev, dT, f_damp, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t);
+                fe_getForce_3d_embed(f_tot, u, fext, time_step_counter, host_id, embed_id, correct_vr, include_d, (*embed_map), u_prev, dT, f_damp, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot);
             }
         }
     }
@@ -51,10 +51,10 @@ void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int tim
      * }*/
     else if (ndof == 3 && embedded_constraint != true) {
         f_tot = VectorXd::Zero((mesh[0].getNumNodes() * ndof));
-        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp);
+        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp, t_plot);
     } else {
         f_tot = VectorXd::Zero((mesh[0].getNumNodes() * ndof));
-        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp);
+        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp, t_plot);
     }
 
 

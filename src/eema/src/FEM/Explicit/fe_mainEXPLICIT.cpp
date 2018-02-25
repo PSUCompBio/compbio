@@ -3,7 +3,8 @@ using namespace Eigen;
 
 double eps_energy = 0.01;
 double failure_time_step = 1e-8;
-
+int counter_test = 0;
+MatrixXd I = MatrixXd::Identity(3, 3);
 /*! \brief
  * This function carries out the explicit dynamic analysis of the FEM problem.
  */
@@ -21,6 +22,8 @@ fe_mainEXPLICIT()
     double t              = t_start;
     int time_step_counter = 0; // time step count
     int plot_state_counter = 1;
+    int t_plot = 1;
+
     double output_temp_1  = ((double) (t_end / output_frequency));
     VectorXd A            = VectorXd::Zero(sdof); // Acceleration Vector
     VectorXd V            = VectorXd::Zero(sdof); // Velocity Vector
@@ -116,7 +119,7 @@ fe_mainEXPLICIT()
 
     // ----------------------------------------------------------------------------
     // Step-2: getforce step from Belytschko
-    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t);
+    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot);
 
     mesh[0].readNodalKinematics(U, V, A);
 
@@ -152,8 +155,14 @@ fe_mainEXPLICIT()
         /** Update Loading Conditions - time dependent loading conditions */
         fe_apply_bc_load(fe, t);
 
+        if (t >= (plot_state_counter * (output_temp_1)))
+            t_plot = 1;
+
+        else
+          t_plot = 0;
+
         /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
-        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t); // Calculating the force term.
+        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot); // Calculating the force term.
 
         /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
         fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.
@@ -223,5 +232,5 @@ fe_mainEXPLICIT()
       std::string damage_variables_export = home_path + "/" + "results/fiber_damage_output.txt";
       fe_damageVariableExport(damage_variables_export, d, d_fatigue, d_tot, lambda_min, lambda_max);
     }
-
+    std::cout << "\n Counter Value = " << counter_test;
 } // fe_mainEXPLICIT
