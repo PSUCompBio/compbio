@@ -43,7 +43,7 @@ MatrixXd fe_calDefGrad(VectorXd dndx, VectorXd dndy, VectorXd dndz, VectorXd u) 
 void fe_calDefGrad_pbr(MatrixXd& F, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u) {
 
 	MatrixXd H = MatrixXd::Zero(3, 3); // F  = I+H and H = du/dX
-	MatrixXd I = MatrixXd::Identity(3, 3); // Identity Matrix
+	
 	int i1, i2, i3;
 
 	for (int i = 0; i < dndx.size(); i++) {

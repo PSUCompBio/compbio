@@ -116,8 +116,7 @@ void fe_ogden_hyperelastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& 
 	double dW_1 = ((one_third / l_1) * (2 * mu / alpha) * pow(defJacobian, (-alpha * one_third)) * (2 * pow(l_1, alpha) - pow(l_2, alpha) - pow(l_3, alpha))) + ((2 / D_1) * (defJacobian - 1) * (defJacobian / l_1));
 	double dW_2 = ((one_third / l_2) * (2 * mu / alpha) * pow(defJacobian, (-alpha * one_third)) * (2 * pow(l_2, alpha) - pow(l_3, alpha) - pow(l_1, alpha))) + ((2 / D_1) * (defJacobian - 1) * (defJacobian / l_2));
 	double dW_3 = ((one_third / l_3) * (2 * mu / alpha) * pow(defJacobian, (-alpha * one_third)) * (2 * pow(l_3, alpha) - pow(l_1, alpha) - pow(l_2, alpha))) + ((2 / D_1) * (defJacobian - 1) * (defJacobian / l_3));
-
-	MatrixXd I = MatrixXd::Identity(ndof, ndof);
+	
 	MatrixXd tau = MatrixXd::Zero(ndof, ndof); // Kirchhoff stress
 	MatrixXd pk_S = MatrixXd::Zero(ndof, ndof); // second Piola-Kirchhoff stress
 	MatrixXd cauchy_sigma = MatrixXd::Zero(ndof, ndof); // Cauchy stress

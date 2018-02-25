@@ -65,8 +65,6 @@ void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, 
 
     double pressure_scalar = b1 * rho_current * c_wave * lc * vol_strain_rate; // bulk viscosity pressure, scalar format
 
-    MatrixXd I = MatrixXd::Identity(ndof, ndof);
-
     MatrixXd pressure_matrix = MatrixXd::Zero(ndof, ndof); // bulk viscosity pressure, matrix format
 
     pressure_matrix = pressure_scalar * I;

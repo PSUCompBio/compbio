@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp)
+void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp, int t_plot)
 {
 
     MatrixXd* nodes_host    = mesh[host_id].getNewNodesPointer();
@@ -120,11 +120,14 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                 }
             }
 
-            fe_calCentroidStress_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e, (*elements_host)(i, 1));
-            element_stress_host_local.segment<9>(i * 9) = tmp_storage;
+            if (t_plot == 1) {
+              fe_calCentroidStress_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e, (*elements_host)(i, 1));
+              element_stress_host_local.segment<9>(i * 9) = tmp_storage;
 
-            fe_calCentroidStrain_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e);
-            element_strain_host_local.segment<9>(i * 9) = tmp_storage;
+              fe_calCentroidStrain_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e);
+              element_strain_host_local.segment<9>(i * 9) = tmp_storage;
+              counter_test += 1;
+            }
         }
         f_tot_e = f_ext_e - f_int_e - f_damp_e;
 
@@ -132,7 +135,9 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
         fe_scatter_pbr(f_damp, f_damp_e, (*elements_host).block<1, 8>(i, 2), sdof);
     }
 
-    mesh[host_id].readElementStressStrain(element_stress_host_local, element_strain_host_local);
+    if (t_plot == 1) {
+        mesh[host_id].readElementStressStrain(element_stress_host_local, element_strain_host_local);
+    }
 
     nodes_host = NULL;
     elements_host = NULL;
