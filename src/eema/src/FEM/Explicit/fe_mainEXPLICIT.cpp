@@ -69,8 +69,9 @@ fe_mainEXPLICIT()
       include_d = cons[0].get_EmbedIncludeDamage();
 
       if (import_damage == 1) {
+        double t_healing = cons[0].get_HealingTime();
         std::string damage_variables_import = home_path + "/" + "fiber_damage_input.txt";
-        fe_damageVariableImport(damage_variables_import, d, d_fatigue, d_tot, lambda_min, lambda_max);
+        fe_damageVariableImport(damage_variables_import, d, d_fatigue, d_tot, lambda_min, lambda_max, t_healing);
       }
 
     }

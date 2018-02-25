@@ -3,7 +3,7 @@
 
 using namespace Eigen;
 
-void Constraint::readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR, bool include_d, bool import_d) {
+void Constraint::readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR, bool include_d, bool import_d, double t_healing) {
 	constraint_name = name;
 	constraint_id = id;
 	master_name = master;
@@ -11,6 +11,7 @@ void Constraint::readConstraints(std::string name, int id, std::string master, s
 	address_volume_redundancy = address_VR;
 	include_damage = include_d;
 	import_damage = import_d;
+	time_healing = t_healing;
 }
 
 void Constraint::printInfo() {
@@ -43,6 +44,10 @@ bool Constraint::get_EmbedIncludeDamage() {
 
 bool Constraint::get_EmbedImportDamage() {
 	return import_damage;
+}
+
+double Constraint::get_HealingTime() {
+	return time_healing;
 }
 
 void Constraint::preprocess() {

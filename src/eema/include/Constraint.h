@@ -31,8 +31,10 @@ private:
 	bool include_damage;
 	bool import_damage;
 
+	double time_healing;
+
 public:
-	void readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR, bool include_d, bool import_d);
+	void readConstraints(std::string name, int id, std::string master, std::string slave, bool address_VR, bool include_d, bool import_d, double t_healing);
 	void preprocess();
 	void printInfo();
 
@@ -45,6 +47,7 @@ public:
 	bool get_EmbedIncludeDamage();
 	bool get_EmbedImportDamage();
 	VectorXi* get_EmbedMapPointer();
+	double get_HealingTime();
 };
 
 #endif /* HEADERS_CONSTRAINT_H_ */

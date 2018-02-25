@@ -5,7 +5,7 @@ using namespace Eigen;
 double fe_function(double a, std::string b, double time){
   double result;
 
-  double T = 0.1;  // period for harmonic functions (sec)
+  double T = 0.2;  // period for harmonic functions (sec)
   double omega = 2*M_PI/T;  // frequency for harmonic functions
 
   if(b=="RAMP"){
@@ -30,7 +30,7 @@ double fe_function(double a, std::string b, double time){
 double fe_function_derivative(double a, std::string b, double time){
   double result;
 
-  double T = 0.1;  // period for harmonic functions (sec)
+  double T = 0.2;  // period for harmonic functions (sec)
   double omega = 2*M_PI/T;  // frequency for harmonic functions
 
   if(b=="RAMP"){
@@ -55,7 +55,7 @@ double fe_function_derivative(double a, std::string b, double time){
 double fe_function_d_derivative(double a, std::string b, double time){
   double result;
 
-  double T = 0.1;  // period for harmonic functions (sec)
+  double T = 0.2;  // period for harmonic functions (sec)
   double omega = 2*M_PI/T;  // frequency for harmonic functions
 
   if(b=="RAMP"){
