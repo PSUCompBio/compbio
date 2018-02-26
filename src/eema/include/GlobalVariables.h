@@ -124,4 +124,8 @@ extern int counter_test;
 
 extern MatrixXd I;
 
+extern double ****dndr_store;
+extern double ****dnds_store;
+extern double ****dndt_store;
+
 #endif

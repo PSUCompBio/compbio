@@ -85,8 +85,21 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                         double z   = points(intz);
                         double wtz = weights(intz);
 
-                        fe_dniso_8(dndr, dnds, dndt, x, y, z);
+                        for (int kloop = 0; kloop < 8; kloop++) {
+                                dndr(kloop) = dndr_store[intx][inty][intz][kloop];
+                                dnds(kloop) = dnds_store[intx][inty][intz][kloop];
+                                dndt(kloop) = dndt_store[intx][inty][intz][kloop];
+                                counter_test += 1;
+                        }
+                        /*
+                        if (counter_test == 8)
+                            std::cout << "\n Our value - " << dndr << dnds << dndt;
 
+                        fe_dniso_8 (dndr, dnds, dndt, x, y, z);
+
+                        if (counter_test == 8)
+                            std::cout << "\n Func value - " << dndr << dnds << dndt;
+                        */
                         jacobian = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
                         // double detJacobian = jacobian.determinant();
                         double detJacobian = fe_detMatrix_pbr(jacobian);
@@ -126,7 +139,6 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
 
               fe_calCentroidStrain_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e);
               element_strain_host_local.segment<9>(i * 9) = tmp_storage;
-              counter_test += 1;
             }
         }
         f_tot_e = f_ext_e - f_int_e - f_damp_e;

@@ -238,6 +238,31 @@ void Mesh::preprocessMesh(std::string choice)
     stretch_max_pointer = &stretch_max;
     element_charateristic_pointer = &element_charateristic;
     nodal_electric_potential_pointer = &nodal_electric_potential;
+
+    // fe_dniso_8
+
+    int nglx = 2, ngly = 2, nglz = 2, nnel;
+    nnel = getNumNodesPerElement();
+    VectorXd points  = guass_points(nglx);
+    VectorXd weights = guass_weights(nglx);
+
+    VectorXd dndr(nnel);
+    VectorXd dnds(nnel);
+    VectorXd dndt(nnel);
+
+    for (int intx = 0; intx < nglx; intx++) {
+        double x   = points(intx);
+        for (int inty = 0; inty < ngly; inty++) {
+            double y   = points(inty);
+            for (int intz = 0; intz < nglz; intz++) {
+                double z   = points(intz);
+                fe_dniso_8(dndr, dnds, dndt, x, y, z);
+                Map<VectorXd>(dndr_store[intx][inty][intz], dndr.rows()) = dndr;
+                Map<VectorXd>(dnds_store[intx][inty][intz], dnds.rows()) = dnds;
+                Map<VectorXd>(dndt_store[intx][inty][intz], dndt.rows()) = dndt;
+            }
+        }
+    }
 }
 
 void Mesh::append2nodes(std::string choice, VectorXd& b) {
