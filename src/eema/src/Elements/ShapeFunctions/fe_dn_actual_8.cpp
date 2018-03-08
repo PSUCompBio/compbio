@@ -61,3 +61,27 @@ void fe_dndz_8_pbr(VectorXd& dndz, int nnel, VectorXd& dndr, VectorXd& dnds, Vec
 		dndz(i) = (invJacobian(2, 0) * dndr(i)) + (invJacobian(2, 1) * dnds(i)) + (invJacobian(2, 2) * dndt(i));
 	}
 }
+
+void fe_dndx_8_pbr_array(VectorXd& dndx, int nnel, double* dndr, double* dnds, double* dndt, MatrixXd& invJacobian) {
+	for (int i = 0; i < nnel; i++) {
+		dndx(i) = (invJacobian(0, 0) * dndr[i]) + (invJacobian(0, 1) * dnds[i]) + (invJacobian(0, 2) * dndt[i]);
+		//dndy(i) = (invJacobian(1,0)*dndr(i)) + (invJacobian(1,1)*dnds(i)) + (invJacobian(1,2)*dndt(i));
+		//dndz(i) = (invJacobian(2,0)*dndr(i)) + (invJacobian(2,1)*dnds(i)) + (invJacobian(2,2)*dndt(i));
+	}
+}
+
+void fe_dndy_8_pbr_array(VectorXd& dndy, int nnel, double* dndr, double* dnds, double* dndt, MatrixXd& invJacobian) {
+	for (int i = 0; i < nnel; i++) {
+		//dndx(i) = (invJacobian(0,0)*dndr(i)) + (invJacobian(0,1)*dnds(i)) + (invJacobian(0,2)*dndt(i));
+		dndy(i) = (invJacobian(1, 0) * dndr[i]) + (invJacobian(1, 1) * dnds[i]) + (invJacobian(1, 2) * dndt[i]);
+		//dndz(i) = (invJacobian(2,0)*dndr(i)) + (invJacobian(2,1)*dnds(i)) + (invJacobian(2,2)*dndt(i));
+	}
+}
+
+void fe_dndz_8_pbr_array(VectorXd& dndz, int nnel, double* dndr, double* dnds, double* dndt, MatrixXd& invJacobian) {
+	for (int i = 0; i < nnel; i++) {
+		//dndx(i) = (invJacobian(0,0)*dndr(i)) + (invJacobian(0,1)*dnds(i)) + (invJacobian(0,2)*dndt(i));
+		//dndy(i) = (invJacobian(1,0)*dndr(i)) + (invJacobian(1,1)*dnds(i)) + (invJacobian(1,2)*dndt(i));
+		dndz(i) = (invJacobian(2, 0) * dndr[i]) + (invJacobian(2, 1) * dnds[i]) + (invJacobian(2, 2) * dndt[i]);
+	}
+}

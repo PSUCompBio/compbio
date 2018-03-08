@@ -120,12 +120,25 @@ extern double iterations_nr;
 /** Energy Balance Criterion */
 extern double eps_energy;
 
+// Variables added/moved
+
 extern int counter_test;
+extern int nnel_test;
+extern int edof_test;
 
 extern MatrixXd I;
 
 extern double ****dndr_store;
 extern double ****dnds_store;
 extern double ****dndt_store;
+
+extern double detJacobian_normal;
+
+extern MatrixXd disp_mat_normal;
+extern VectorXd dndx_normal;
+extern VectorXd dndy_normal;
+extern VectorXd dndz_normal;
+extern MatrixXd jacobian_normal;
+extern MatrixXd invJacobian_normal;
 
 #endif

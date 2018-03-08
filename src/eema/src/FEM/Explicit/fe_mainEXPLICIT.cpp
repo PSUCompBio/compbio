@@ -5,6 +5,17 @@ double eps_energy = 0.01;
 double failure_time_step = 1e-8;
 int counter_test = 0;
 MatrixXd I = MatrixXd::Identity(3, 3);
+
+double detJacobian_normal = 0;
+
+MatrixXd jacobian_normal = MatrixXd::Zero(3, 3);
+MatrixXd invJacobian_normal = MatrixXd::Zero(3, 3);
+MatrixXd disp_mat_normal = MatrixXd::Zero(6, 24);
+
+VectorXd dndx_normal = VectorXd::Zero(8);
+VectorXd dndy_normal = VectorXd::Zero(8);
+VectorXd dndz_normal = VectorXd::Zero(8);
+
 /*! \brief
  * This function carries out the explicit dynamic analysis of the FEM problem.
  */
@@ -233,5 +244,5 @@ fe_mainEXPLICIT()
       std::string damage_variables_export = home_path + "/" + "results/fiber_damage_output.txt";
       fe_damageVariableExport(damage_variables_export, d, d_fatigue, d_tot, lambda_min, lambda_max);
     }
-    std::cout << "\n Counter Value = " << counter_test;
+
 } // fe_mainEXPLICIT

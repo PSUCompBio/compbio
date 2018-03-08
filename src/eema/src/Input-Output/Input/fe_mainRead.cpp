@@ -38,6 +38,9 @@ double ****dndr_store;
 double ****dnds_store;
 double ****dndt_store;
 
+int nnel_test;
+int edof_test;
+
 void fe_mainRead(std::string file) {
 
     dndr_store = new double***[2];

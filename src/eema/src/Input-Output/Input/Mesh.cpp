@@ -240,26 +240,35 @@ void Mesh::preprocessMesh(std::string choice)
     nodal_electric_potential_pointer = &nodal_electric_potential;
 
     // fe_dniso_8
+    if (counter_test == 0) {
 
-    int nglx = 2, ngly = 2, nglz = 2, nnel;
-    nnel = getNumNodesPerElement();
-    VectorXd points  = guass_points(nglx);
-    VectorXd weights = guass_weights(nglx);
+        std::cout << "\n Hurray\n";
+        counter_test += 1;
 
-    VectorXd dndr(nnel);
-    VectorXd dnds(nnel);
-    VectorXd dndt(nnel);
+        int nglx = 2, ngly = 2, nglz = 2, nnel;
+        nnel = getNumNodesPerElement();
+        nnel_test = nnel;
+        edof_test = nnel * 3;
+        std::cout << "\n " << nnel_test << "\n";
+        std::cout << "\n " << edof_test << "\n";
+        VectorXd points  = guass_points(nglx);
+        VectorXd weights = guass_weights(nglx);
 
-    for (int intx = 0; intx < nglx; intx++) {
-        double x   = points(intx);
-        for (int inty = 0; inty < ngly; inty++) {
-            double y   = points(inty);
-            for (int intz = 0; intz < nglz; intz++) {
-                double z   = points(intz);
-                fe_dniso_8(dndr, dnds, dndt, x, y, z);
-                Map<VectorXd>(dndr_store[intx][inty][intz], dndr.rows()) = dndr;
-                Map<VectorXd>(dnds_store[intx][inty][intz], dnds.rows()) = dnds;
-                Map<VectorXd>(dndt_store[intx][inty][intz], dndt.rows()) = dndt;
+        VectorXd dndr(nnel);
+        VectorXd dnds(nnel);
+        VectorXd dndt(nnel);
+
+        for (int intx = 0; intx < nglx; intx++) {
+            double x   = points(intx);
+            for (int inty = 0; inty < ngly; inty++) {
+                double y   = points(inty);
+                for (int intz = 0; intz < nglz; intz++) {
+                    double z   = points(intz);
+                    fe_dniso_8(dndr, dnds, dndt, x, y, z);
+                    Map<VectorXd>(dndr_store[intx][inty][intz], dndr.rows()) = dndr;
+                    Map<VectorXd>(dnds_store[intx][inty][intz], dnds.rows()) = dnds;
+                    Map<VectorXd>(dndt_store[intx][inty][intz], dndt.rows()) = dndt;
+                }
             }
         }
     }

@@ -26,8 +26,6 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
 
     for (int i = 0; i < nel; i++) {
 
-        // std::cout << "Here...." << i << "\n";
-
         for (int j = 0; j < nnel; j++) {
             int g = (*elements_host)(i, j + 2);
             xcoord(j)      = (*nodes_host)(g, 1);
@@ -54,79 +52,43 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
         int ngly = 2;
         int nglz = 2;
 
-        MatrixXd disp_mat(6, edof);
-
-        VectorXd dndr(nnel);
-        VectorXd dnds(nnel);
-        VectorXd dndt(nnel);
-        VectorXd dndx(nnel);
-        VectorXd dndy(nnel);
-        VectorXd dndz(nnel);
-        MatrixXd jacobian(ndof, ndof);
-        MatrixXd invJacobian(ndof, ndof);
         VectorXd sigma_e = VectorXd::Zero(6);
         VectorXd pressure_e = VectorXd::Zero(6);
 
-        // MatrixXd points_3d = guass_points_3d(nglx,ngly,nglz);
-        // MatrixXd weights_3d = guass_weights_3d(ndof,nglx,ngly,nglz);
-
         VectorXd points  = guass_points(nglx);
         VectorXd weights = guass_weights(nglx);
+
         int node_counter = 0;
 
         if (time_step_counter != 0) { // if this is not the first time step the go into the loop
             for (int intx = 0; intx < nglx; intx++) {
-                double x   = points(intx);
                 double wtx = weights(intx);
                 for (int inty = 0; inty < ngly; inty++) {
-                    double y   = points(inty);
                     double wty = weights(inty);
                     for (int intz = 0; intz < nglz; intz++) {
-                        double z   = points(intz);
                         double wtz = weights(intz);
 
-                        for (int kloop = 0; kloop < 8; kloop++) {
-                                dndr(kloop) = dndr_store[intx][inty][intz][kloop];
-                                dnds(kloop) = dnds_store[intx][inty][intz][kloop];
-                                dndt(kloop) = dndt_store[intx][inty][intz][kloop];
-                                counter_test += 1;
-                        }
-                        /*
-                        if (counter_test == 8)
-                            std::cout << "\n Our value - " << dndr << dnds << dndt;
+                        jacobian_normal = fe_calJacobian_array(ndof, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], xcoord, ycoord, zcoord);
+                        detJacobian_normal = fe_detMatrix_pbr(jacobian_normal);
+                        fe_invMatrix_pbr(invJacobian_normal, jacobian_normal);
 
-                        fe_dniso_8 (dndr, dnds, dndt, x, y, z);
+                        fe_dndx_8_pbr_array(dndx_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
+                        fe_dndy_8_pbr_array(dndy_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
+                        fe_dndz_8_pbr_array(dndz_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
 
-                        if (counter_test == 8)
-                            std::cout << "\n Func value - " << dndr << dnds << dndt;
-                        */
-                        jacobian = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-                        // double detJacobian = jacobian.determinant();
-                        double detJacobian = fe_detMatrix_pbr(jacobian);
-                        // invJacobian = jacobian.inverse();
-                        fe_invMatrix_pbr(invJacobian, jacobian);
+                        fe_strDispMatrix_totalLagrangian_pbr(disp_mat_normal, edof, nnel, dndx_normal, dndy_normal, dndz_normal, u_e);
 
-                        fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
-                        fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
-                        fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
+                        fe_stressUpdate_pbr(sigma_e, dndx_normal, dndy_normal, dndz_normal, disp_mat_normal, u_e, (*elements_host)(i, 1), 0);
 
-                        fe_strDispMatrix_totalLagrangian_pbr(disp_mat, edof, nnel, dndx, dndy, dndz, u_e);
-                        // disp_mat = fe_strDispMatrix(edof, nnel, dndx, dndy, dndz);
-
-                        fe_stressUpdate_pbr(sigma_e, dndx, dndy, dndz, disp_mat, u_e, (*elements_host)(i, 1), 0);
-
-                        // f_int_e = f_int_e + ((disp_mat.transpose())*sigma_e*wtx*wty*wtz*detJacobian); (previous correct)
-                        // std::cout<<k<<std::endl;
-
-                        f_int_e = f_int_e + ((disp_mat.transpose()) * sigma_e * wtx * wty * wtz * detJacobian);
+                        f_int_e = f_int_e + ((disp_mat_normal.transpose()) * sigma_e * wtx * wty * wtz * detJacobian_normal);
 
                         if (f_ext_e_sum < 1e-18) { // only include damping when no external forces act on the element
 
                           // calculate bulk viscosity pressure that is linear in the volumetric strain rate
-                          fe_getPressure_lbv_pbr(pressure_e, dndx, dndy, dndz, u_e, u_e_prev, dT, xcoord, ycoord, zcoord, (*elements_host)(i, 1));
+                          fe_getPressure_lbv_pbr(pressure_e, dndx_normal, dndy_normal, dndz_normal, u_e, u_e_prev, dT, xcoord, ycoord, zcoord, (*elements_host)(i, 1));
 
                           // calculate internal damping force resulting from bulk viscosity pressure
-                          f_damp_e = f_damp_e + ((disp_mat.transpose()) * pressure_e * wtx * wty * wtz * detJacobian);
+                          f_damp_e = f_damp_e + ((disp_mat_normal.transpose()) * pressure_e * wtx * wty * wtz * detJacobian_normal);
 
                         }
                     }
@@ -141,6 +103,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
               element_strain_host_local.segment<9>(i * 9) = tmp_storage;
             }
         }
+
         f_tot_e = f_ext_e - f_int_e - f_damp_e;
 
         fe_scatter_pbr(f_tot, f_tot_e, (*elements_host).block<1, 8>(i, 2), sdof);

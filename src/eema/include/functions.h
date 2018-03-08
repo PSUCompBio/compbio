@@ -83,19 +83,20 @@ guass_weights_3d(int ndof, int nx, int ny, int nz);
 
 /** Calculates the jacobian -- using the derivates of shape functions */
 MatrixXd fe_calJacobian(int dim, int nnel, VectorXd& dndr, VectorXd& dnds, VectorXd& dndt, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord);
+MatrixXd fe_calJacobian_array(int dim, int nnel, double* dndr, double* dnds, double* dndt, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord);
 
 /** dndx of actual element calculates using jacobian and shape function derivates calculated in the isoparametric element */
 VectorXd fe_dndx_8(int nnel, VectorXd& dndr, VectorXd& dnds, VectorXd& dndt, MatrixXd& invJacobian);
 void fe_dndx_8_pbr(VectorXd& dndx, int nnel, VectorXd& dndr, VectorXd& dnds, VectorXd& dndt, MatrixXd& invJacobian);
-
+void fe_dndx_8_pbr_array(VectorXd& dndx, int nnel, double* dndr, double* dnds, double* dndt, MatrixXd& invJacobian);
 /** dndy of actual element calculates using jacobian and shape function derivates calculated in the isoparametric element */
 VectorXd fe_dndy_8(int nnel, VectorXd& dndr, VectorXd& dnds, VectorXd& dndt, MatrixXd& invJacobian);
 void fe_dndy_8_pbr(VectorXd& dndy, int nnel, VectorXd& dndr, VectorXd& dnds, VectorXd& dndt, MatrixXd& invJacobian);
-
+void fe_dndy_8_pbr_array(VectorXd& dndy, int nnel, double* dndr, double* dnds, double* dndt, MatrixXd& invJacobian);
 /** dndz of actual element calculates using jacobian and shape function derivates calculated in the isoparametric element */
 VectorXd fe_dndz_8(int nnel, VectorXd& dndr, VectorXd& dnds, VectorXd& dndt, MatrixXd& invJacobian);
 void fe_dndz_8_pbr(VectorXd& dndz, int nnel, VectorXd& dndr, VectorXd& dnds, VectorXd& dndt, MatrixXd& invJacobian);
-
+void fe_dndz_8_pbr_array(VectorXd& dndz, int nnel, double* dndr, double* dnds, double* dndt, MatrixXd& invJacobian);
 /** Strain displacement matrix B */
 MatrixXd fe_strDispMatrix(int edof, int nnel, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz);
 
