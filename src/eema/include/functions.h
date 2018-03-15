@@ -67,7 +67,7 @@ fe_shapes_8(double rvalue, double svalue, double tvalue);
 /** dn of isoparametric element calculated for particular r, s, and t */
 
 void fe_dniso_8(VectorXd& dndr, VectorXd& dnds, VectorXd& dndt, double& r, double& s, double& t);
-
+void fe_dniso_8_array(double ****dndr, double ****dnds, double ****dndt, double& rvalue, double& svalue, double& tvalue, int intx, int inty, int intz);
 /** Create a guass_point vector of n values */
 VectorXd
 guass_points(int n);

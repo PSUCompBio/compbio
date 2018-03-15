@@ -34,44 +34,7 @@ Constraint *cons;
 bool embedded_constraint;
 double area_truss = 0; // default 7.85398e-7
 
-double ****dndr_store;
-double ****dnds_store;
-double ****dndt_store;
-
-int nnel_test;
-int edof_test;
-
 void fe_mainRead(std::string file) {
-
-    dndr_store = new double***[2];
-    for (int i = 0; i < 2; i++) {
-        dndr_store[i] = new double**[2];
-        for (int j = 0; j < 2; j++) {
-            dndr_store[i][j] = new double*[2];
-            for (int k = 0; k < 2; k++)
-                dndr_store[i][j][k] = new double[8];
-            }
-        }
-
-    dnds_store = new double***[2];
-    for (int i = 0; i < 2; i++) {
-        dnds_store[i] = new double**[2];
-        for (int j = 0; j < 2; j++) {
-            dnds_store[i][j] = new double*[2];
-            for (int k = 0; k < 2; k++)
-                dnds_store[i][j][k] = new double[8];
-            }
-        }
-
-    dndt_store = new double***[2];
-    for (int i = 0; i < 2; i++) {
-        dndt_store[i] = new double**[2];
-        for (int j = 0; j < 2; j++) {
-            dndt_store[i][j] = new double*[2];
-            for (int k = 0; k < 2; k++)
-                dndt_store[i][j][k] = new double[8];
-            }
-        }
 
   num_meshes = 0;
   int num_meshes_counter = 0;

@@ -123,8 +123,6 @@ extern double eps_energy;
 // Variables added/moved
 
 extern int counter_test;
-extern int nnel_test;
-extern int edof_test;
 
 extern MatrixXd I;
 
@@ -141,4 +139,9 @@ extern VectorXd dndz_normal;
 extern MatrixXd jacobian_normal;
 extern MatrixXd invJacobian_normal;
 
+extern VectorXd xcoord_normal;
+extern VectorXd ycoord_normal;
+extern VectorXd zcoord_normal;
+
+extern VectorXd weights_normal;
 #endif

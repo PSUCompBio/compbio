@@ -3,10 +3,17 @@ using namespace Eigen;
 
 double eps_energy = 0.01;
 double failure_time_step = 1e-8;
+
+double ****dndr_store;
+double ****dnds_store;
+double ****dndt_store;
+
 int counter_test = 0;
 MatrixXd I = MatrixXd::Identity(3, 3);
 
 double detJacobian_normal = 0;
+
+VectorXd weights_normal = guass_weights(2);
 
 MatrixXd jacobian_normal = MatrixXd::Zero(3, 3);
 MatrixXd invJacobian_normal = MatrixXd::Zero(3, 3);
@@ -16,6 +23,74 @@ VectorXd dndx_normal = VectorXd::Zero(8);
 VectorXd dndy_normal = VectorXd::Zero(8);
 VectorXd dndz_normal = VectorXd::Zero(8);
 
+VectorXd xcoord_normal = VectorXd::Zero(8);
+VectorXd ycoord_normal = VectorXd::Zero(8);
+VectorXd zcoord_normal = VectorXd::Zero(8);
+
+void experimental() {
+
+    int nnel = mesh[0].getNumNodesPerElement();
+    VectorXd points  = guass_points(2);
+    MatrixXd* nodes_host    = mesh[0].getNewNodesPointer();
+    MatrixXi* elements_host = mesh[0].getNewElementsPointer();
+
+    dndr_store = new double***[2];
+    for (int i = 0; i < 2; i++) {
+        dndr_store[i] = new double**[2];
+        for (int j = 0; j < 2; j++) {
+            dndr_store[i][j] = new double*[2];
+            for (int k = 0; k < 2; k++)
+                dndr_store[i][j][k] = new double[8];
+            }
+        }
+
+    dnds_store = new double***[2];
+    for (int i = 0; i < 2; i++) {
+        dnds_store[i] = new double**[2];
+        for (int j = 0; j < 2; j++) {
+            dnds_store[i][j] = new double*[2];
+            for (int k = 0; k < 2; k++)
+                dnds_store[i][j][k] = new double[8];
+            }
+        }
+
+    dndt_store = new double***[2];
+    for (int i = 0; i < 2; i++) {
+        dndt_store[i] = new double**[2];
+        for (int j = 0; j < 2; j++) {
+            dndt_store[i][j] = new double*[2];
+            for (int k = 0; k < 2; k++)
+                dndt_store[i][j][k] = new double[8];
+            }
+        }
+
+    for (int j = 0; j < nnel; j++) {
+        int g = (*elements_host)(0, j + 2);
+        xcoord_normal(j) = (*nodes_host)(g, 1);
+        ycoord_normal(j) = (*nodes_host)(g, 2);
+        zcoord_normal(j) = (*nodes_host)(g, 3);
+    }
+
+    for (int intx = 0; intx < 2; intx++) {
+        double x   = points(intx);
+        for (int inty = 0; inty < 2; inty++) {
+            double y   = points(inty);
+            for (int intz = 0; intz < 2; intz++) {
+                double z   = points(intz);
+                fe_dniso_8_array(dndr_store, dnds_store, dndt_store, x, y, z, intx, inty, intz);
+
+                jacobian_normal = fe_calJacobian_array(3, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], xcoord_normal, ycoord_normal, zcoord_normal);
+                detJacobian_normal = fe_detMatrix_pbr(jacobian_normal);
+                fe_invMatrix_pbr(invJacobian_normal, jacobian_normal);
+
+                fe_dndx_8_pbr_array(dndx_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
+                fe_dndy_8_pbr_array(dndy_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
+                fe_dndz_8_pbr_array(dndz_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
+            }
+        }
+    }
+}
+
 /*! \brief
  * This function carries out the explicit dynamic analysis of the FEM problem.
  */
@@ -23,6 +98,7 @@ VectorXd dndz_normal = VectorXd::Zero(8);
 void
 fe_mainEXPLICIT()
 {
+    experimental();
     // Following variables - Only for Hex Element
     int nnode = mesh[0].getNumNodes();            // number of nodes
     int sdof  = nnode * ndof;                     // system degrees of freedom

@@ -19,20 +19,20 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
     VectorXd element_strain_host_local = VectorXd::Zero(nel * 9);
     VectorXd tmp_storage = VectorXd::Zero(ndof * ndof);
 
-    // Element Data
+    /* Element Data
     VectorXd xcoord      = VectorXd::Zero(nnel);
     VectorXd ycoord      = VectorXd::Zero(nnel);
     VectorXd zcoord      = VectorXd::Zero(nnel);
-
+    */
     for (int i = 0; i < nel; i++) {
-
+        /*
         for (int j = 0; j < nnel; j++) {
             int g = (*elements_host)(i, j + 2);
             xcoord(j)      = (*nodes_host)(g, 1);
             ycoord(j)      = (*nodes_host)(g, 2);
             zcoord(j)      = (*nodes_host)(g, 3);
         }
-
+        */
         VectorXd u_e = VectorXd::Zero(edof); // element displacements
         fe_gather_pbr(u, u_e, (*elements_host).block<1, 8>(i, 2), sdof);
 
@@ -55,26 +55,15 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
         VectorXd sigma_e = VectorXd::Zero(6);
         VectorXd pressure_e = VectorXd::Zero(6);
 
-        VectorXd points  = guass_points(nglx);
-        VectorXd weights = guass_weights(nglx);
-
         int node_counter = 0;
 
         if (time_step_counter != 0) { // if this is not the first time step the go into the loop
             for (int intx = 0; intx < nglx; intx++) {
-                double wtx = weights(intx);
+                double wtx = weights_normal(intx);
                 for (int inty = 0; inty < ngly; inty++) {
-                    double wty = weights(inty);
+                    double wty = weights_normal(inty);
                     for (int intz = 0; intz < nglz; intz++) {
-                        double wtz = weights(intz);
-
-                        jacobian_normal = fe_calJacobian_array(ndof, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], xcoord, ycoord, zcoord);
-                        detJacobian_normal = fe_detMatrix_pbr(jacobian_normal);
-                        fe_invMatrix_pbr(invJacobian_normal, jacobian_normal);
-
-                        fe_dndx_8_pbr_array(dndx_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
-                        fe_dndy_8_pbr_array(dndy_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
-                        fe_dndz_8_pbr_array(dndz_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
+                        double wtz = weights_normal(intz);
 
                         fe_strDispMatrix_totalLagrangian_pbr(disp_mat_normal, edof, nnel, dndx_normal, dndy_normal, dndz_normal, u_e);
 
@@ -85,7 +74,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                         if (f_ext_e_sum < 1e-18) { // only include damping when no external forces act on the element
 
                           // calculate bulk viscosity pressure that is linear in the volumetric strain rate
-                          fe_getPressure_lbv_pbr(pressure_e, dndx_normal, dndy_normal, dndz_normal, u_e, u_e_prev, dT, xcoord, ycoord, zcoord, (*elements_host)(i, 1));
+                          fe_getPressure_lbv_pbr(pressure_e, dndx_normal, dndy_normal, dndz_normal, u_e, u_e_prev, dT, xcoord_normal, ycoord_normal, zcoord_normal, (*elements_host)(i, 1));
 
                           // calculate internal damping force resulting from bulk viscosity pressure
                           f_damp_e = f_damp_e + ((disp_mat_normal.transpose()) * pressure_e * wtx * wty * wtz * detJacobian_normal);
@@ -96,10 +85,10 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
             }
 
             if (t_plot == 1) {
-              fe_calCentroidStress_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e, (*elements_host)(i, 1));
+              fe_calCentroidStress_3d_pbr(tmp_storage, nnel, xcoord_normal, ycoord_normal, zcoord_normal, u_e, (*elements_host)(i, 1));
               element_stress_host_local.segment<9>(i * 9) = tmp_storage;
 
-              fe_calCentroidStrain_3d_pbr(tmp_storage, nnel, xcoord, ycoord, zcoord, u_e);
+              fe_calCentroidStrain_3d_pbr(tmp_storage, nnel, xcoord_normal, ycoord_normal, zcoord_normal, u_e);
               element_strain_host_local.segment<9>(i * 9) = tmp_storage;
             }
         }
