@@ -8,6 +8,21 @@ double ****dndr_store;
 double ****dnds_store;
 double ****dndt_store;
 
+int i_normal;
+int j_normal;
+int g_normal;
+int nel_normal;
+int nnel_normal;
+int nnode_normal;
+int sdof_normal;
+int edof_normal;
+int intx_normal;
+int inty_normal;
+int intz_normal;
+double wtx_normal;
+double wty_normal;
+double wtz_normal;
+
 int counter_test = 0;
 MatrixXd I = MatrixXd::Identity(3, 3);
 
@@ -27,12 +42,33 @@ VectorXd xcoord_normal = VectorXd::Zero(8);
 VectorXd ycoord_normal = VectorXd::Zero(8);
 VectorXd zcoord_normal = VectorXd::Zero(8);
 
+
+// fe_getPressure_lbv_pbr
+
+MatrixXd F_curr_lbv = MatrixXd::Zero(3, 3);
+MatrixXd F_inv_lbv = MatrixXd::Zero(3, 3);
+MatrixXd F_invT_lbv = MatrixXd::Zero(3, 3);
+MatrixXd F_prev_lbv = MatrixXd::Zero(3, 3);
+MatrixXd F_dot_lbv = MatrixXd::Zero(3, 3);
+MatrixXd F_dotT_lbv = MatrixXd::Zero(3, 3);
+MatrixXd D_lbv = MatrixXd::Zero(3, 3);
+MatrixXd pressure_matrix_lbv = MatrixXd::Zero(3, 3);
+
+double vol_strain_rate_lbv;
+double volume_initial_lbv;
+int nnel_lbv;
+int i_lbv;
+double volume_current_lbv;
+double lc_lbv;
+double c_wave_lbv;
+double rho_initial_lbv;
+double rho_current_lbv;
+double pressure_scalar_lbv;
+
 void experimental() {
 
     int nnel = mesh[0].getNumNodesPerElement();
     VectorXd points  = guass_points(2);
-    MatrixXd* nodes_host    = mesh[0].getNewNodesPointer();
-    MatrixXi* elements_host = mesh[0].getNewElementsPointer();
 
     dndr_store = new double***[2];
     for (int i = 0; i < 2; i++) {
@@ -64,13 +100,6 @@ void experimental() {
             }
         }
 
-    for (int j = 0; j < nnel; j++) {
-        int g = (*elements_host)(0, j + 2);
-        xcoord_normal(j) = (*nodes_host)(g, 1);
-        ycoord_normal(j) = (*nodes_host)(g, 2);
-        zcoord_normal(j) = (*nodes_host)(g, 3);
-    }
-
     for (int intx = 0; intx < 2; intx++) {
         double x   = points(intx);
         for (int inty = 0; inty < 2; inty++) {
@@ -78,14 +107,6 @@ void experimental() {
             for (int intz = 0; intz < 2; intz++) {
                 double z   = points(intz);
                 fe_dniso_8_array(dndr_store, dnds_store, dndt_store, x, y, z, intx, inty, intz);
-
-                jacobian_normal = fe_calJacobian_array(3, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], xcoord_normal, ycoord_normal, zcoord_normal);
-                detJacobian_normal = fe_detMatrix_pbr(jacobian_normal);
-                fe_invMatrix_pbr(invJacobian_normal, jacobian_normal);
-
-                fe_dndx_8_pbr_array(dndx_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
-                fe_dndy_8_pbr_array(dndy_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
-                fe_dndz_8_pbr_array(dndz_normal, nnel, dndr_store[intx][inty][intz], dnds_store[intx][inty][intz], dndt_store[intx][inty][intz], invJacobian_normal);
             }
         }
     }

@@ -120,11 +120,14 @@ extern double iterations_nr;
 /** Energy Balance Criterion */
 extern double eps_energy;
 
+
 // Variables added/moved
 
-extern int counter_test;
+extern int counter_test; // Testing loops
 
-extern MatrixXd I;
+extern MatrixXd I; // fe_calDefGrad
+
+// fe_getForce_3d_normal
 
 extern double ****dndr_store;
 extern double ****dnds_store;
@@ -144,4 +147,41 @@ extern VectorXd ycoord_normal;
 extern VectorXd zcoord_normal;
 
 extern VectorXd weights_normal;
+
+extern int i_normal;
+extern int j_normal;
+extern int g_normal;
+extern int nel_normal;
+extern int nnel_normal;
+extern int nnode_normal;
+extern int sdof_normal;
+extern int edof_normal;
+extern int intx_normal;
+extern int inty_normal;
+extern int intz_normal;
+extern double wtx_normal;
+extern double wty_normal;
+extern double wtz_normal;
+
+// fe_getPressure_lbv_pbr
+
+extern MatrixXd F_curr_lbv;
+extern MatrixXd F_inv_lbv;
+extern MatrixXd F_invT_lbv;
+extern MatrixXd F_prev_lbv;
+extern MatrixXd F_dot_lbv;
+extern MatrixXd F_dotT_lbv;
+extern MatrixXd D_lbv;
+extern MatrixXd pressure_matrix_lbv;
+extern double vol_strain_rate_lbv;
+extern double volume_initial_lbv;
+extern int nnel_lbv;
+extern int i_lbv;
+extern double volume_current_lbv;
+extern double lc_lbv;
+extern double c_wave_lbv;
+extern double rho_initial_lbv;
+extern double rho_current_lbv;
+extern double pressure_scalar_lbv;
+
 #endif
