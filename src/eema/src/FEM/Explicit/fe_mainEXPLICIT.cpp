@@ -4,71 +4,68 @@ using namespace Eigen;
 double eps_energy = 0.01;
 double failure_time_step = 1e-8;
 
-double ****dndr_store;
-double ****dnds_store;
-double ****dndt_store;
-
-int i_normal;
-int j_normal;
-int g_normal;
-int nel_normal;
-int nnel_normal;
-int nnode_normal;
-int sdof_normal;
-int edof_normal;
-int intx_normal;
-int inty_normal;
-int intz_normal;
-double wtx_normal;
-double wty_normal;
-double wtz_normal;
+// Global
 
 int counter_test = 0;
-MatrixXd I = MatrixXd::Identity(3, 3);
+MatrixXd I;
 
-double detJacobian_normal = 0;
+// fe_getForce_3d_normal
 
-VectorXd weights_normal = guass_weights(2);
-
-MatrixXd jacobian_normal = MatrixXd::Zero(3, 3);
-MatrixXd invJacobian_normal = MatrixXd::Zero(3, 3);
-MatrixXd disp_mat_normal = MatrixXd::Zero(6, 24);
-
-VectorXd dndx_normal = VectorXd::Zero(8);
-VectorXd dndy_normal = VectorXd::Zero(8);
-VectorXd dndz_normal = VectorXd::Zero(8);
-
-VectorXd xcoord_normal = VectorXd::Zero(8);
-VectorXd ycoord_normal = VectorXd::Zero(8);
-VectorXd zcoord_normal = VectorXd::Zero(8);
-
+double ****dndr_store, ****dnds_store, ****dndt_store, x_normal, y_normal, z_normal, wtx_normal, wty_normal, wtz_normal, detJacobian_normal, f_ext_e_sum_normal;
+int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal, intx_normal, inty_normal, intz_normal;
+VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal;
+MatrixXd jacobian_normal, invJacobian_normal, disp_mat_normal;
 
 // fe_getPressure_lbv_pbr
 
-MatrixXd F_curr_lbv = MatrixXd::Zero(3, 3);
-MatrixXd F_inv_lbv = MatrixXd::Zero(3, 3);
-MatrixXd F_invT_lbv = MatrixXd::Zero(3, 3);
-MatrixXd F_prev_lbv = MatrixXd::Zero(3, 3);
-MatrixXd F_dot_lbv = MatrixXd::Zero(3, 3);
-MatrixXd F_dotT_lbv = MatrixXd::Zero(3, 3);
-MatrixXd D_lbv = MatrixXd::Zero(3, 3);
-MatrixXd pressure_matrix_lbv = MatrixXd::Zero(3, 3);
+int nnel_lbv, i_lbv;
+double vol_strain_rate_lbv, volume_initial_lbv, volume_current_lbv, lc_lbv, c_wave_lbv, rho_initial_lbv, rho_current_lbv, pressure_scalar_lbv;
+MatrixXd F_curr_lbv, F_inv_lbv, F_invT_lbv, F_prev_lbv, F_dot_lbv, F_dotT_lbv, D_lbv, pressure_matrix_lbv;
 
-double vol_strain_rate_lbv;
-double volume_initial_lbv;
-int nnel_lbv;
-int i_lbv;
-double volume_current_lbv;
-double lc_lbv;
-double c_wave_lbv;
-double rho_initial_lbv;
-double rho_current_lbv;
-double pressure_scalar_lbv;
+// fe_calDefGrad
+
+MatrixXd H_DefGrad;
 
 void experimental() {
 
+    int nel = mesh[0].getNumElements();
     int nnel = mesh[0].getNumNodesPerElement();
-    VectorXd points  = guass_points(2);
+    int ndof_local = 3;
+    int edof = nnel * ndof_local;
+
+    // Allocating Memory
+    
+    I = MatrixXd::Identity(3, 3);
+    points_normal  = guass_points(2);
+    weights_normal = guass_weights(2);
+    jacobian_normal = MatrixXd::Zero(ndof_local, ndof_local);
+    invJacobian_normal = MatrixXd::Zero(ndof_local, ndof_local);
+    disp_mat_normal = MatrixXd::Zero(6, edof);
+    dndx_normal = VectorXd::Zero(nnel);
+    dndy_normal = VectorXd::Zero(nnel);
+    dndz_normal = VectorXd::Zero(nnel);
+    xcoord_normal = VectorXd::Zero(nnel);
+    ycoord_normal = VectorXd::Zero(nnel);
+    zcoord_normal = VectorXd::Zero(nnel);
+    element_stress_host_local_normal = VectorXd::Zero(nel * 9);
+    element_strain_host_local_normal = VectorXd::Zero(nel * 9);
+    tmp_storage_normal = VectorXd::Zero(ndof_local * ndof_local);
+    u_e_normal = VectorXd::Zero(edof);
+    u_e_prev_normal = VectorXd::Zero(edof);
+    f_ext_e_normal = VectorXd::Zero(edof);
+    pressure_e_normal = VectorXd::Zero(6);
+    sigma_e_normal = VectorXd::Zero(6);
+    F_curr_lbv = MatrixXd::Zero(ndof_local, ndof_local);
+    F_inv_lbv = MatrixXd::Zero(ndof_local, ndof_local);
+    F_invT_lbv = MatrixXd::Zero(ndof_local, ndof_local);
+    F_prev_lbv = MatrixXd::Zero(ndof_local, ndof_local);
+    F_dot_lbv = MatrixXd::Zero(ndof_local, ndof_local);
+    F_dotT_lbv = MatrixXd::Zero(ndof_local, ndof_local);
+    D_lbv = MatrixXd::Zero(ndof_local, ndof_local);
+    pressure_matrix_lbv = MatrixXd::Zero(ndof_local, ndof_local);
+    H_DefGrad = MatrixXd::Zero(ndof_local, ndof_local);
+
+    detJacobian_normal = 0;
 
     dndr_store = new double***[2];
     for (int i = 0; i < 2; i++) {
@@ -99,17 +96,6 @@ void experimental() {
                 dndt_store[i][j][k] = new double[8];
             }
         }
-
-    for (int intx = 0; intx < 2; intx++) {
-        double x   = points(intx);
-        for (int inty = 0; inty < 2; inty++) {
-            double y   = points(inty);
-            for (int intz = 0; intz < 2; intz++) {
-                double z   = points(intz);
-                fe_dniso_8_array(dndr_store, dnds_store, dndt_store, x, y, z, intx, inty, intz);
-            }
-        }
-    }
 }
 
 /*! \brief

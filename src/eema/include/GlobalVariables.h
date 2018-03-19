@@ -124,64 +124,23 @@ extern double eps_energy;
 // Variables added/moved
 
 extern int counter_test; // Testing loops
-
-extern MatrixXd I; // fe_calDefGrad
+extern MatrixXd I;
 
 // fe_getForce_3d_normal
 
-extern double ****dndr_store;
-extern double ****dnds_store;
-extern double ****dndt_store;
-
-extern double detJacobian_normal;
-
-extern MatrixXd disp_mat_normal;
-extern VectorXd dndx_normal;
-extern VectorXd dndy_normal;
-extern VectorXd dndz_normal;
-extern MatrixXd jacobian_normal;
-extern MatrixXd invJacobian_normal;
-
-extern VectorXd xcoord_normal;
-extern VectorXd ycoord_normal;
-extern VectorXd zcoord_normal;
-
-extern VectorXd weights_normal;
-
-extern int i_normal;
-extern int j_normal;
-extern int g_normal;
-extern int nel_normal;
-extern int nnel_normal;
-extern int nnode_normal;
-extern int sdof_normal;
-extern int edof_normal;
-extern int intx_normal;
-extern int inty_normal;
-extern int intz_normal;
-extern double wtx_normal;
-extern double wty_normal;
-extern double wtz_normal;
+extern double ****dndr_store, ****dnds_store, ****dndt_store, x_normal, y_normal, z_normal, wtx_normal, wty_normal, wtz_normal, detJacobian_normal, f_ext_e_sum_normal;
+extern int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal, intx_normal, inty_normal, intz_normal;
+extern VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal;
+extern MatrixXd jacobian_normal, invJacobian_normal, disp_mat_normal;
 
 // fe_getPressure_lbv_pbr
 
-extern MatrixXd F_curr_lbv;
-extern MatrixXd F_inv_lbv;
-extern MatrixXd F_invT_lbv;
-extern MatrixXd F_prev_lbv;
-extern MatrixXd F_dot_lbv;
-extern MatrixXd F_dotT_lbv;
-extern MatrixXd D_lbv;
-extern MatrixXd pressure_matrix_lbv;
-extern double vol_strain_rate_lbv;
-extern double volume_initial_lbv;
-extern int nnel_lbv;
-extern int i_lbv;
-extern double volume_current_lbv;
-extern double lc_lbv;
-extern double c_wave_lbv;
-extern double rho_initial_lbv;
-extern double rho_current_lbv;
-extern double pressure_scalar_lbv;
+extern int nnel_lbv, i_lbv;
+extern double vol_strain_rate_lbv, volume_initial_lbv, volume_current_lbv, lc_lbv, c_wave_lbv, rho_initial_lbv, rho_current_lbv, pressure_scalar_lbv;
+extern MatrixXd F_curr_lbv, F_inv_lbv, F_invT_lbv, F_prev_lbv, F_dot_lbv, F_dotT_lbv, D_lbv, pressure_matrix_lbv;
+
+// fe_calDefGrad
+
+extern MatrixXd H_DefGrad;
 
 #endif
