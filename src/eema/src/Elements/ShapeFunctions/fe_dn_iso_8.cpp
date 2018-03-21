@@ -73,7 +73,7 @@ void fe_dniso_8(VectorXd& dndr, VectorXd& dnds, VectorXd& dndt, double& rvalue, 
 	}
 }
 
-void fe_dniso_8_array(double ****dndr, double ****dnds, double ****dndt, double& rvalue, double& svalue, double& tvalue, int intx, int inty, int intz) {
+void fe_dniso_8_array(double *dndr, double *dnds, double *dndt, double& rvalue, double& svalue, double& tvalue, int intx, int inty, int intz) {
 
 	double nnr = (1 - svalue) * (1 - tvalue);
 	double pnr = (1 + svalue) * (1 - tvalue);
@@ -108,7 +108,7 @@ void fe_dniso_8_array(double ****dndr, double ****dnds, double ****dndt, double&
 		else
 			use = ppr;
 
-		dndr[intx][inty][intz][i] = 0.125 * sign * use;
+		dndr[i] = 0.125 * sign * use;
 
 		if (i == 2 || i == 3 || i == 6 || i == 7)
 			sign = 1;
@@ -124,7 +124,7 @@ void fe_dniso_8_array(double ****dndr, double ****dnds, double ****dndt, double&
 		else
 			use = pps;
 
-		dnds[intx][inty][intz][i] = 0.125 * sign * use;
+		dnds[i] = 0.125 * sign * use;
 
 		if (i > 3)
 			sign = 1;
@@ -140,6 +140,6 @@ void fe_dniso_8_array(double ****dndr, double ****dnds, double ****dndt, double&
 		else
 			use = ppt;
 
-		dndt[intx][inty][intz][i] = 0.125 * sign * use;
+		dndt[i] = 0.125 * sign * use;
 	}
 }

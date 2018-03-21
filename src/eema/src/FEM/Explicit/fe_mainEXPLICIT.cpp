@@ -11,10 +11,10 @@ MatrixXd I;
 
 // fe_getForce_3d_normal
 
-double ****dndr_store, ****dnds_store, ****dndt_store, x_normal, y_normal, z_normal, wtx_normal, wty_normal, wtz_normal, detJacobian_normal, f_ext_e_sum_normal;
+double *dndr_store, *dnds_store, *dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, wtx_normal, wty_normal, wtz_normal, detJacobian_normal, f_ext_e_sum_normal, ***jacobian_store, ***invJacobian_store, *det_store, **dndx_store, **dndy_store, **dndz_store;
 int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal, intx_normal, inty_normal, intz_normal;
 VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal;
-MatrixXd jacobian_normal, invJacobian_normal, disp_mat_normal;
+MatrixXd disp_mat_normal;
 
 // fe_getPressure_lbv_pbr
 
@@ -30,16 +30,14 @@ void experimental() {
 
     int nel = mesh[0].getNumElements();
     int nnel = mesh[0].getNumNodesPerElement();
-    int ndof_local = 3;
-    int edof = nnel * ndof_local;
+    int edof = nnel * ndof;
+    int i, j, k ,l;
 
     // Allocating Memory
-    
+
     I = MatrixXd::Identity(3, 3);
     points_normal  = guass_points(2);
     weights_normal = guass_weights(2);
-    jacobian_normal = MatrixXd::Zero(ndof_local, ndof_local);
-    invJacobian_normal = MatrixXd::Zero(ndof_local, ndof_local);
     disp_mat_normal = MatrixXd::Zero(6, edof);
     dndx_normal = VectorXd::Zero(nnel);
     dndy_normal = VectorXd::Zero(nnel);
@@ -49,53 +47,77 @@ void experimental() {
     zcoord_normal = VectorXd::Zero(nnel);
     element_stress_host_local_normal = VectorXd::Zero(nel * 9);
     element_strain_host_local_normal = VectorXd::Zero(nel * 9);
-    tmp_storage_normal = VectorXd::Zero(ndof_local * ndof_local);
+    tmp_storage_normal = VectorXd::Zero(ndof * ndof);
     u_e_normal = VectorXd::Zero(edof);
     u_e_prev_normal = VectorXd::Zero(edof);
     f_ext_e_normal = VectorXd::Zero(edof);
     pressure_e_normal = VectorXd::Zero(6);
     sigma_e_normal = VectorXd::Zero(6);
-    F_curr_lbv = MatrixXd::Zero(ndof_local, ndof_local);
-    F_inv_lbv = MatrixXd::Zero(ndof_local, ndof_local);
-    F_invT_lbv = MatrixXd::Zero(ndof_local, ndof_local);
-    F_prev_lbv = MatrixXd::Zero(ndof_local, ndof_local);
-    F_dot_lbv = MatrixXd::Zero(ndof_local, ndof_local);
-    F_dotT_lbv = MatrixXd::Zero(ndof_local, ndof_local);
-    D_lbv = MatrixXd::Zero(ndof_local, ndof_local);
-    pressure_matrix_lbv = MatrixXd::Zero(ndof_local, ndof_local);
-    H_DefGrad = MatrixXd::Zero(ndof_local, ndof_local);
+    F_curr_lbv = MatrixXd::Zero(ndof, ndof);
+    F_inv_lbv = MatrixXd::Zero(ndof, ndof);
+    F_invT_lbv = MatrixXd::Zero(ndof, ndof);
+    F_prev_lbv = MatrixXd::Zero(ndof, ndof);
+    F_dot_lbv = MatrixXd::Zero(ndof, ndof);
+    F_dotT_lbv = MatrixXd::Zero(ndof, ndof);
+    D_lbv = MatrixXd::Zero(ndof, ndof);
+    pressure_matrix_lbv = MatrixXd::Zero(ndof, ndof);
+    H_DefGrad = MatrixXd::Zero(ndof, ndof);
 
     detJacobian_normal = 0;
 
-    dndr_store = new double***[2];
-    for (int i = 0; i < 2; i++) {
-        dndr_store[i] = new double**[2];
-        for (int j = 0; j < 2; j++) {
-            dndr_store[i][j] = new double*[2];
-            for (int k = 0; k < 2; k++)
-                dndr_store[i][j][k] = new double[8];
-            }
-        }
+    dndr_store = new double[8];
 
-    dnds_store = new double***[2];
-    for (int i = 0; i < 2; i++) {
-        dnds_store[i] = new double**[2];
-        for (int j = 0; j < 2; j++) {
-            dnds_store[i][j] = new double*[2];
-            for (int k = 0; k < 2; k++)
-                dnds_store[i][j][k] = new double[8];
-            }
-        }
+    dnds_store = new double[8];
 
-    dndt_store = new double***[2];
-    for (int i = 0; i < 2; i++) {
-        dndt_store[i] = new double**[2];
-        for (int j = 0; j < 2; j++) {
-            dndt_store[i][j] = new double*[2];
-            for (int k = 0; k < 2; k++)
-                dndt_store[i][j][k] = new double[8];
-            }
+    dndt_store = new double[8];
+
+    x_store = new double*[nel];
+    for (i = 0; i < nel; i++) {
+        x_store[i] = new double[nnel];
+    }
+
+    y_store = new double*[nel];
+    for (i = 0; i < nel; i++) {
+        y_store[i] = new double[nnel];
+    }
+
+    z_store = new double*[nel];
+    for (i = 0; i < nel; i++) {
+        z_store[i] = new double[nnel];
+    }
+
+    jacobian_store = new double**[nel];
+    for (i = 0; i < nel; i++) {
+        jacobian_store[i] = new double*[ndof];
+        for (j = 0; j < ndof; j++) {
+            jacobian_store[i][j] = new double[ndof];
         }
+    }
+
+    invJacobian_store = new double**[nel];
+    for (i = 0; i < nel; i++) {
+        invJacobian_store[i] = new double*[ndof];
+        for (j = 0; j < ndof; j++) {
+            invJacobian_store[i][j] = new double[ndof];
+        }
+    }
+
+    det_store = new double[nel];
+
+    dndx_store = new double*[nel];
+    for (i = 0; i < nel; i++) {
+        dndx_store[i] = new double[nnel];
+    }
+
+    dndy_store = new double*[nel];
+    for (i = 0; i < nel; i++) {
+        dndy_store[i] = new double[nnel];
+    }
+
+    dndz_store = new double*[nel];
+    for (i = 0; i < nel; i++) {
+        dndz_store[i] = new double[nnel];
+    }
 }
 
 /*! \brief
@@ -327,5 +349,5 @@ fe_mainEXPLICIT()
       std::string damage_variables_export = home_path + "/" + "results/fiber_damage_output.txt";
       fe_damageVariableExport(damage_variables_export, d, d_fatigue, d_tot, lambda_min, lambda_max);
     }
-
+    std::cout << "\n Counter = " << counter_test << "\n";
 } // fe_mainEXPLICIT

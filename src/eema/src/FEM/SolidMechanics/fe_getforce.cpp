@@ -51,10 +51,10 @@ void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int tim
      * }*/
     else if (ndof == 3 && embedded_constraint != true) {
         f_tot = VectorXd::Zero((mesh[0].getNumNodes() * ndof));
-        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp, t_plot);
+        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp, t, t_plot);
     } else {
         f_tot = VectorXd::Zero((mesh[0].getNumNodes() * ndof));
-        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp, t_plot);
+        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp, t, t_plot);
     }
 
 
