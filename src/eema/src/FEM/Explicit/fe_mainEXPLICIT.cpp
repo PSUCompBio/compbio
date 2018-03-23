@@ -26,12 +26,20 @@ MatrixXd F_curr_lbv, F_inv_lbv, F_invT_lbv, F_prev_lbv, F_dot_lbv, F_dotT_lbv, D
 
 MatrixXd H_DefGrad;
 
+// fe_strDispMatrix_totalLagrangian_pbr
+
+MatrixXd F_sdm, FT_sdm;
+int i_sdm;
+
+// fe_mooneyrivlin_hyperelastic_pbr
+
+MatrixXd F_mrh, C_mrh, C_inv_mrh, C_square_mrh, C_bar_mrh, C_bar_inv_mrh, cauchy_sigma_mrh, pk_S_mrh;
+double I1_mrh, tmp1_mrh, I2_mrh, defJacobian_mrh, defJacobian_frac_mrh, I1_bar_mrh, I2_bar_mrh, c1_mrh, c2_mrh, D_mrh, p_mrh;
+
 void experimental() {
 
     /*
-    fe_strDispMatrix_totalLagrangian_pbr
-    fe_mooneyrivlin_hyperelastic
-
+        fe_mooneyrivlin_hyperelastic
     */
 
     int nel = mesh[0].getNumElements();
@@ -68,6 +76,17 @@ void experimental() {
     D_lbv = MatrixXd::Zero(ndof, ndof);
     pressure_matrix_lbv = MatrixXd::Zero(ndof, ndof);
     H_DefGrad = MatrixXd::Zero(ndof, ndof);
+    F_sdm = MatrixXd::Zero(3, 3);
+    FT_sdm = MatrixXd::Zero(3, 3);
+    F_mrh = MatrixXd::Zero(ndof, ndof);
+    C_mrh = MatrixXd::Zero(ndof, ndof);
+    C_inv_mrh = MatrixXd::Zero(ndof, ndof);
+    C_square_mrh = MatrixXd::Zero(ndof, ndof);
+    C_bar_mrh = MatrixXd::Zero(ndof, ndof);
+    C_bar_inv_mrh = MatrixXd::Zero(ndof, ndof);
+    cauchy_sigma_mrh = MatrixXd::Zero(ndof, ndof);
+    pk_S_mrh = MatrixXd::Zero(ndof, ndof);
+
 
     dndr_store = new double[8];
 

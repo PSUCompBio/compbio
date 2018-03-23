@@ -144,4 +144,14 @@ extern MatrixXd F_curr_lbv, F_inv_lbv, F_invT_lbv, F_prev_lbv, F_dot_lbv, F_dotT
 
 extern MatrixXd H_DefGrad;
 
+// fe_strDispMatrix_totalLagrangian_pbr
+
+extern MatrixXd F_sdm, FT_sdm;
+extern int i_sdm;
+
+// fe_mooneyrivlin_hyperelastic_pbr
+
+extern MatrixXd F_mrh, C_mrh, C_inv_mrh, C_square_mrh, C_bar_mrh, C_bar_inv_mrh, cauchy_sigma_mrh, pk_S_mrh;
+extern double I1_mrh, tmp1_mrh, I2_mrh, defJacobian_mrh, defJacobian_frac_mrh, I1_bar_mrh, I2_bar_mrh, c1_mrh, c2_mrh, D_mrh, p_mrh;
+
 #endif
