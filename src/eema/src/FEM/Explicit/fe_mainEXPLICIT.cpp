@@ -11,7 +11,7 @@ MatrixXd I;
 
 // fe_getForce_3d_normal
 
-double *dndr_store, *dnds_store, *dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, wtx_normal, wty_normal, wtz_normal, detJacobian_normal, f_ext_e_sum_normal, ***jacobian_store, ***invJacobian_store, *det_store, **dndx_store, **dndy_store, **dndz_store;
+double *dndr_store, *dnds_store, *dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store;
 int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal, intx_normal, inty_normal, intz_normal;
 VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal;
 MatrixXd disp_mat_normal;
@@ -31,7 +31,7 @@ void experimental() {
     int nel = mesh[0].getNumElements();
     int nnel = mesh[0].getNumNodesPerElement();
     int edof = nnel * ndof;
-    int i, j, k ,l;
+    int i, j, k ,l, m;
 
     // Allocating Memory
 
@@ -63,8 +63,6 @@ void experimental() {
     pressure_matrix_lbv = MatrixXd::Zero(ndof, ndof);
     H_DefGrad = MatrixXd::Zero(ndof, ndof);
 
-    detJacobian_normal = 0;
-
     dndr_store = new double[8];
 
     dnds_store = new double[8];
@@ -86,37 +84,105 @@ void experimental() {
         z_store[i] = new double[nnel];
     }
 
-    jacobian_store = new double**[nel];
-    for (i = 0; i < nel; i++) {
-        jacobian_store[i] = new double*[ndof];
-        for (j = 0; j < ndof; j++) {
-            jacobian_store[i][j] = new double[ndof];
+    wtx_normal = new double[2];
+
+    wty_normal = new double*[2];
+    for (i = 0; i < 2; i++)
+        wty_normal[i] = new double[2];
+
+    wtz_normal = new double**[2];
+    for (i = 0; i < 2; i++) {
+        wtz_normal[i] = new double*[2];
+        for (j = 0; j < 2; j++) {
+            wtz_normal[i][j] = new double[2];
         }
     }
 
-    invJacobian_store = new double**[nel];
+    jacobian_store = new double*****[nel];
     for (i = 0; i < nel; i++) {
-        invJacobian_store[i] = new double*[ndof];
-        for (j = 0; j < ndof; j++) {
-            invJacobian_store[i][j] = new double[ndof];
+        jacobian_store[i] = new double****[2];
+        for (j = 0; j < 2; j++) {
+            jacobian_store[i][j] = new double***[2];
+            for (k = 0; k < 2; k++) {
+                jacobian_store[i][j][k] = new double**[2];
+                for (l = 0; l < 2; l++) {
+                    jacobian_store[i][j][k][l] = new double*[ndof];
+                    for (m = 0; m < ndof; m++) {
+                        jacobian_store[i][j][k][l][m] = new double[ndof];
+                    }
+                }
+            }
         }
     }
 
-    det_store = new double[nel];
-
-    dndx_store = new double*[nel];
+    invJacobian_store = new double*****[nel];
     for (i = 0; i < nel; i++) {
-        dndx_store[i] = new double[nnel];
+        invJacobian_store[i] = new double****[2];
+        for (j = 0; j < 2; j++) {
+            invJacobian_store[i][j] = new double***[2];
+            for (k = 0; k < 2; k++) {
+                invJacobian_store[i][j][k] = new double**[2];
+                for (l = 0; l < 2; l++) {
+                    invJacobian_store[i][j][k][l] = new double*[ndof];
+                    for (m = 0; m < ndof; m++) {
+                        invJacobian_store[i][j][k][l][m] = new double[ndof];
+                    }
+                }
+            }
+        }
     }
 
-    dndy_store = new double*[nel];
-    for (i = 0; i < nel; i++) {
-        dndy_store[i] = new double[nnel];
+    det_store = new double***[nel];
+    for (j = 0; j < nel; j++) {
+        det_store[j] = new double**[2];
+        for (k = 0; k < 2; k++) {
+            det_store[j][k] = new double*[2];
+            for (l = 0; l < 2; l++) {
+                det_store[j][k][l] = new double[2];
+            }
+        }
     }
 
-    dndz_store = new double*[nel];
+    dndx_store = new double****[nel];
     for (i = 0; i < nel; i++) {
-        dndz_store[i] = new double[nnel];
+        dndx_store[i] = new double***[2];
+        for (j = 0; j < 2; j++) {
+            dndx_store[i][j] = new double**[2];
+            for (k = 0; k < 2; k++) {
+                dndx_store[i][j][k] = new double*[2];
+                for (l = 0; l < 2; l++) {
+                    dndx_store[i][j][k][l] = new double[nnel];
+                }
+            }
+        }
+    }
+
+    dndy_store = new double****[nel];
+    for (i = 0; i < nel; i++) {
+        dndy_store[i] = new double***[2];
+        for (j = 0; j < 2; j++) {
+            dndy_store[i][j] = new double**[2];
+            for (k = 0; k < 2; k++) {
+                dndy_store[i][j][k] = new double*[2];
+                for (l = 0; l < 2; l++) {
+                    dndy_store[i][j][k][l] = new double[nnel];
+                }
+            }
+        }
+    }
+
+    dndz_store = new double****[nel];
+    for (i = 0; i < nel; i++) {
+        dndz_store[i] = new double***[2];
+        for (j = 0; j < 2; j++) {
+            dndz_store[i][j] = new double**[2];
+            for (k = 0; k < 2; k++) {
+                dndz_store[i][j][k] = new double*[2];
+                for (l = 0; l < 2; l++) {
+                    dndz_store[i][j][k][l] = new double[nnel];
+                }
+            }
+        }
     }
 }
 

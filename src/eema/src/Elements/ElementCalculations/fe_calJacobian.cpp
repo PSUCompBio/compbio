@@ -25,28 +25,28 @@ MatrixXd fe_calJacobian(int dim, int nnel, VectorXd& dndr, VectorXd& dnds, Vecto
 	return jacobian;
 }
 
-void fe_calJacobian_array(double ***jacobian_store, int i, int nnel, double* dndr, double* dnds, double* dndt, double* xcoord, double* ycoord, double* zcoord) {
+void fe_calJacobian_array(double **jacobian_store, int nnel, double* dndr, double* dnds, double* dndt, double* xcoord, double* ycoord, double* zcoord) {
 	int k = 0;
 
-	jacobian_store[i][0][0] = dndr[k] * xcoord[k];
-	jacobian_store[i][0][1] = dndr[k] * ycoord[k];
-	jacobian_store[i][0][2] = dndr[k] * zcoord[k];
-	jacobian_store[i][1][0] = dnds[k] * xcoord[k];
-	jacobian_store[i][1][1] = dnds[k] * ycoord[k];
-	jacobian_store[i][1][2] = dnds[k] * zcoord[k];
-	jacobian_store[i][2][0] = dndt[k] * xcoord[k];
-	jacobian_store[i][2][1] = dndt[k] * ycoord[k];
-	jacobian_store[i][2][2] = dndt[k] * zcoord[k];
+	jacobian_store[0][0] = dndr[k] * xcoord[k];
+	jacobian_store[0][1] = dndr[k] * ycoord[k];
+	jacobian_store[0][2] = dndr[k] * zcoord[k];
+	jacobian_store[1][0] = dnds[k] * xcoord[k];
+	jacobian_store[1][1] = dnds[k] * ycoord[k];
+	jacobian_store[1][2] = dnds[k] * zcoord[k];
+	jacobian_store[2][0] = dndt[k] * xcoord[k];
+	jacobian_store[2][1] = dndt[k] * ycoord[k];
+	jacobian_store[2][2] = dndt[k] * zcoord[k];
 
 	for (k = 1; k < nnel; k++) {
-		jacobian_store[i][0][0] = jacobian_store[i][0][0] + dndr[k] * xcoord[k];
-		jacobian_store[i][0][1] = jacobian_store[i][0][1] + dndr[k] * ycoord[k];
-		jacobian_store[i][0][2] = jacobian_store[i][0][2] + dndr[k] * zcoord[k];
-		jacobian_store[i][1][0] = jacobian_store[i][1][0] + dnds[k] * xcoord[k];
-		jacobian_store[i][1][1] = jacobian_store[i][1][1] + dnds[k] * ycoord[k];
-		jacobian_store[i][1][2] = jacobian_store[i][1][2] + dnds[k] * zcoord[k];
-		jacobian_store[i][2][0] = jacobian_store[i][2][0] + dndt[k] * xcoord[k];
-		jacobian_store[i][2][1] = jacobian_store[i][2][1] + dndt[k] * ycoord[k];
-		jacobian_store[i][2][2] = jacobian_store[i][2][2] + dndt[k] * zcoord[k];
+		jacobian_store[0][0] = jacobian_store[0][0] + dndr[k] * xcoord[k];
+		jacobian_store[0][1] = jacobian_store[0][1] + dndr[k] * ycoord[k];
+		jacobian_store[0][2] = jacobian_store[0][2] + dndr[k] * zcoord[k];
+		jacobian_store[1][0] = jacobian_store[1][0] + dnds[k] * xcoord[k];
+		jacobian_store[1][1] = jacobian_store[1][1] + dnds[k] * ycoord[k];
+		jacobian_store[1][2] = jacobian_store[1][2] + dnds[k] * zcoord[k];
+		jacobian_store[2][0] = jacobian_store[2][0] + dndt[k] * xcoord[k];
+		jacobian_store[2][1] = jacobian_store[2][1] + dndt[k] * ycoord[k];
+		jacobian_store[2][2] = jacobian_store[2][2] + dndt[k] * zcoord[k];
 	}
 }

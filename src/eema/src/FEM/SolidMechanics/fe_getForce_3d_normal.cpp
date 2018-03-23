@@ -18,11 +18,31 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
     for (i_normal = 0; i_normal < nel_normal; i_normal++) {
 
         if (t == 0) {
+
             for (j_normal = 0; j_normal < nnel_normal; j_normal++) {
                 g_normal = (*elements_host)(i_normal, j_normal + 2);
                 x_store[i_normal][j_normal] = (*nodes_host)(g_normal, 1);
                 y_store[i_normal][j_normal] = (*nodes_host)(g_normal, 2);
                 z_store[i_normal][j_normal] = (*nodes_host)(g_normal, 3);
+            }
+
+            for (intx_normal = 0; intx_normal < 2; intx_normal++) {
+                x_normal   = points_normal(intx_normal);
+                wtx_normal[intx_normal] = weights_normal(intx_normal);
+                for (inty_normal = 0; inty_normal < 2; inty_normal++) {
+                    y_normal   = points_normal(inty_normal);
+                    wty_normal[intx_normal][inty_normal] = weights_normal(inty_normal);
+                    for (intz_normal = 0; intz_normal < 2; intz_normal++) {
+                        z_normal   = points_normal(intz_normal);
+                        wtz_normal[intx_normal][inty_normal][intz_normal] = weights_normal(intz_normal);
+
+                        fe_dniso_8_array(dndr_store, dnds_store, dndt_store, x_normal, y_normal, z_normal, intx_normal, inty_normal, intz_normal);
+                        fe_calJacobian_array(jacobian_store[i_normal][intx_normal][inty_normal][intz_normal], nnel_normal, dndr_store, dnds_store, dndt_store, x_store[i_normal], y_store[i_normal], z_store[i_normal]);
+                        det_store[i_normal][intx_normal][inty_normal][intz_normal] = fe_detMatrix_pbr_array(jacobian_store[i_normal][intx_normal][inty_normal][intz_normal]);
+                        fe_invMatrix_pbr_array(invJacobian_store[i_normal][intx_normal][inty_normal][intz_normal], jacobian_store[i_normal][intx_normal][inty_normal][intz_normal], det_store[i_normal][intx_normal][inty_normal][intz_normal]);
+                        fe_dndxyz_8_pbr_array(dndx_store[i_normal][intx_normal][inty_normal][intz_normal], dndy_store[i_normal][intx_normal][inty_normal][intz_normal], dndz_store[i_normal][intx_normal][inty_normal][intz_normal], nnel_normal, dndr_store, dnds_store, dndt_store, invJacobian_store[i_normal][intx_normal][inty_normal][intz_normal]);
+                    }
+                }
             }
         }
 
@@ -46,35 +66,21 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
 
         if (time_step_counter != 0) { // if this is not the first time step the go into the loop
             for (intx_normal = 0; intx_normal < 2; intx_normal++) {
-                x_normal   = points_normal(intx_normal);
-                wtx_normal = weights_normal(intx_normal);
                 for (inty_normal = 0; inty_normal < 2; inty_normal++) {
-                    y_normal   = points_normal(inty_normal);
-                    wty_normal = weights_normal(inty_normal);
                     for (intz_normal = 0; intz_normal < 2; intz_normal++) {
-                        z_normal   = points_normal(intz_normal);
-                        wtz_normal = weights_normal(intz_normal);
 
-                        if (t == 0) {
-                            fe_dniso_8_array(dndr_store, dnds_store, dndt_store, x_normal, y_normal, z_normal, intx_normal, inty_normal, intz_normal);
-                            fe_calJacobian_array(jacobian_store, i_normal, nnel_normal, dndr_store, dnds_store, dndt_store, x_store[i_normal], y_store[i_normal], z_store[i_normal]);
-                            det_store[i_normal] = fe_detMatrix_pbr_array(jacobian_store[i_normal]);
-                            fe_invMatrix_pbr_array(invJacobian_store[i_normal], jacobian_store[i_normal], det_store[i_normal]);
-                            fe_dndxyz_8_pbr_array(dndx_store, dndy_store, dndz_store, i_normal, nnel_normal, dndr_store, dnds_store, dndt_store, invJacobian_store[i_normal]);
-                            counter_test += 1;
-                        }
 
                         for (j_normal = 0; j_normal < nnel_normal; j_normal++) {
-                            dndx_normal(j_normal) = dndx_store[i_normal][j_normal];
-                            dndy_normal(j_normal) = dndy_store[i_normal][j_normal];
-                            dndz_normal(j_normal) = dndz_store[i_normal][j_normal];
+                            dndx_normal(j_normal) = dndx_store[i_normal][intx_normal][inty_normal][intz_normal][j_normal];
+                            dndy_normal(j_normal) = dndy_store[i_normal][intx_normal][inty_normal][intz_normal][j_normal];
+                            dndz_normal(j_normal) = dndz_store[i_normal][intx_normal][inty_normal][intz_normal][j_normal];
                         }
 
                         fe_strDispMatrix_totalLagrangian_pbr(disp_mat_normal, edof_normal, nnel_normal, dndx_normal, dndy_normal, dndz_normal, u_e_normal);
 
                         fe_stressUpdate_pbr(sigma_e_normal, dndx_normal, dndy_normal, dndz_normal, disp_mat_normal, u_e_normal, (*elements_host)(i_normal, 1), 0);
 
-                        f_int_e = f_int_e + ((disp_mat_normal.transpose()) * sigma_e_normal * wtx_normal * wty_normal * wtz_normal * det_store[i_normal]);
+                        f_int_e = f_int_e + ((disp_mat_normal.transpose()) * sigma_e_normal * wtx_normal[intx_normal] * wty_normal[intx_normal][inty_normal] * wtz_normal[intx_normal][inty_normal][intz_normal] * det_store[i_normal][intx_normal][inty_normal][intz_normal]);
 
                         if (f_ext_e_sum_normal < 1e-18) { // only include damping when no external forces act on the element
 
@@ -82,7 +88,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                           fe_getPressure_lbv_pbr(pressure_e_normal, dndx_normal, dndy_normal, dndz_normal, u_e_normal, u_e_prev_normal, dT, xcoord_normal, ycoord_normal, zcoord_normal, (*elements_host)(i_normal, 1));
 
                           // calculate internal damping force resulting from bulk viscosity pressure
-                          f_damp_e = f_damp_e + ((disp_mat_normal.transpose()) * pressure_e_normal * wtx_normal * wty_normal * wtz_normal * det_store[i_normal]);
+                          f_damp_e = f_damp_e + ((disp_mat_normal.transpose()) * pressure_e_normal * wtx_normal[intx_normal] * wty_normal[intx_normal][inty_normal] * wtz_normal[intx_normal][inty_normal][intz_normal] * det_store[i_normal][intx_normal][inty_normal][intz_normal]);
 
                         }
                     }
