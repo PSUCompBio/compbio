@@ -48,3 +48,11 @@ void Materials::printInfo(std::string type) {
 		std::cout << "----------------------------------" << "\n";
 	}
 }
+
+double Materials::getMechMatParam(int obj_interest) {
+	return mechanical_mat_properties(obj_interest);
+}
+
+double Materials::getElecMatParam(int obj_interest) {
+	return electrical_mat_properties(obj_interest);
+}

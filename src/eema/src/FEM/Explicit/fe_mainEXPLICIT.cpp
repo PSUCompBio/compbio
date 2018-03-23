@@ -28,6 +28,12 @@ MatrixXd H_DefGrad;
 
 void experimental() {
 
+    /*
+    fe_strDispMatrix_totalLagrangian_pbr
+    fe_mooneyrivlin_hyperelastic
+
+    */
+
     int nel = mesh[0].getNumElements();
     int nnel = mesh[0].getNumNodesPerElement();
     int edof = nnel * ndof;

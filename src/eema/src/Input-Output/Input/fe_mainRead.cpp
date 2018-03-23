@@ -33,9 +33,11 @@ int num_constraints;
 Constraint *cons;
 bool embedded_constraint;
 double area_truss = 0; // default 7.85398e-7
+double *matMap;
 
 void fe_mainRead(std::string file) {
 
+  matMap = new double[5000];
   num_meshes = 0;
   int num_meshes_counter = 0;
   material_types = 0;
@@ -165,6 +167,9 @@ void fe_mainRead(std::string file) {
         }
 
         mat[material_types_counter].readMatId(mat_id);
+
+        matMap[mat_id] = material_types_counter;
+
         if (mech_mat_properties.size() != 0) {
           mat[material_types_counter].readMats(mech_mat_model, mech_mat_properties, "mechanical");
         }

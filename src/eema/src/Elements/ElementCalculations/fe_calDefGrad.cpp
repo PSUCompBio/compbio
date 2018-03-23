@@ -42,8 +42,21 @@ MatrixXd fe_calDefGrad(VectorXd dndx, VectorXd dndy, VectorXd dndz, VectorXd u) 
 
 void fe_calDefGrad_pbr(MatrixXd& F, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u) {
 
-	H_DefGrad = MatrixXd::Zero(3, 3);
-	for (i_lbv = 0; i_lbv < dndx.size(); i_lbv++) {
+	i_lbv = 0;
+
+	H_DefGrad(0, 0) = (dndx(i_lbv) * u(i_lbv * 3));
+	H_DefGrad(0, 1) = (dndy(i_lbv) * u(i_lbv * 3));
+	H_DefGrad(0, 2) = (dndz(i_lbv) * u(i_lbv * 3));
+
+	H_DefGrad(1, 0) = (dndx(i_lbv) * u((i_lbv * 3) + 1));
+	H_DefGrad(1, 1) = (dndy(i_lbv) * u((i_lbv * 3) + 1));
+	H_DefGrad(1, 2) = (dndz(i_lbv) * u((i_lbv * 3) + 1));
+
+	H_DefGrad(2, 0) = (dndx(i_lbv) * u((i_lbv * 3) + 2));
+	H_DefGrad(2, 1) = (dndy(i_lbv) * u((i_lbv * 3) + 2));
+	H_DefGrad(2, 2) = (dndz(i_lbv) * u((i_lbv * 3) + 2));
+
+	for (i_lbv = 1; i_lbv < dndx.size(); i_lbv++) {
 
 		// First row
 		H_DefGrad(0, 0) = H_DefGrad(0, 0) + (dndx(i_lbv) * u(i_lbv * 3));

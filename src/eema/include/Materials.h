@@ -35,6 +35,8 @@ public:
 	void readMatId(int a);
 	void readMats(std::string b, VectorXd c, std::string type);
 	void printInfo(std::string type);
+	double getMechMatParam(int obj_interest);
+	double getElecMatParam(int obj_interest);
 };
 
 #endif /* HEADERS_MATERIALS_H_ */

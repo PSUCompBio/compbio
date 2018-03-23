@@ -125,6 +125,7 @@ extern double eps_energy;
 
 extern int counter_test; // Testing loops
 extern MatrixXd I;
+extern double *matMap;
 
 // fe_getForce_3d_normal
 
