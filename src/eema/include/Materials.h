@@ -37,6 +37,7 @@ public:
 	void printInfo(std::string type);
 	double getMechMatParam(int obj_interest);
 	double getElecMatParam(int obj_interest);
+	int getMatID();
 };
 
 #endif /* HEADERS_MATERIALS_H_ */

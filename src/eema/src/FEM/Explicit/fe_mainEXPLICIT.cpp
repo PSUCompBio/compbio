@@ -6,7 +6,7 @@ double failure_time_step = 1e-8;
 
 // Global
 
-int counter_test = 0;
+int counter_test = 0, *matMap;
 MatrixXd I;
 
 // fe_getForce_3d_normal
@@ -41,35 +41,44 @@ double I1_mrh, tmp1_mrh, I2_mrh, defJacobian_mrh, defJacobian_frac_mrh, I1_bar_m
 double E_cws, nu_cws, rho_cws, c_wave_cws;
 std::string model_cws;
 
+// fe_calArea_4
+
+Vector3d tr1_side1, tr1_side2, tr2_side1, tr2_side2, area_tr1, area_tr2;
+double area;
+
+// fe_calVolume
+
+Vector3d a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3, e1, e2, e3;
+double volume, tet1_vol, tet2_vol, tet3_vol, tet4_vol, tet5_vol;
+
 void experimental() {
 
-    /*
-        fe_mooneyrivlin_hyperelastic
-    */
-
-    int nel = mesh[0].getNumElements();
-    int nnel = mesh[0].getNumNodesPerElement();
-    int edof = nnel * ndof;
     int i, j, k ,l, m;
+
+    nel_normal   = mesh[0].getNumElements();
+    nnel_normal  = mesh[0].getNumNodesPerElement();
+    nnode_normal = mesh[0].getNumNodes();
+    sdof_normal  = nnode_normal * ndof;
+    edof_normal  = nnel_normal * ndof;
 
     // Allocating Memory
 
     I = MatrixXd::Identity(3, 3);
     points_normal  = guass_points(2);
     weights_normal = guass_weights(2);
-    disp_mat_normal = MatrixXd::Zero(6, edof);
-    dndx_normal = VectorXd::Zero(nnel);
-    dndy_normal = VectorXd::Zero(nnel);
-    dndz_normal = VectorXd::Zero(nnel);
-    xcoord_normal = VectorXd::Zero(nnel);
-    ycoord_normal = VectorXd::Zero(nnel);
-    zcoord_normal = VectorXd::Zero(nnel);
-    element_stress_host_local_normal = VectorXd::Zero(nel * 9);
-    element_strain_host_local_normal = VectorXd::Zero(nel * 9);
+    disp_mat_normal = MatrixXd::Zero(6, edof_normal);
+    dndx_normal = VectorXd::Zero(nnel_normal);
+    dndy_normal = VectorXd::Zero(nnel_normal);
+    dndz_normal = VectorXd::Zero(nnel_normal);
+    xcoord_normal = VectorXd::Zero(nnel_normal);
+    ycoord_normal = VectorXd::Zero(nnel_normal);
+    zcoord_normal = VectorXd::Zero(nnel_normal);
+    element_stress_host_local_normal = VectorXd::Zero(nel_normal * 9);
+    element_strain_host_local_normal = VectorXd::Zero(nel_normal * 9);
     tmp_storage_normal = VectorXd::Zero(ndof * ndof);
-    u_e_normal = VectorXd::Zero(edof);
-    u_e_prev_normal = VectorXd::Zero(edof);
-    f_ext_e_normal = VectorXd::Zero(edof);
+    u_e_normal = VectorXd::Zero(edof_normal);
+    u_e_prev_normal = VectorXd::Zero(edof_normal);
+    f_ext_e_normal = VectorXd::Zero(edof_normal);
     pressure_e_normal = VectorXd::Zero(6);
     sigma_e_normal = VectorXd::Zero(6);
     F_curr_lbv = MatrixXd::Zero(ndof, ndof);
@@ -91,7 +100,25 @@ void experimental() {
     C_bar_inv_mrh = MatrixXd::Zero(ndof, ndof);
     cauchy_sigma_mrh = MatrixXd::Zero(ndof, ndof);
     pk_S_mrh = MatrixXd::Zero(ndof, ndof);
+    tr1_side1 = Vector3d(3);
+    tr1_side2 = Vector3d(3);
+    tr2_side1 = Vector3d(3);
+    tr2_side2 = Vector3d(3);
+    area_tr1 = Vector3d(3);
+    area_tr2 = Vector3d(3);
 
+    if (material_types_counter >= matTypeHigh)
+        matMap = new int[material_types_counter + 1];
+    else
+        matMap = new int[matTypeHigh + 1];
+
+    for (i_lbv = 0; i_lbv < material_types_counter; i_lbv++) {
+        i_normal = mat[i_lbv].getMatID();
+        matMap[i_normal] = i_lbv;
+    }
+
+    i_lbv = 0;
+    i_normal = 0;
 
     dndr_store = new double[8];
 
@@ -99,19 +126,19 @@ void experimental() {
 
     dndt_store = new double[8];
 
-    x_store = new double*[nel];
-    for (i = 0; i < nel; i++) {
-        x_store[i] = new double[nnel];
+    x_store = new double*[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        x_store[i] = new double[nnel_normal];
     }
 
-    y_store = new double*[nel];
-    for (i = 0; i < nel; i++) {
-        y_store[i] = new double[nnel];
+    y_store = new double*[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        y_store[i] = new double[nnel_normal];
     }
 
-    z_store = new double*[nel];
-    for (i = 0; i < nel; i++) {
-        z_store[i] = new double[nnel];
+    z_store = new double*[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        z_store[i] = new double[nnel_normal];
     }
 
     wtx_normal = new double[2];
@@ -128,8 +155,8 @@ void experimental() {
         }
     }
 
-    jacobian_store = new double*****[nel];
-    for (i = 0; i < nel; i++) {
+    jacobian_store = new double*****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
         jacobian_store[i] = new double****[2];
         for (j = 0; j < 2; j++) {
             jacobian_store[i][j] = new double***[2];
@@ -145,8 +172,8 @@ void experimental() {
         }
     }
 
-    invJacobian_store = new double*****[nel];
-    for (i = 0; i < nel; i++) {
+    invJacobian_store = new double*****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
         invJacobian_store[i] = new double****[2];
         for (j = 0; j < 2; j++) {
             invJacobian_store[i][j] = new double***[2];
@@ -162,8 +189,8 @@ void experimental() {
         }
     }
 
-    det_store = new double***[nel];
-    for (j = 0; j < nel; j++) {
+    det_store = new double***[nel_normal];
+    for (j = 0; j < nel_normal; j++) {
         det_store[j] = new double**[2];
         for (k = 0; k < 2; k++) {
             det_store[j][k] = new double*[2];
@@ -173,43 +200,43 @@ void experimental() {
         }
     }
 
-    dndx_store = new double****[nel];
-    for (i = 0; i < nel; i++) {
+    dndx_store = new double****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
         dndx_store[i] = new double***[2];
         for (j = 0; j < 2; j++) {
             dndx_store[i][j] = new double**[2];
             for (k = 0; k < 2; k++) {
                 dndx_store[i][j][k] = new double*[2];
                 for (l = 0; l < 2; l++) {
-                    dndx_store[i][j][k][l] = new double[nnel];
+                    dndx_store[i][j][k][l] = new double[nnel_normal];
                 }
             }
         }
     }
 
-    dndy_store = new double****[nel];
-    for (i = 0; i < nel; i++) {
+    dndy_store = new double****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
         dndy_store[i] = new double***[2];
         for (j = 0; j < 2; j++) {
             dndy_store[i][j] = new double**[2];
             for (k = 0; k < 2; k++) {
                 dndy_store[i][j][k] = new double*[2];
                 for (l = 0; l < 2; l++) {
-                    dndy_store[i][j][k][l] = new double[nnel];
+                    dndy_store[i][j][k][l] = new double[nnel_normal];
                 }
             }
         }
     }
 
-    dndz_store = new double****[nel];
-    for (i = 0; i < nel; i++) {
+    dndz_store = new double****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
         dndz_store[i] = new double***[2];
         for (j = 0; j < 2; j++) {
             dndz_store[i][j] = new double**[2];
             for (k = 0; k < 2; k++) {
                 dndz_store[i][j][k] = new double*[2];
                 for (l = 0; l < 2; l++) {
-                    dndz_store[i][j][k][l] = new double[nnel];
+                    dndz_store[i][j][k][l] = new double[nnel_normal];
                 }
             }
         }
@@ -224,10 +251,6 @@ void
 fe_mainEXPLICIT()
 {
     experimental();
-    // Following variables - Only for Hex Element
-    int nnode = mesh[0].getNumNodes();            // number of nodes
-    int sdof  = nnode * ndof;                     // system degrees of freedom
-    int nel   = mesh[0].getNumElements();         // number of elements
 
     // Initialization
     double dT             = dt_initial;
@@ -237,25 +260,25 @@ fe_mainEXPLICIT()
     int t_plot = 1;
 
     double output_temp_1  = ((double) (t_end / output_frequency));
-    VectorXd A            = VectorXd::Zero(sdof); // Acceleration Vector
-    VectorXd V            = VectorXd::Zero(sdof); // Velocity Vector
-    VectorXd V_half       = VectorXd::Zero(sdof); // Velocity Vector at n+1/2
-    VectorXd U            = VectorXd::Zero(sdof); // Displacement Vector
-    VectorXd U_prev       = VectorXd::Zero(sdof); // Displacement Vector used to calculate strain rate for damping force calculation
-    VectorXd F_net        = VectorXd::Zero(sdof); // Total Nodal force vector
-    VectorXd fe           = VectorXd::Zero(sdof); // External Nodal force vector
-    VectorXd fe_prev      = VectorXd::Zero(sdof);
+    VectorXd A            = VectorXd::Zero(sdof_normal); // Acceleration Vector
+    VectorXd V            = VectorXd::Zero(sdof_normal); // Velocity Vector
+    VectorXd V_half       = VectorXd::Zero(sdof_normal); // Velocity Vector at n+1/2
+    VectorXd U            = VectorXd::Zero(sdof_normal); // Displacement Vector
+    VectorXd U_prev       = VectorXd::Zero(sdof_normal); // Displacement Vector used to calculate strain rate for damping force calculation
+    VectorXd F_net        = VectorXd::Zero(sdof_normal); // Total Nodal force vector
+    VectorXd fe           = VectorXd::Zero(sdof_normal); // External Nodal force vector
+    VectorXd fe_prev      = VectorXd::Zero(sdof_normal);
 
-    VectorXd fr_prev      = VectorXd::Zero(sdof); // Reaction Nodal force vector at previous timestep
-    VectorXd fr_curr      = VectorXd::Zero(sdof); // Reaction Nodal force vector at current timestep
-    VectorXd fi_prev      = VectorXd::Zero(sdof); // Internal Nodal force vector at previous timestep
-    VectorXd fi_curr      = VectorXd::Zero(sdof); // Internal Nodal force vector at current timestep
-    VectorXd f_damp_curr  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector
-    VectorXd f_damp_prev  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector at previous timestep
+    VectorXd fr_prev      = VectorXd::Zero(sdof_normal); // Reaction Nodal force vector at previous timestep
+    VectorXd fr_curr      = VectorXd::Zero(sdof_normal); // Reaction Nodal force vector at current timestep
+    VectorXd fi_prev      = VectorXd::Zero(sdof_normal); // Internal Nodal force vector at previous timestep
+    VectorXd fi_curr      = VectorXd::Zero(sdof_normal); // Internal Nodal force vector at current timestep
+    VectorXd f_damp_curr  = VectorXd::Zero(sdof_normal); // Linear Bulk Viscosity Damping Nodal force vector
+    VectorXd f_damp_prev  = VectorXd::Zero(sdof_normal); // Linear Bulk Viscosity Damping Nodal force vector at previous timestep
 
     double d_mesh_avg;                            // Average of d_avg values for entire host mesh
     double d_avg_tot;                             // Sum of d_tot values for entire host mesh
-    VectorXd d_avg        = VectorXd::Zero(nel);  // Average d_tot of truss elements associated with each hex element
+    VectorXd d_avg        = VectorXd::Zero(nel_normal);  // Average d_tot of truss elements associated with each hex element
 
     // Following variables - Only for Truss Element
     int nel_truss = 1;                                   // number of truss elements
@@ -324,7 +347,7 @@ fe_mainEXPLICIT()
 
     // ----------------------------------------------------------------------------
     // Step-1: Calculate the mass matrix similar to that of belytschko.
-    VectorXd m_system = VectorXd::Zero(sdof);
+    VectorXd m_system = VectorXd::Zero(sdof_normal);
     fe_calculateMass(m_system, "direct_lumped");
 
     std::string mass = home_path + "/" + "results/system_mass.txt";
@@ -422,10 +445,10 @@ fe_mainEXPLICIT()
             fe_singleDoubleWrite_append(reaction_forces, plot_state_counter, t, total_applied_fr);
 
             d_avg_tot = 0;
-            for (int i = 0; i < nel; i++) {
+            for (int i = 0; i < nel_normal; i++) {
               d_avg_tot = d_avg_tot + d_avg(i);
             }
-            d_mesh_avg = d_avg_tot / nel;
+            d_mesh_avg = d_avg_tot / nel_normal;
 
             fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d[0], d_fatigue[0], d_tot[0], lambda_min[0], lambda_max[0]);
             fe_singleDoubleWrite_append(average_damage, plot_state_counter, t, d_mesh_avg);

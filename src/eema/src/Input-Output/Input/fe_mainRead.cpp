@@ -33,19 +33,19 @@ int num_constraints;
 Constraint *cons;
 bool embedded_constraint;
 double area_truss = 0; // default 7.85398e-7
-double *matMap;
+int material_types_counter, matTypeHigh;
 
 void fe_mainRead(std::string file) {
 
-  matMap = new double[5000];
   num_meshes = 0;
   int num_meshes_counter = 0;
   material_types = 0;
-  int material_types_counter = 0;
+  material_types_counter = 0;
   bc_types = 0;
   int bc_types_counter = 0;
   num_constraints = 0;
   int num_constraints_counter = 0;
+  matTypeHigh = -1;
 
   std::ifstream myfile(file.c_str());
   std::string line;
@@ -167,8 +167,8 @@ void fe_mainRead(std::string file) {
         }
 
         mat[material_types_counter].readMatId(mat_id);
-
-        matMap[mat_id] = material_types_counter;
+        if (matTypeHigh < mat_id)
+            matTypeHigh = mat_id;
 
         if (mech_mat_properties.size() != 0) {
           mat[material_types_counter].readMats(mech_mat_model, mech_mat_properties, "mechanical");

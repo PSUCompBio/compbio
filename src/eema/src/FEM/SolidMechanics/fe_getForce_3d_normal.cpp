@@ -8,13 +8,6 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
     MatrixXd* nodes_host    = mesh[host_id].getNewNodesPointer();
     MatrixXi* elements_host = mesh[host_id].getNewElementsPointer();
 
-    // Variables - Mesh Details
-    nel_normal   = mesh[host_id].getNumElements();       /*! number of elements */
-    nnel_normal  = mesh[host_id].getNumNodesPerElement(); // number of nodes per element
-    nnode_normal = mesh[host_id].getNumNodes();          // number of nodes
-    sdof_normal  = nnode_normal * ndof;          // system degrees of freedom
-    edof_normal  = nnel_normal * ndof;           // element degrees of freedom
-
     for (i_normal = 0; i_normal < nel_normal; i_normal++) {
 
         if (t == 0) {

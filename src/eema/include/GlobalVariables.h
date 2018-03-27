@@ -123,9 +123,9 @@ extern double eps_energy;
 
 // Variables added/moved
 
-extern int counter_test; // Testing loops
+extern int counter_test, material_types_counter, matTypeHigh;
 extern MatrixXd I;
-extern double *matMap;
+extern int *matMap;
 
 // fe_getForce_3d_normal
 
@@ -158,5 +158,15 @@ extern double I1_mrh, tmp1_mrh, I2_mrh, defJacobian_mrh, defJacobian_frac_mrh, I
 
 extern double E_cws, nu_cws, rho_cws, c_wave_cws;
 extern std::string model_cws;
+
+// fe_calArea_4
+
+extern Vector3d tr1_side1, tr1_side2, tr2_side1, tr2_side2, area_tr1, area_tr2;
+extern double area;
+
+// fe_calVolume
+
+extern Vector3d a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3, e1, e2, e3;
+extern double volume, tet1_vol, tet2_vol, tet3_vol, tet4_vol, tet5_vol;
 
 #endif

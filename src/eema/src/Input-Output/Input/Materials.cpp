@@ -56,3 +56,7 @@ double Materials::getMechMatParam(int obj_interest) {
 double Materials::getElecMatParam(int obj_interest) {
 	return electrical_mat_properties(obj_interest);
 }
+
+int Materials::getMatID() {
+	return mat_id;
+}
