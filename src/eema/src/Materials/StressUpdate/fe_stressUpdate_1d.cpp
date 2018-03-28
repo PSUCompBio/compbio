@@ -108,7 +108,7 @@ fe_stressUpdate_1d(int material_id, VectorXd u_embed_local, VectorXd xcoord_embe
     // fe_display_matrix(element_cauchy_sigma);
 
     MatrixXd F = MatrixXd::Zero(3, 3); // deformation gradient
-    F = fe_calDefGrad(dndx, dndy, dndz, u_e);
+    fe_calDefGrad_pbr(F, dndx, dndy, dndz, u_e);
     double defJacobian = F.determinant();
     MatrixXd F_inv     = F.inverse();
     MatrixXd pk_S      = MatrixXd::Zero(3, 3);
