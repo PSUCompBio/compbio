@@ -114,7 +114,6 @@ fe_calCentroidStrain_3d(int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& 
 
     // Strain - Calculation
     MatrixXd E = MatrixXd::Zero(3, 3);
-    MatrixXd I = MatrixXd::Ones(3, 3);
     MatrixXd F = fe_calDefGrad(dndx, dndy, dndz, u_e);
 
     /* Polar Deomposition of F */
@@ -172,7 +171,6 @@ void fe_calCentroidStrain_3d_pbr(VectorXd& element_strain, int nnel, VectorXd& x
 
     // Strain - Calculation
     MatrixXd E = MatrixXd::Zero(3, 3);
-    MatrixXd I = MatrixXd::Ones(3, 3);
     MatrixXd F = MatrixXd::Zero(3, 3);
     fe_calDefGrad_pbr(F, dndx, dndy, dndz, u_e);
 
@@ -189,7 +187,6 @@ void fe_calCentroidStrain_3d_pbr(VectorXd& element_strain, int nnel, VectorXd& x
     MatrixXd Upd = Vsvd * Ssvdmat * Vsvd.adjoint(); //material stretch
     MatrixXd Vpd = Usvd * Ssvdmat * Usvd.adjoint(); //spatial stretch
 
-    // E = 0.5*(F.transpose()*F-I);
     E = Vpd.log();
     element_strain(0) = E(0, 0);
     element_strain(1) = E(0, 1);

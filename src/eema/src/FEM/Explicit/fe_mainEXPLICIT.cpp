@@ -4,6 +4,245 @@ using namespace Eigen;
 double eps_energy = 0.01;
 double failure_time_step = 1e-8;
 
+// Global
+
+int counter_test = 0, *matMap;
+MatrixXd I;
+
+// fe_getForce_3d_normal
+
+double *dndr_store, *dnds_store, *dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store;
+int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal, intx_normal, inty_normal, intz_normal;
+VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal;
+MatrixXd disp_mat_normal;
+
+// fe_getPressure_lbv_pbr
+
+int nnel_lbv, i_lbv;
+double vol_strain_rate_lbv, volume_initial_lbv, volume_current_lbv, lc_lbv, c_wave_lbv, rho_initial_lbv, rho_current_lbv, pressure_scalar_lbv;
+MatrixXd F_curr_lbv, F_inv_lbv, F_invT_lbv, F_prev_lbv, F_dot_lbv, F_dotT_lbv, D_lbv, pressure_matrix_lbv;
+
+// fe_calDefGrad
+
+MatrixXd H_DefGrad;
+
+// fe_strDispMatrix_totalLagrangian_pbr
+
+MatrixXd F_sdm, FT_sdm;
+int i_sdm;
+
+// fe_mooneyrivlin_hyperelastic_pbr
+
+MatrixXd F_mrh, C_mrh, C_inv_mrh, C_square_mrh, C_bar_mrh, C_bar_inv_mrh, cauchy_sigma_mrh, pk_S_mrh;
+double I1_mrh, tmp1_mrh, I2_mrh, defJacobian_mrh, defJacobian_frac_mrh, I1_bar_mrh, I2_bar_mrh, c1_mrh, c2_mrh, D_mrh, p_mrh;
+
+// fe_calWaveSpeed
+
+double E_cws, nu_cws, rho_cws, c_wave_cws;
+std::string model_cws;
+
+// fe_calArea_4
+
+Vector3d tr1_side1, tr1_side2, tr2_side1, tr2_side2, area_tr1, area_tr2;
+double area;
+
+// fe_calVolume
+
+Vector3d a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3, e1, e2, e3;
+double volume, tet1_vol, tet2_vol, tet3_vol, tet4_vol, tet5_vol;
+
+void experimental() {
+
+    int i, j, k ,l, m;
+
+    nel_normal   = mesh[0].getNumElements();
+    nnel_normal  = mesh[0].getNumNodesPerElement();
+    nnode_normal = mesh[0].getNumNodes();
+    sdof_normal  = nnode_normal * ndof;
+    edof_normal  = nnel_normal * ndof;
+
+    // Allocating Memory
+
+    I = MatrixXd::Identity(3, 3);
+    points_normal  = guass_points(2);
+    weights_normal = guass_weights(2);
+    disp_mat_normal = MatrixXd::Zero(6, edof_normal);
+    dndx_normal = VectorXd::Zero(nnel_normal);
+    dndy_normal = VectorXd::Zero(nnel_normal);
+    dndz_normal = VectorXd::Zero(nnel_normal);
+    xcoord_normal = VectorXd::Zero(nnel_normal);
+    ycoord_normal = VectorXd::Zero(nnel_normal);
+    zcoord_normal = VectorXd::Zero(nnel_normal);
+    element_stress_host_local_normal = VectorXd::Zero(nel_normal * 9);
+    element_strain_host_local_normal = VectorXd::Zero(nel_normal * 9);
+    tmp_storage_normal = VectorXd::Zero(ndof * ndof);
+    u_e_normal = VectorXd::Zero(edof_normal);
+    u_e_prev_normal = VectorXd::Zero(edof_normal);
+    f_ext_e_normal = VectorXd::Zero(edof_normal);
+    pressure_e_normal = VectorXd::Zero(6);
+    sigma_e_normal = VectorXd::Zero(6);
+    F_curr_lbv = MatrixXd::Zero(ndof, ndof);
+    F_inv_lbv = MatrixXd::Zero(ndof, ndof);
+    F_invT_lbv = MatrixXd::Zero(ndof, ndof);
+    F_prev_lbv = MatrixXd::Zero(ndof, ndof);
+    F_dot_lbv = MatrixXd::Zero(ndof, ndof);
+    F_dotT_lbv = MatrixXd::Zero(ndof, ndof);
+    D_lbv = MatrixXd::Zero(ndof, ndof);
+    pressure_matrix_lbv = MatrixXd::Zero(ndof, ndof);
+    H_DefGrad = MatrixXd::Zero(ndof, ndof);
+    F_sdm = MatrixXd::Zero(3, 3);
+    FT_sdm = MatrixXd::Zero(3, 3);
+    F_mrh = MatrixXd::Zero(ndof, ndof);
+    C_mrh = MatrixXd::Zero(ndof, ndof);
+    C_inv_mrh = MatrixXd::Zero(ndof, ndof);
+    C_square_mrh = MatrixXd::Zero(ndof, ndof);
+    C_bar_mrh = MatrixXd::Zero(ndof, ndof);
+    C_bar_inv_mrh = MatrixXd::Zero(ndof, ndof);
+    cauchy_sigma_mrh = MatrixXd::Zero(ndof, ndof);
+    pk_S_mrh = MatrixXd::Zero(ndof, ndof);
+    tr1_side1 = Vector3d(3);
+    tr1_side2 = Vector3d(3);
+    tr2_side1 = Vector3d(3);
+    tr2_side2 = Vector3d(3);
+    area_tr1 = Vector3d(3);
+    area_tr2 = Vector3d(3);
+
+    if (material_types_counter >= matTypeHigh)
+        matMap = new int[material_types_counter + 1];
+    else
+        matMap = new int[matTypeHigh + 1];
+
+    for (i_lbv = 0; i_lbv < material_types_counter; i_lbv++) {
+        i_normal = mat[i_lbv].getMatID();
+        matMap[i_normal] = i_lbv;
+    }
+
+    i_lbv = 0;
+    i_normal = 0;
+
+    dndr_store = new double[8];
+
+    dnds_store = new double[8];
+
+    dndt_store = new double[8];
+
+    x_store = new double*[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        x_store[i] = new double[nnel_normal];
+    }
+
+    y_store = new double*[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        y_store[i] = new double[nnel_normal];
+    }
+
+    z_store = new double*[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        z_store[i] = new double[nnel_normal];
+    }
+
+    wtx_normal = new double[2];
+
+    wty_normal = new double*[2];
+    for (i = 0; i < 2; i++)
+        wty_normal[i] = new double[2];
+
+    wtz_normal = new double**[2];
+    for (i = 0; i < 2; i++) {
+        wtz_normal[i] = new double*[2];
+        for (j = 0; j < 2; j++) {
+            wtz_normal[i][j] = new double[2];
+        }
+    }
+
+    jacobian_store = new double*****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        jacobian_store[i] = new double****[2];
+        for (j = 0; j < 2; j++) {
+            jacobian_store[i][j] = new double***[2];
+            for (k = 0; k < 2; k++) {
+                jacobian_store[i][j][k] = new double**[2];
+                for (l = 0; l < 2; l++) {
+                    jacobian_store[i][j][k][l] = new double*[ndof];
+                    for (m = 0; m < ndof; m++) {
+                        jacobian_store[i][j][k][l][m] = new double[ndof];
+                    }
+                }
+            }
+        }
+    }
+
+    invJacobian_store = new double*****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        invJacobian_store[i] = new double****[2];
+        for (j = 0; j < 2; j++) {
+            invJacobian_store[i][j] = new double***[2];
+            for (k = 0; k < 2; k++) {
+                invJacobian_store[i][j][k] = new double**[2];
+                for (l = 0; l < 2; l++) {
+                    invJacobian_store[i][j][k][l] = new double*[ndof];
+                    for (m = 0; m < ndof; m++) {
+                        invJacobian_store[i][j][k][l][m] = new double[ndof];
+                    }
+                }
+            }
+        }
+    }
+
+    det_store = new double***[nel_normal];
+    for (j = 0; j < nel_normal; j++) {
+        det_store[j] = new double**[2];
+        for (k = 0; k < 2; k++) {
+            det_store[j][k] = new double*[2];
+            for (l = 0; l < 2; l++) {
+                det_store[j][k][l] = new double[2];
+            }
+        }
+    }
+
+    dndx_store = new double****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        dndx_store[i] = new double***[2];
+        for (j = 0; j < 2; j++) {
+            dndx_store[i][j] = new double**[2];
+            for (k = 0; k < 2; k++) {
+                dndx_store[i][j][k] = new double*[2];
+                for (l = 0; l < 2; l++) {
+                    dndx_store[i][j][k][l] = new double[nnel_normal];
+                }
+            }
+        }
+    }
+
+    dndy_store = new double****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        dndy_store[i] = new double***[2];
+        for (j = 0; j < 2; j++) {
+            dndy_store[i][j] = new double**[2];
+            for (k = 0; k < 2; k++) {
+                dndy_store[i][j][k] = new double*[2];
+                for (l = 0; l < 2; l++) {
+                    dndy_store[i][j][k][l] = new double[nnel_normal];
+                }
+            }
+        }
+    }
+
+    dndz_store = new double****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        dndz_store[i] = new double***[2];
+        for (j = 0; j < 2; j++) {
+            dndz_store[i][j] = new double**[2];
+            for (k = 0; k < 2; k++) {
+                dndz_store[i][j][k] = new double*[2];
+                for (l = 0; l < 2; l++) {
+                    dndz_store[i][j][k][l] = new double[nnel_normal];
+                }
+            }
+        }
+    }
+}
+
 /*! \brief
  * This function carries out the explicit dynamic analysis of the FEM problem.
  */
@@ -11,36 +250,35 @@ double failure_time_step = 1e-8;
 void
 fe_mainEXPLICIT()
 {
-    // Following variables - Only for Hex Element
-    int nnode = mesh[0].getNumNodes();            // number of nodes
-    int sdof  = nnode * ndof;                     // system degrees of freedom
-    int nel   = mesh[0].getNumElements();         // number of elements
+    experimental();
 
     // Initialization
     double dT             = dt_initial;
     double t              = t_start;
     int time_step_counter = 0; // time step count
     int plot_state_counter = 1;
-    double output_temp_1  = ((double) (t_end / output_frequency));
-    VectorXd A            = VectorXd::Zero(sdof); // Acceleration Vector
-    VectorXd V            = VectorXd::Zero(sdof); // Velocity Vector
-    VectorXd V_half       = VectorXd::Zero(sdof); // Velocity Vector at n+1/2
-    VectorXd U            = VectorXd::Zero(sdof); // Displacement Vector
-    VectorXd U_prev       = VectorXd::Zero(sdof); // Displacement Vector used to calculate strain rate for damping force calculation
-    VectorXd F_net        = VectorXd::Zero(sdof); // Total Nodal force vector
-    VectorXd fe           = VectorXd::Zero(sdof); // External Nodal force vector
-    VectorXd fe_prev      = VectorXd::Zero(sdof);
+    int t_plot = 1;
 
-    VectorXd fr_prev      = VectorXd::Zero(sdof); // Reaction Nodal force vector at previous timestep
-    VectorXd fr_curr      = VectorXd::Zero(sdof); // Reaction Nodal force vector at current timestep
-    VectorXd fi_prev      = VectorXd::Zero(sdof); // Internal Nodal force vector at previous timestep
-    VectorXd fi_curr      = VectorXd::Zero(sdof); // Internal Nodal force vector at current timestep
-    VectorXd f_damp_curr  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector
-    VectorXd f_damp_prev  = VectorXd::Zero(sdof); // Linear Bulk Viscosity Damping Nodal force vector at previous timestep
+    double output_temp_1  = ((double) (t_end / output_frequency));
+    VectorXd A            = VectorXd::Zero(sdof_normal); // Acceleration Vector
+    VectorXd V            = VectorXd::Zero(sdof_normal); // Velocity Vector
+    VectorXd V_half       = VectorXd::Zero(sdof_normal); // Velocity Vector at n+1/2
+    VectorXd U            = VectorXd::Zero(sdof_normal); // Displacement Vector
+    VectorXd U_prev       = VectorXd::Zero(sdof_normal); // Displacement Vector used to calculate strain rate for damping force calculation
+    VectorXd F_net        = VectorXd::Zero(sdof_normal); // Total Nodal force vector
+    VectorXd fe           = VectorXd::Zero(sdof_normal); // External Nodal force vector
+    VectorXd fe_prev      = VectorXd::Zero(sdof_normal);
+
+    VectorXd fr_prev      = VectorXd::Zero(sdof_normal); // Reaction Nodal force vector at previous timestep
+    VectorXd fr_curr      = VectorXd::Zero(sdof_normal); // Reaction Nodal force vector at current timestep
+    VectorXd fi_prev      = VectorXd::Zero(sdof_normal); // Internal Nodal force vector at previous timestep
+    VectorXd fi_curr      = VectorXd::Zero(sdof_normal); // Internal Nodal force vector at current timestep
+    VectorXd f_damp_curr  = VectorXd::Zero(sdof_normal); // Linear Bulk Viscosity Damping Nodal force vector
+    VectorXd f_damp_prev  = VectorXd::Zero(sdof_normal); // Linear Bulk Viscosity Damping Nodal force vector at previous timestep
 
     double d_mesh_avg;                            // Average of d_avg values for entire host mesh
     double d_avg_tot;                             // Sum of d_tot values for entire host mesh
-    VectorXd d_avg        = VectorXd::Zero(nel);  // Average d_tot of truss elements associated with each hex element
+    VectorXd d_avg        = VectorXd::Zero(nel_normal);  // Average d_tot of truss elements associated with each hex element
 
     // Following variables - Only for Truss Element
     int nel_truss = 1;                                   // number of truss elements
@@ -109,7 +347,7 @@ fe_mainEXPLICIT()
 
     // ----------------------------------------------------------------------------
     // Step-1: Calculate the mass matrix similar to that of belytschko.
-    VectorXd m_system = VectorXd::Zero(sdof);
+    VectorXd m_system = VectorXd::Zero(sdof_normal);
     fe_calculateMass(m_system, "direct_lumped");
 
     std::string mass = home_path + "/" + "results/system_mass.txt";
@@ -117,7 +355,7 @@ fe_mainEXPLICIT()
 
     // ----------------------------------------------------------------------------
     // Step-2: getforce step from Belytschko
-    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t);
+    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot);
 
     mesh[0].readNodalKinematics(U, V, A);
 
@@ -153,8 +391,14 @@ fe_mainEXPLICIT()
         /** Update Loading Conditions - time dependent loading conditions */
         fe_apply_bc_load(fe, t);
 
+        if (t >= (plot_state_counter * (output_temp_1)))
+            t_plot = 1;
+
+        else
+          t_plot = 0;
+
         /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
-        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t); // Calculating the force term.
+        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot); // Calculating the force term.
 
         /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
         fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.
@@ -201,10 +445,10 @@ fe_mainEXPLICIT()
             fe_singleDoubleWrite_append(reaction_forces, plot_state_counter, t, total_applied_fr);
 
             d_avg_tot = 0;
-            for (int i = 0; i < nel; i++) {
+            for (int i = 0; i < nel_normal; i++) {
               d_avg_tot = d_avg_tot + d_avg(i);
             }
-            d_mesh_avg = d_avg_tot / nel;
+            d_mesh_avg = d_avg_tot / nel_normal;
 
             fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d[0], d_fatigue[0], d_tot[0], lambda_min[0], lambda_max[0]);
             fe_singleDoubleWrite_append(average_damage, plot_state_counter, t, d_mesh_avg);
@@ -224,5 +468,5 @@ fe_mainEXPLICIT()
       std::string damage_variables_export = home_path + "/" + "results/fiber_damage_output.txt";
       fe_damageVariableExport(damage_variables_export, d, d_fatigue, d_tot, lambda_min, lambda_max);
     }
-
+    std::cout << "\n Counter = " << counter_test << "\n";
 } // fe_mainEXPLICIT

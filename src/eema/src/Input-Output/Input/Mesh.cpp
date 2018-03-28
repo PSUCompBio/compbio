@@ -338,7 +338,6 @@ void Mesh::calculateElementCharateristic() {
     VectorXd xcoord = VectorXd::Zero(elements_new.cols() - 2);
     VectorXd ycoord = VectorXd::Zero(elements_new.cols() - 2);
     VectorXd zcoord = VectorXd::Zero(elements_new.cols() - 2);
-    double volume;
 
     for (int i = 0; i < elements_new.rows(); i++) {
         for (int j = 0; j < elements_new.cols() - 2; j++) {
