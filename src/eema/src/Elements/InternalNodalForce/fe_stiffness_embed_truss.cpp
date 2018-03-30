@@ -8,10 +8,10 @@ MatrixXd fe_stiffness_embed_truss(MatrixXd nodes_truss, MatrixXd elements_truss,
 	MatrixXd disp_mat(6,edof);
 
 	VectorXd shapes_3d(edof);
-	VectorXd dndr(edof);	
+	VectorXd dndr(edof);
 	VectorXd dnds(edof);
 	VectorXd dndt(edof);
-	VectorXd dndx(edof);	
+	VectorXd dndx(edof);
 	VectorXd dndy(edof);
 	VectorXd dndz(edof);
 	MatrixXd jacobian(edof,edof);
@@ -24,7 +24,7 @@ MatrixXd fe_stiffness_embed_truss(MatrixXd nodes_truss, MatrixXd elements_truss,
 
 	MatrixXd k_correction(edof,edof);
 	k_correction = MatrixXd::Zero(edof,edof);
-	
+
 	double length = 1;
 	int truss_intg = 2;
 	MatrixXd nodes_intg_global(2,3);
@@ -42,14 +42,14 @@ MatrixXd fe_stiffness_embed_truss(MatrixXd nodes_truss, MatrixXd elements_truss,
 		double t = truss_intg_points(i);
 		//std::cout<<t<<"is t\n";
 		double wtt = truss_intg_weights(i);
-		//std::cout<<wtt<<"is the weight\n";	
+		//std::cout<<wtt<<"is the weight\n";
 		nodes_intg_local << t, 0, 0;
 		MatrixXd tmp(3,3);
 		tmp = fe_calSimpTransformation(nodes_truss);
 		//nodes_intg_global.row(i) = truss_origin + (tmp.transpose()*nodes_intg_local);
 		nodes_intg_global.row(i) = (tmp.transpose()*nodes_intg_local);
-		//nodes_intg_global.row(i) = 
-		
+		//nodes_intg_global.row(i) =
+
 		// Calculating the Parent Strain Displacement Matrix at embedded node positions
 		//dndr = fe_dndr_8(nodes_intg_global(i,0),nodes_intg_global(i,1),nodes_intg_global(i,2));
 		//dnds = fe_dnds_8(nodes_intg_global(i,0),nodes_intg_global(i,1),nodes_intg_global(i,2));
@@ -62,10 +62,9 @@ MatrixXd fe_stiffness_embed_truss(MatrixXd nodes_truss, MatrixXd elements_truss,
 		//std::cout<<"JACOBIAN: "<<jacobian<<"\n";
                 invJacobian = jacobian.inverse();
 		//std::cout<<"Inverse Jacobian: "<<invJacobian<<"\n";
-                dndx = fe_dndx_8(nnel, dndr, dnds, dndt, invJacobian);
-		//std::cout<<"DNDX is: "<<dndx<<"\n";
-                dndy = fe_dndy_8(nnel, dndr, dnds, dndt, invJacobian);
-                dndz = fe_dndz_8(nnel, dndr, dnds, dndt, invJacobian);
+				fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
+                fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
+                fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
                 disp_mat = fe_strDispMatrix(edof,nnel,dndx,dndy,dndz);
 		//std::cout<<"Displacement Matrix is: "<<disp_mat.transpose()<<"\n";
 		//std::cout<<"Size of disp_mat is: "<<disp_mat.transpose().rows()<<"&"<<disp_mat.transpose().cols()<<"\n";
@@ -74,7 +73,7 @@ MatrixXd fe_stiffness_embed_truss(MatrixXd nodes_truss, MatrixXd elements_truss,
 
 		k_truss = k_truss + ((A_truss)*(((disp_mat.transpose()*strain_transform_mat.transpose())*E_truss*strain_transform_mat)*disp_mat)*(length/2)*(wtt));
 		//k_correction = k_correction + (A_truss*E*(((disp_mat.transpose()*strain_transform_mat.transpose())*strain_transform_mat)*disp_mat)*(length/2)*wtt);
-	}	
+	}
 	std::string truss_stiffness_file = "result_trussStiffness.txt";
 	matrix2text(truss_stiffness_file.c_str(),k_truss,0);
 

@@ -1,5 +1,3 @@
-
-
 #include"functions.h"
 
 using namespace Eigen;
@@ -104,4 +102,3 @@ MatrixXd fe_calTransformation(VectorXd x, VectorXd y, VectorXd z, int choice) {
 	//std::cout<<"Transformation Matrix is: "<<T<<"\n";
 	return T;
 }
-

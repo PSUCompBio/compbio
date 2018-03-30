@@ -13,8 +13,14 @@ MatrixXd I;
 
 double *dndr_store, *dnds_store, *dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store, ******invDistGrad_prev, ******devInstantPk1Stress_prev, ******devInternalPk1Stress1_prev, ******devInternalPk1Stress2_prev;
 int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal, intx_normal, inty_normal, intz_normal;
+<<<<<<< HEAD
 VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal;
 MatrixXd disp_mat_normal, defGrad_normal;
+=======
+VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal, *element_characteristic_embed_normal, element_stress_embed_local_normal, element_strain_embed_local_normal;
+MatrixXd disp_mat_normal, *nodes_host_normal, *nodes_embed_normal;
+MatrixXi *elements_host_normal, *elements_embed_normal;
+>>>>>>> master
 
 // fe_getPressure_lbv_pbr
 
@@ -53,8 +59,17 @@ double volume, tet1_vol, tet2_vol, tet3_vol, tet4_vol, tet5_vol;
 
 void experimental() {
 
+<<<<<<< HEAD
     int i, j, k ,l, m, n;
 
+=======
+    int i, j, k ,l, m;
+    nodes_host_normal = mesh[0].getNewNodesPointer();
+    elements_host_normal = mesh[0].getNewElementsPointer();
+    nodes_embed_normal    = mesh[1].getNewNodesPointer();
+    elements_embed_normal = mesh[1].getNewElementsPointer();
+    element_characteristic_embed_normal = mesh[1].getElementCharacteristicPointer();
+>>>>>>> master
     nel_normal   = mesh[0].getNumElements();
     nnel_normal  = mesh[0].getNumNodesPerElement();
     nnode_normal = mesh[0].getNumNodes();
@@ -76,6 +91,8 @@ void experimental() {
     zcoord_normal = VectorXd::Zero(nnel_normal);
     element_stress_host_local_normal = VectorXd::Zero(nel_normal * 9);
     element_strain_host_local_normal = VectorXd::Zero(nel_normal * 9);
+    element_stress_embed_local_normal = VectorXd::Zero((*elements_embed_normal).rows() * 9);
+    element_strain_embed_local_normal = VectorXd::Zero((*elements_embed_normal).rows() * 9);
     tmp_storage_normal = VectorXd::Zero(ndof * ndof);
     u_e_normal = VectorXd::Zero(edof_normal);
     u_e_prev_normal = VectorXd::Zero(edof_normal);

@@ -4,19 +4,15 @@ using namespace Eigen;
 
 void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp, double t, int t_plot)
 {
-
-    MatrixXd* nodes_host    = mesh[host_id].getNewNodesPointer();
-    MatrixXi* elements_host = mesh[host_id].getNewElementsPointer();
-
     for (i_normal = 0; i_normal < nel_normal; i_normal++) {
 
         if (t == 0) {
 
             for (j_normal = 0; j_normal < nnel_normal; j_normal++) {
-                g_normal = (*elements_host)(i_normal, j_normal + 2);
-                x_store[i_normal][j_normal] = (*nodes_host)(g_normal, 1);
-                y_store[i_normal][j_normal] = (*nodes_host)(g_normal, 2);
-                z_store[i_normal][j_normal] = (*nodes_host)(g_normal, 3);
+                g_normal = (*elements_host_normal)(i_normal, j_normal + 2);
+                x_store[i_normal][j_normal] = (*nodes_host_normal)(g_normal, 1);
+                y_store[i_normal][j_normal] = (*nodes_host_normal)(g_normal, 2);
+                z_store[i_normal][j_normal] = (*nodes_host_normal)(g_normal, 3);
             }
 
             for (intx_normal = 0; intx_normal < 2; intx_normal++) {
@@ -45,11 +41,11 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
             zcoord_normal(intx_normal) = z_store[i_normal][intx_normal];
         }
 
-        fe_gather_pbr(u, u_e_normal, (*elements_host).block<1, 8>(i_normal, 2), sdof_normal);
+        fe_gather_pbr(u, u_e_normal, ((*elements_host_normal).block<1, 8>(i_normal, 2)), sdof_normal);
 
-        fe_gather_pbr(u_prev, u_e_prev_normal, (*elements_host).block<1, 8>(i_normal, 2), sdof_normal);
+        fe_gather_pbr(u_prev, u_e_prev_normal, (*elements_host_normal).block<1, 8>(i_normal, 2), sdof_normal);
 
-        fe_gather_pbr(fext, f_ext_e_normal, (*elements_host).block<1, 8>(i_normal, 2), sdof_normal); // element external nodal forces
+        fe_gather_pbr(fext, f_ext_e_normal, (*elements_host_normal).block<1, 8>(i_normal, 2), sdof_normal); // element external nodal forces
 
         f_ext_e_sum_normal = f_ext_e_normal.sum();
 
@@ -73,14 +69,14 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
 
                         fe_strDispMatrix_totalLagrangian_pbr(disp_mat_normal, edof_normal, nnel_normal, dndx_normal, dndy_normal, dndz_normal, u_e_normal);
 
-                        fe_stressUpdate_pbr(sigma_e_normal, dndx_normal, dndy_normal, dndz_normal, disp_mat_normal, u_e_normal, (*elements_host)(i_normal, 1), 0);
+                        fe_stressUpdate_pbr(sigma_e_normal, dndx_normal, dndy_normal, dndz_normal, disp_mat_normal, u_e_normal, (*elements_host_normal)(i_normal, 1), 0);
 
                         f_int_e = f_int_e + ((disp_mat_normal.transpose()) * sigma_e_normal * wtx_normal[intx_normal] * wty_normal[intx_normal][inty_normal] * wtz_normal[intx_normal][inty_normal][intz_normal] * det_store[i_normal][intx_normal][inty_normal][intz_normal]);
 
                         if (f_ext_e_sum_normal < 1e-18) { // only include damping when no external forces act on the element
 
                           // calculate bulk viscosity pressure that is linear in the volumetric strain rate
-                          fe_getPressure_lbv_pbr(pressure_e_normal, dndx_normal, dndy_normal, dndz_normal, u_e_normal, u_e_prev_normal, dT, xcoord_normal, ycoord_normal, zcoord_normal, (*elements_host)(i_normal, 1));
+                          fe_getPressure_lbv_pbr(pressure_e_normal, dndx_normal, dndy_normal, dndz_normal, u_e_normal, u_e_prev_normal, dT, xcoord_normal, ycoord_normal, zcoord_normal, (*elements_host_normal)(i_normal, 1));
 
                           // calculate internal damping force resulting from bulk viscosity pressure
                           f_damp_e = f_damp_e + ((disp_mat_normal.transpose()) * pressure_e_normal * wtx_normal[intx_normal] * wty_normal[intx_normal][inty_normal] * wtz_normal[intx_normal][inty_normal][intz_normal] * det_store[i_normal][intx_normal][inty_normal][intz_normal]);
@@ -91,7 +87,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
             }
 
             if (t_plot == 1) {
-              fe_calCentroidStress_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host)(i_normal, 1));
+              fe_calCentroidStress_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1));
               element_stress_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
 
               fe_calCentroidStrain_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal);
@@ -101,14 +97,11 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
 
         f_tot_e = f_ext_e_normal - f_int_e - f_damp_e;
 
-        fe_scatter_pbr(f_tot, f_tot_e, (*elements_host).block<1, 8>(i_normal, 2), sdof_normal);
-        fe_scatter_pbr(f_damp, f_damp_e, (*elements_host).block<1, 8>(i_normal, 2), sdof_normal);
+        fe_scatter_pbr(f_tot, f_tot_e, (*elements_host_normal).block<1, 8>(i_normal, 2), sdof_normal);
+        fe_scatter_pbr(f_damp, f_damp_e, (*elements_host_normal).block<1, 8>(i_normal, 2), sdof_normal);
     }
 
     if (t_plot == 1) {
         mesh[host_id].readElementStressStrain(element_stress_host_local_normal, element_strain_host_local_normal);
     }
-
-    nodes_host = NULL;
-    elements_host = NULL;
-} // fe_getForce_3d_normal
+}

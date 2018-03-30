@@ -198,25 +198,4 @@ void fe_insert_int2vector(VectorXi& A, int num, int b) {
 		A = VectorXi::Zero(1);
 		A(0) = b;
 	}
-
-	// if (A.size() != 0) {
-	// 	VectorXi tmp = VectorXi::Zero(A.size());
-	// 	tmp = A;
-	// 	A = VectorXi::Zero(tmp.size() + 1);
-	// 	int counter = 0;
-	// 	for (int i = 0; i < A.size(); i++) {
-	// 		if (i != num) {
-	// 			A(i) = tmp(counter);
-	// 			counter = counter + 1;
-	// 		}
-	// 		else {
-	// 			A(i) = b;
-	// 		}
-	// 	}
-	// }
-	// else {
-	// 	A = VectorXi::Zero(1);
-	// 	A(0) = b;
-	// }
-
 }
