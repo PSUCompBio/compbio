@@ -1,5 +1,3 @@
-
-
 #include"functions.h"
 
 using namespace Eigen;
@@ -18,9 +16,9 @@ MatrixXd fe_calSimpTransformation(MatrixXd truss_nodes){
 
 	Vector3d dir_truss_y(3);
 	Vector3d dir_truss_z(3);
-	
+
 	if(dir_truss_x(0)!=0){
-		dir_truss_y(1) = 1;	
+		dir_truss_y(1) = 1;
 		dir_truss_y(2) = 1;
 		dir_truss_y(0) = -((dir_truss_x(1)+dir_truss_x(2))/dir_truss_x(0));
 	}
@@ -28,23 +26,23 @@ MatrixXd fe_calSimpTransformation(MatrixXd truss_nodes){
 		if((dir_truss_x(0)==0) && (dir_truss_x(1)!=0)){
 			dir_truss_y(0) = 1;
 			dir_truss_y(2) = 1;
-			dir_truss_y(1) = -((dir_truss_x(2)+dir_truss_x(0))/dir_truss_x(1));		
+			dir_truss_y(1) = -((dir_truss_x(2)+dir_truss_x(0))/dir_truss_x(1));
 		}
 		else if((dir_truss_x(0)==0) && (dir_truss_x(2)!=0)){
 			dir_truss_y(0) = 1;
 			dir_truss_y(1) = 1;
-			dir_truss_y(2) = -((dir_truss_x(0)+dir_truss_x(1))/dir_truss_x(2)); 
+			dir_truss_y(2) = -((dir_truss_x(0)+dir_truss_x(1))/dir_truss_x(2));
 		}
 		else{
 			std::cout<<"Truss element is not practically possible"<<"\n";
 		}
 	}
-	
+
 	dir_truss_z = dir_truss_x.cross(dir_truss_y);
 
 	VectorXd dir_global_x(3);
 	dir_global_x << 1, 0, 0;
-	
+
 	VectorXd dir_global_y(3);
 	dir_global_y << 0, 1, 0;
 
@@ -53,8 +51,8 @@ MatrixXd fe_calSimpTransformation(MatrixXd truss_nodes){
 
 	l_1 = (dir_global_x.dot(dir_truss_x))/(dir_global_x.norm()*dir_truss_x.norm());
 	l_2 = (dir_global_x.dot(dir_truss_y))/(dir_global_x.norm()*dir_truss_y.norm());
-	l_3 = (dir_global_x.dot(dir_truss_z))/(dir_global_x.norm()*dir_truss_z.norm()); 
-	m_1 = (dir_global_y.dot(dir_truss_x))/(dir_global_y.norm()*dir_truss_x.norm());	
+	l_3 = (dir_global_x.dot(dir_truss_z))/(dir_global_x.norm()*dir_truss_z.norm());
+	m_1 = (dir_global_y.dot(dir_truss_x))/(dir_global_y.norm()*dir_truss_x.norm());
 	m_2 = (dir_global_y.dot(dir_truss_y))/(dir_global_y.norm()*dir_truss_y.norm());
 	m_3 = (dir_global_y.dot(dir_truss_z))/(dir_global_y.norm()*dir_truss_z.norm());
 	n_1 = (dir_global_z.dot(dir_truss_x))/(dir_global_z.norm()*dir_truss_x.norm());

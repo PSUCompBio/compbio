@@ -72,19 +72,7 @@ MatrixXd fe_mass_hex(MatrixXd nodes, VectorXi elements_row) {
 				//MatrixXd jacobian(ndof,ndof);
 				jacobian = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
 				double detJacobian = jacobian.determinant();
-				//MatrixXd invJacobian(ndof,ndof);
-				//invJacobian = jacobian.inverse();
 
-				//VectorXd dndx(edof);
-				//dndx = fe_dndx_8(nnel, dndr, dnds, dndt, invJacobian);
-				//VectorXd dndy(edof);
-				//dndy = fe_dndy_8(nnel, dndr, dnds, dndt, invJacobian);
-				//VectorXd dndz(edof);
-				//dndz = fe_dndz_8(nnel, dndr, dnds, dndt, invJacobian);
-
-
-				//disp_mat = fe_strDispMatrix(edof,nnel,dndx,dndy,dndz);
-				//k = k + (((disp_mat.transpose())*matl_mat*disp_mat)*wtx*wty*wtz*detJacobian);
 				shape_mat = fe_shapeMatrix(edof, nnel, shapes_3d);
 				m = m + (rho * (shape_mat.transpose()) * shape_mat * detJacobian * wtx * wty * wtz);
 
