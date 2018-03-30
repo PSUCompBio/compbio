@@ -69,6 +69,8 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                             dndz_normal(j_normal) = dndz_store[i_normal][intx_normal][inty_normal][intz_normal][j_normal];
                         }
 
+                        fe_calDefGrad_pbr(defGrad_normal, dndx_normal, dndy_normal, dndz_normal, u_e_normal); // reference defGrad_normal in other functions later on...
+
                         fe_strDispMatrix_totalLagrangian_pbr(disp_mat_normal, edof_normal, nnel_normal, dndx_normal, dndy_normal, dndz_normal, u_e_normal);
 
                         fe_stressUpdate_pbr(sigma_e_normal, dndx_normal, dndy_normal, dndz_normal, disp_mat_normal, u_e_normal, (*elements_host)(i_normal, 1), 0);
