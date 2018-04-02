@@ -8,6 +8,7 @@ std::string job_file; /** Job input file name */
 
 /* Dimension of the Problem */
 int ndof;
+int x; /*test*/
 
 /* Input meshes - number of meshes and type of meshes */
 int num_meshes;
