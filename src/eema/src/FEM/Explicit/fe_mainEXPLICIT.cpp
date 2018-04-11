@@ -3,7 +3,10 @@ using namespace Eigen;
 
 double eps_energy = 0.01;
 double failure_time_step = 1e-8;
-bool include_viscoelasticity = 1;
+
+// set include_viscoelasticity = 0 to ignore viscoelasticity in the hex elements
+// set include_viscoelasticity = 1 to include viscoelasticity in the hex elements
+bool include_viscoelasticity = 0;
 
 // Global
 

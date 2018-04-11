@@ -64,7 +64,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                             dndz_normal(j_normal) = dndz_store[i_normal][intx_normal][inty_normal][intz_normal][j_normal];
                         }
 
-                        fe_calDefGrad_pbr(defGrad_normal, dndx_normal, dndy_normal, dndz_normal, u_e_normal); // *JG. Reference defGrad_normal in other functions too. We repeat this calculation many times.
+                        fe_calDefGrad_pbr(defGrad_normal, dndx_normal, dndy_normal, dndz_normal, u_e_normal); // In the future, reference defGrad_normal in other functions too. We repeat this calculation many times.
                         defJacobian_normal = fe_detMatrix_pbr(defGrad_normal);
                         fe_invMatrix_pbr(invDefGrad_normal, defGrad_normal);
 
@@ -73,6 +73,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                         fe_stressUpdate_pbr(sigma_e_normal, dndx_normal, dndy_normal, dndz_normal, disp_mat_normal, u_e_normal, (*elements_host_normal)(i_normal, 1), 0);
 
                         if (include_viscoelasticity == 1) {
+                          // modifies sigma_e_normal to include viscoelastic effects
                           fe_stressUpdateViscoelasticity_pbr(sigma_e_normal, dT, defGrad_normal, invDefGrad_normal, defJacobian_normal, i_normal, intx_normal, inty_normal, intz_normal, 0);
                         }
 
@@ -91,20 +92,23 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                 }
             }
 
-            // *JG. I had to comment this if statement out for now. We need history when considering viscoelasticity.
-            // if (t_plot == 1) {
-            //   fe_calCentroidStress_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1));
-            //   element_stress_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
-            //
-            //   fe_calCentroidStrain_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal);
-            //   element_strain_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
-            // }
+            if (include_viscoelasticity == 0) {
+              if (t_plot == 1) {
+                fe_calCentroidStress_3d_pbr(tmp_storage_normal, dT, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1));
+                element_stress_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
 
-            fe_calCentroidStress_3d_pbr(tmp_storage_normal, dT, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1));
-            element_stress_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
+                fe_calCentroidStrain_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal);
+                element_strain_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
+              }
+            }
 
-            fe_calCentroidStrain_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal);
-            element_strain_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
+            if (include_viscoelasticity == 1) {
+              fe_calCentroidStress_3d_pbr(tmp_storage_normal, dT, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1));
+              element_stress_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
+
+              fe_calCentroidStrain_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal);
+              element_strain_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
+            }
 
         }
 

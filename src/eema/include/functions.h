@@ -327,8 +327,6 @@ void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, 
 
 void fe_stressModify(VectorXd& sigma_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed, int choice);
 
-void fe_damageUpdate_pbr(VectorXd& d, int fib, double lambda);
-
 void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double lambda, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t);
 
 double fe_calEquivalentStrain(int opt, double lambda);
