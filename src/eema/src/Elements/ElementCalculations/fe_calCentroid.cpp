@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id)
+void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, double dT, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id)
 {
     int edof = nnel * ndof;
 
@@ -20,19 +20,31 @@ void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, int nnel, VectorXd& x
     VectorXd dndz(nnel);
     MatrixXd jacobian(ndof, ndof);
     MatrixXd invJacobian(ndof, ndof);
+    MatrixXd defGrad_centroid(ndof, ndof);
+    MatrixXd invDefGrad_centroid(ndof, ndof);
 
     fe_dniso_8(dndr, dnds, dndt, zero, zero, zero);
-    jacobian    = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
-    // invJacobian = jacobian.inverse();
+    jacobian = fe_calJacobian(ndof, nnel, dndr, dnds, dndt, xcoord, ycoord, zcoord);
     fe_invMatrix_pbr(invJacobian, jacobian);
     fe_dndx_8_pbr(dndx, nnel, dndr, dnds, dndt, invJacobian);
     fe_dndy_8_pbr(dndy, nnel, dndr, dnds, dndt, invJacobian);
     fe_dndz_8_pbr(dndz, nnel, dndr, dnds, dndt, invJacobian);
+
+    fe_calDefGrad_pbr(defGrad_centroid, dndx, dndy, dndz, u_e);
+    double defJacobian_centroid = fe_detMatrix_pbr(defGrad_centroid);
+    fe_invMatrix_pbr(invDefGrad_centroid, defGrad_centroid);
+
     fe_strDispMatrix_totalLagrangian_pbr(disp_mat, edof, nnel, dndx, dndy, dndz, u_e);
 
     // Stress- Calculation
 
     fe_stressUpdate_pbr(sigma_centroid, dndx, dndy, dndz, disp_mat, u_e, material_id, 1);
+
+    if (include_viscoelasticity == 1) {
+      // modifies sigma_e_centroid to include viscoelastic effects
+      fe_stressUpdateViscoelasticity_pbr(sigma_centroid, dT, defGrad_centroid, invDefGrad_centroid, defJacobian_centroid, i_normal, intx_normal, inty_normal, intz_normal, 1);
+    }
+
     element_stress(0) = sigma_centroid(0);
     element_stress(1) = sigma_centroid(3);
     element_stress(2) = sigma_centroid(5);

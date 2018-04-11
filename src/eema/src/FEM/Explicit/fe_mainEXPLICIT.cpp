@@ -4,6 +4,10 @@ using namespace Eigen;
 double eps_energy = 0.01;
 double failure_time_step = 1e-8;
 
+// set include_viscoelasticity = 0 to ignore viscoelasticity in the hex elements
+// set include_viscoelasticity = 1 to include viscoelasticity in the hex elements
+bool include_viscoelasticity = 0;
+
 // Global
 
 int counter_test = 0, *matMap;
@@ -11,10 +15,10 @@ MatrixXd I;
 
 // fe_getForce_3d_normal
 
-double *dndr_store, *dnds_store, *dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store;
+double *dndr_store, *dnds_store, *dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, defJacobian_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store, ******internalStressVariable1_prev_normal_store, ******internalStressVariable2_prev_normal_store, ******devInstantPK2Stress_prev_normal_store, ***internalStressVariable1_prev_centroid_store, ***internalStressVariable2_prev_centroid_store, ***devInstantPK2Stress_prev_centroid_store;
 int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal, intx_normal, inty_normal, intz_normal;
 VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal, *element_characteristic_embed_normal, element_stress_embed_local_normal, element_strain_embed_local_normal;
-MatrixXd disp_mat_normal, *nodes_host_normal, *nodes_embed_normal;
+MatrixXd disp_mat_normal, defGrad_normal, invDefGrad_normal, *nodes_host_normal, *nodes_embed_normal;
 MatrixXi *elements_host_normal, *elements_embed_normal;
 
 // fe_getPressure_lbv_pbr
@@ -54,17 +58,19 @@ double volume, tet1_vol, tet2_vol, tet3_vol, tet4_vol, tet5_vol;
 
 void experimental() {
 
-    int i, j, k ,l, m;
+    int i, j, k ,l, m, n;
     nodes_host_normal = mesh[0].getNewNodesPointer();
     elements_host_normal = mesh[0].getNewElementsPointer();
-    nodes_embed_normal    = mesh[1].getNewNodesPointer();
-    elements_embed_normal = mesh[1].getNewElementsPointer();
-    element_characteristic_embed_normal = mesh[1].getElementCharacteristicPointer();
     nel_normal   = mesh[0].getNumElements();
     nnel_normal  = mesh[0].getNumNodesPerElement();
     nnode_normal = mesh[0].getNumNodes();
     sdof_normal  = nnode_normal * ndof;
     edof_normal  = nnel_normal * ndof;
+    if (embedded_constraint == 1) {
+      nodes_embed_normal    = mesh[1].getNewNodesPointer();
+      elements_embed_normal = mesh[1].getNewElementsPointer();
+      element_characteristic_embed_normal = mesh[1].getElementCharacteristicPointer();
+    }
 
     // Allocating Memory
 
@@ -72,6 +78,8 @@ void experimental() {
     points_normal  = guass_points(2);
     weights_normal = guass_weights(2);
     disp_mat_normal = MatrixXd::Zero(6, edof_normal);
+    defGrad_normal = MatrixXd::Identity(ndof, ndof);
+    invDefGrad_normal = MatrixXd::Identity(ndof, ndof);
     dndx_normal = VectorXd::Zero(nnel_normal);
     dndy_normal = VectorXd::Zero(nnel_normal);
     dndz_normal = VectorXd::Zero(nnel_normal);
@@ -80,8 +88,6 @@ void experimental() {
     zcoord_normal = VectorXd::Zero(nnel_normal);
     element_stress_host_local_normal = VectorXd::Zero(nel_normal * 9);
     element_strain_host_local_normal = VectorXd::Zero(nel_normal * 9);
-    element_stress_embed_local_normal = VectorXd::Zero((*elements_embed_normal).rows() * 9);
-    element_strain_embed_local_normal = VectorXd::Zero((*elements_embed_normal).rows() * 9);
     tmp_storage_normal = VectorXd::Zero(ndof * ndof);
     u_e_normal = VectorXd::Zero(edof_normal);
     u_e_prev_normal = VectorXd::Zero(edof_normal);
@@ -113,6 +119,11 @@ void experimental() {
     tr2_side2 = Vector3d(3);
     area_tr1 = Vector3d(3);
     area_tr2 = Vector3d(3);
+
+    if (embedded_constraint == 1) {
+      element_stress_embed_local_normal = VectorXd::Zero((*elements_embed_normal).rows() * 9);
+      element_strain_embed_local_normal = VectorXd::Zero((*elements_embed_normal).rows() * 9);
+    }
 
     if (material_types_counter >= matTypeHigh)
         matMap = new int[material_types_counter + 1];
@@ -248,6 +259,74 @@ void experimental() {
             }
         }
     }
+
+  internalStressVariable1_prev_normal_store = new double*****[nel_normal];
+  internalStressVariable2_prev_normal_store = new double*****[nel_normal];
+  devInstantPK2Stress_prev_normal_store = new double*****[nel_normal];
+  for (i = 0; i < nel_normal; i++) {
+      internalStressVariable1_prev_normal_store[i] = new double****[2];
+      internalStressVariable2_prev_normal_store[i] = new double****[2];
+      devInstantPK2Stress_prev_normal_store[i] = new double****[2];
+      for (j = 0; j < 2; j++) {
+          internalStressVariable1_prev_normal_store[i][j] = new double***[2];
+          internalStressVariable2_prev_normal_store[i][j] = new double***[2];
+          devInstantPK2Stress_prev_normal_store[i][j] = new double***[2];
+          for (k = 0; k < 2; k++) {
+              internalStressVariable1_prev_normal_store[i][j][k] = new double**[2];
+              internalStressVariable2_prev_normal_store[i][j][k] = new double**[2];
+              devInstantPK2Stress_prev_normal_store[i][j][k] = new double**[2];
+              for (l = 0; l < 2; l++) {
+                  internalStressVariable1_prev_normal_store[i][j][k][l] = new double*[ndof];
+                  internalStressVariable2_prev_normal_store[i][j][k][l] = new double*[ndof];
+                  devInstantPK2Stress_prev_normal_store[i][j][k][l] = new double*[ndof];
+                  for (m = 0; m < ndof; m++) {
+                      internalStressVariable1_prev_normal_store[i][j][k][l][m] = new double[ndof];
+                      internalStressVariable2_prev_normal_store[i][j][k][l][m] = new double[ndof];
+                      devInstantPK2Stress_prev_normal_store[i][j][k][l][m] = new double[ndof];
+                  }
+              }
+          }
+      }
+  }
+  for (i = 0; i < nel_normal; i++) {
+      for (j = 0; j < 2; j++) {
+          for (k = 0; k < 2; k++) {
+              for (l = 0; l < 2; l++) {
+                  for (m = 0; m < ndof; m++) {
+                    for (n = 0; n < ndof; n++) {
+                        internalStressVariable1_prev_normal_store[i][j][k][l][m][n] = 0.0;
+                        internalStressVariable2_prev_normal_store[i][j][k][l][m][n] = 0.0;
+                        devInstantPK2Stress_prev_normal_store[i][j][k][l][m][n] = 0.0;
+                    }
+                  }
+              }
+          }
+      }
+  }
+
+  internalStressVariable1_prev_centroid_store = new double**[nel_normal];
+  internalStressVariable2_prev_centroid_store = new double**[nel_normal];
+  devInstantPK2Stress_prev_centroid_store = new double**[nel_normal];
+  for (i = 0; i < nel_normal; i++) {
+      internalStressVariable1_prev_centroid_store[i] = new double*[ndof];
+      internalStressVariable2_prev_centroid_store[i] = new double*[ndof];
+      devInstantPK2Stress_prev_centroid_store[i] = new double*[ndof];
+      for (j = 0; j < ndof; j++) {
+          internalStressVariable1_prev_centroid_store[i][j] = new double[ndof];
+          internalStressVariable2_prev_centroid_store[i][j] = new double[ndof];
+          devInstantPK2Stress_prev_centroid_store[i][j] = new double[ndof];
+      }
+  }
+  for (i = 0; i < nel_normal; i++) {
+      for (j = 0; j < ndof; j++) {
+        for (k = 0; k < ndof; k++) {
+            internalStressVariable1_prev_centroid_store[i][j][k] = 0.0;
+            internalStressVariable2_prev_centroid_store[i][j][k] = 0.0;
+            devInstantPK2Stress_prev_centroid_store[i][j][k] = 0.0;
+        }
+      }
+  }
+
 }
 
 /*! \brief

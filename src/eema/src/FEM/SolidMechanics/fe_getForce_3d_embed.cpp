@@ -16,7 +16,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
     double d_tot_sum_el = 0; // sum of d_tot for all fibers associated with an individual host element
 
     for (i_normal = 0; i_normal < nel_normal; i_normal++) {
-        
+
         for (j_normal = 0; j_normal < nnel_normal; j_normal++) {
             g_normal = (*elements_host_normal)(i_normal, j_normal + 2);
             xcoord_normal(j_normal) = (*nodes_host_normal)(g_normal, 1);
@@ -73,12 +73,18 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         fe_dndy_8_pbr(dndy, nnel_normal, dndr, dnds, dndt, invJacobian);
                         fe_dndz_8_pbr(dndz, nnel_normal, dndr, dnds, dndt, invJacobian);
 
+                        fe_calDefGrad_pbr(defGrad_normal, dndx, dndy, dndz, u_e_normal); // In the future, reference defGrad_normal in other functions too. We repeat this calculation many times.
+                        defJacobian_normal = fe_detMatrix_pbr(defGrad_normal);
+                        fe_invMatrix_pbr(invDefGrad_normal, defGrad_normal);
+
                         fe_strDispMatrix_totalLagrangian_pbr(disp_mat_normal, edof_normal, nnel_normal, dndx, dndy, dndz, u_e_normal);
-                        // disp_mat_normal = fe_strDispMatrix(edof_normal, nnel_normal, dndx, dndy, dndz);
 
                         fe_stressUpdate_pbr(sigma_e, dndx, dndy, dndz, disp_mat_normal, u_e_normal, (*elements_host_normal)(i_normal, 1), 0);
 
-                        // f_int_e = f_int_e + ((disp_mat_normal.transpose())*sigma_e*wtx*wty*wtz*detJacobian); (previous correct)
+                        if (include_viscoelasticity == 1) {
+                          // modifies sigma_e_normal to include viscoelastic effects
+                          fe_stressUpdateViscoelasticity_pbr(sigma_e, dT, defGrad_normal, invDefGrad_normal, defJacobian_normal, i_normal, intx, inty, intz, 0);
+                        }
 
                         f_int_e = f_int_e + ((disp_mat_normal.transpose()) * sigma_e * wtx * wty * wtz * detJacobian);
 
@@ -95,13 +101,24 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                 }
             }
 
-            if (t_plot == 1) {
-                fe_calCentroidStress_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1));
+            if (include_viscoelasticity == 0) {
+              if (t_plot == 1) {
+                fe_calCentroidStress_3d_pbr(tmp_storage_normal, dT, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1));
                 element_stress_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
 
                 fe_calCentroidStrain_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal);
                 element_strain_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
+              }
             }
+
+            if (include_viscoelasticity == 1) {
+              fe_calCentroidStress_3d_pbr(tmp_storage_normal, dT, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1));
+              element_stress_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
+
+              fe_calCentroidStrain_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal);
+              element_strain_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
+            }
+
 
             /*
              *  EMBEDDED FIBER ANALYSIS - STARTS FROM HERE
@@ -143,9 +160,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                         u_embed_local.segment<3>(j_normal * ndof) = u_embed.segment<3>(g_normal * ndof);
                     }
 
-                    //std::cout << "Embedded Displacements: \n" << u_embed << "\n";
-                    //std::cout << "Local Embed Displacement: \n" << u_embed_local << "\n";
-
                     double length_embed = fe_calVolume(xcoord_embed, ycoord_embed, zcoord_embed);
                     double length_embed_orig = (*element_characteristic_embed_normal)(fib);
                     double length_embed_curr = fe_calCurrLength_pbr(u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed);
@@ -160,8 +174,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
                       // length_embed_orig = (*element_characteristic_embed_normal)(fib);
                       // length_embed_curr = fe_calCurrLength_pbr(u_embed_local, xcoord_embed, ycoord_embed, zcoord_embed);
                       // lambda = length_embed_curr/length_embed;
-
-                      // fe_damageUpdate_pbr(d, fib, lambda); // This was the original definition of overload damage (similar to the Mullins effect). We are not using this anymore. However, I will leave the code in place for now. The structure might be useful later on. -JG, 2/8/2018
 
                       fe_fatigueDamageUpdate_pbr((*elements_embed_normal)(fib, 1), d_fatigue, fib, lambda, lambda_min_cycle, lambda_max_cycle, n_load_cycle_full, n_load_cycle_partial, t);
 
@@ -205,9 +217,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
                         // Procedure - 1: (Same Deformation Gradient - Because No Slip)
                         fe_stressUpdate_pbr(sigma_embed, dndx, dndy, dndz, disp_mat_normal, u_e_normal, (*elements_embed_normal)(fib, 1), 0);
-
-                        // New concept that I am trying out...
-                        // fe_stressModify(sigma_embed, xcoord_embed, ycoord_embed, zcoord_embed, 3);
 
                         if (include_d == 0) {
                           // VectorXd f_int_truss = (disp_mat_normal.transpose() * sigma_embed * wtt * (length_embed / 2) * area_truss); // Official version. 2/18/2018
@@ -277,8 +286,6 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
             }
 
         }
-
-        //std::cout << "Host Final - nodal force: " << f_int_e.maxCoeff() << "\n";
 
         f_tot_e = f_ext_e_normal - f_int_e - f_damp_e;
 
