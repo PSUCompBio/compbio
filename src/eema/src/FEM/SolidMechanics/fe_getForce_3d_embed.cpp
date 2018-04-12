@@ -83,7 +83,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 
                         if (include_viscoelasticity == 1) {
                           // modifies sigma_e_normal to include viscoelastic effects
-                          fe_stressUpdateViscoelasticity_pbr(sigma_e, dT, defGrad_normal, invDefGrad_normal, defJacobian_normal, i_normal, intx, inty, intz, 0);
+                          fe_stressUpdateViscoelasticity_pbr(sigma_e, dT, defGrad_normal, invDefGrad_normal, defJacobian_normal, i_normal, intx, inty, intz, (*elements_host_normal)(i_normal, 1), 0);
                         }
 
                         f_int_e = f_int_e + ((disp_mat_normal.transpose()) * sigma_e * wtx * wty * wtz * detJacobian);

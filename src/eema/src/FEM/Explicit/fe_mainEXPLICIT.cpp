@@ -6,7 +6,7 @@ double failure_time_step = 1e-8;
 
 // set include_viscoelasticity = 0 to ignore viscoelasticity in the hex elements
 // set include_viscoelasticity = 1 to include viscoelasticity in the hex elements
-bool include_viscoelasticity = 0;
+bool include_viscoelasticity = 1;
 
 // Global
 
