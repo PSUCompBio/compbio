@@ -6,7 +6,7 @@ double failure_time_step = 1e-8;
 
 // set include_viscoelasticity = 0 to ignore viscoelasticity in the hex elements
 // set include_viscoelasticity = 1 to include viscoelasticity in the hex elements
-bool include_viscoelasticity = 1;
+bool include_viscoelasticity = 0;
 
 // Global
 
@@ -515,7 +515,7 @@ fe_mainEXPLICIT()
                       << "\n Timestep Number = " << (time_step_counter)
                       << "\n Plot State = " << (plot_state_counter - 1)
                       << "\n CPU Time = " << std::setw(5) << std::setprecision(1)
-                      << ((float) ds / CLOCKS_PER_SEC) << "s" << "\n";
+                      << ((double) ds / CLOCKS_PER_SEC) << "s" << "\n";
             // std::cout << std::setw(5) << std::scientific << std::setprecision(5) << "Z Displacement: " << U(20) << "\n";
 
             if (include_d == 1) {

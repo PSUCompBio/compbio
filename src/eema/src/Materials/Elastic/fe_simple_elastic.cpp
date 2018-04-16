@@ -13,6 +13,17 @@ void fe_simple_elastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& dndy
 	sigma_local = matl_mat * disp_mat * u;
 }
 
+void fe_simple_elastic_pbr_array(VectorXd& sigma_local, int i, int x, int y, int z, MatrixXd& disp_mat, VectorXd& u, int opt, int return_opt) {
+
+	sigma_local = VectorXd::Zero(6);
+
+	MatrixXd matl_mat = MatrixXd::Zero(6, 6);
+	double E = fe_get_mats(opt, 1, "mechanical");
+	double nu = fe_get_mats(opt, 2, "mechanical");
+	fe_calculate_matlmat_pbr(matl_mat, 4, E, nu);
+	sigma_local = matl_mat * disp_mat * u;
+}
+
 void fe_calculate_matlmat_pbr(MatrixXd& matl_mat, int n, double E, double nu) {
 
 	double cons = (E / ((1 + nu) * (1 - (2 * nu))));

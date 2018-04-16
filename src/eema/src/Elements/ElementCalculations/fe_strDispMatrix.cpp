@@ -64,6 +64,42 @@ void fe_strDispMatrix_totalLagrangian_pbr(MatrixXd& disp_mat_modified, int edof,
 	}
 }
 
+void fe_strDispMatrix_totalLagrangian_pbr_array(MatrixXd& disp_mat_modified, int edof, int nnel, int i, int x, int y, int z, VectorXd& u) {
+
+	// Refer to Belytschko if you have questions about the formation of this matrix
+
+	fe_calDefGrad_pbr_array(F_sdm, i, x, y, z, u);
+	
+	FT_sdm = F_sdm.transpose();
+
+	for (i_sdm = 0; i_sdm < nnel; i_sdm++) {
+
+		disp_mat_modified(0, (i_sdm * 3)) = dndx_store[i][x][y][z][i_sdm] * FT_sdm(0, 0);
+		disp_mat_modified(0, ((i_sdm * 3) + 1)) = dndx_store[i][x][y][z][i_sdm] * FT_sdm(0, 1);
+		disp_mat_modified(0, (((i_sdm * 3) + 1) + 1)) = dndx_store[i][x][y][z][i_sdm] * FT_sdm(0, 2);
+
+		disp_mat_modified(1, (i_sdm * 3)) = dndy_store[i][x][y][z][i_sdm] * FT_sdm(1, 0);
+		disp_mat_modified(1, ((i_sdm * 3) + 1)) = dndy_store[i][x][y][z][i_sdm] * FT_sdm(1, 1);
+		disp_mat_modified(1, (((i_sdm * 3) + 1) + 1)) = dndy_store[i][x][y][z][i_sdm] * FT_sdm(1, 2);
+
+		disp_mat_modified(2, (i_sdm * 3)) = dndz_store[i][x][y][z][i_sdm] * FT_sdm(2, 0);
+		disp_mat_modified(2, ((i_sdm * 3) + 1)) = dndz_store[i][x][y][z][i_sdm] * FT_sdm(2, 1);
+		disp_mat_modified(2, (((i_sdm * 3) + 1) + 1)) = dndz_store[i][x][y][z][i_sdm] * FT_sdm(2, 2);
+
+
+		disp_mat_modified(3, (i_sdm * 3)) = (dndy_store[i][x][y][z][i_sdm] * FT_sdm(0, 0)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(1, 0));
+		disp_mat_modified(3, ((i_sdm * 3) + 1)) = (dndy_store[i][x][y][z][i_sdm] * FT_sdm(0, 1)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(1, 1));
+		disp_mat_modified(3, (((i_sdm * 3) + 1) + 1)) = (dndy_store[i][x][y][z][i_sdm] * FT_sdm(0, 2)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(1, 2));
+
+		disp_mat_modified(4, (i_sdm * 3)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(1, 0)) + (dndy_store[i][x][y][z][i_sdm] * FT_sdm(2, 0));
+		disp_mat_modified(4, ((i_sdm * 3) + 1)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(1, 1)) + (dndy_store[i][x][y][z][i_sdm] * FT_sdm(2, 1));
+		disp_mat_modified(4, (((i_sdm * 3) + 1) + 1)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(1, 2)) + (dndy_store[i][x][y][z][i_sdm] * FT_sdm(2, 2));
+
+		disp_mat_modified(5, (i_sdm * 3)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(0, 0)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(2, 0));
+		disp_mat_modified(5, ((i_sdm * 3) + 1)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(0, 1)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(2, 1));
+		disp_mat_modified(5, (((i_sdm * 3) + 1) + 1)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(0, 2)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(2, 2));
+	}
+}
 
 void fe_strDispMatrix_totalLagrangian_fiber_pbr(MatrixXd& disp_mat_modified, int edof, int nnel, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, MatrixXd& F_fiber_ref) {
 
