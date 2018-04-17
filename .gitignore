@@ -12,6 +12,7 @@
 obj
 build*
 lib
+src/eema/examples/*/results/*
 .settings
 .vscode
 .idea

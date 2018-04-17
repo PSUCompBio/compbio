@@ -1,0 +1,18 @@
+#!/bin/bash
+#PBS -l nodes=1:ppn=2 		## Requests 1 processor on 1 node
+#PBS -l walltime=0010:00 	## Requests 10 min. of walltime
+#PBS -l pmem=2gb 		## Requests 2 gigabytes of memory per process
+#PBS -A open			## Specifies the allocation. Use -A open for open queue
+#PBS -j oe 			## Requests that regular output and terminal output go to the same file
+
+
+## The following is the body of the script. By default PBS scripts execute in your home directory, not the
+## directory from which they were submitted. The following line places you in the directory from which the job
+## was submitted.
+
+
+cd $PBS_O_WORKDIR
+module load pgi/16.4 openmpi/1.10.1
+
+## Now we want to run the program "test". "test" is in the directory that this script is being submitted from
+mpirun -np 2 ./parallel-test 
