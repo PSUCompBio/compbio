@@ -254,7 +254,7 @@ MatrixXd fe_updateNodes(MatrixXd nodes, VectorXd displacements);
 
 int fe_embed_node_host_check(int host_row, int embed_node, Mesh& host, Mesh& embed);
 
-VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& host, Mesh& embed);
+VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& host, Mesh& embed, int& intersection_check);
 
 VectorXi fe_embed_preprocessing_host_map(VectorXi embed_map, Mesh& host, Mesh& embed);
 
