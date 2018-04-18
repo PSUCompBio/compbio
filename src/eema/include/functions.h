@@ -8,6 +8,8 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
+#include <omp.h>
+#include <utmpx.h>
 
 #include "Eigen/Dense"
 #include "Eigen/Eigenvalues"
@@ -116,10 +118,12 @@ double fe_maxElementLength(VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord)
 
 /** Calculates the strain displacement matrix in total lagrangian system */
 void fe_strDispMatrix_totalLagrangian_pbr(MatrixXd& disp_mat_modified, int edof, int nnel, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u);
+void fe_strDispMatrix_totalLagrangian_pbr_array(MatrixXd& disp_mat_modified, int edof, int nnel, int i, int x, int y, int z, VectorXd& u);
 void fe_strDispMatrix_totalLagrangian_fiber_pbr(MatrixXd& disp_mat_modified, int edof, int nnel, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, MatrixXd& F_fiber_ref);
 
 /** Calculates the deformation gradient */
 void fe_calDefGrad_pbr(MatrixXd& F, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u);
+void fe_calDefGrad_pbr_array(MatrixXd& F, int i, int x, int y, int z, VectorXd& u);
 void fe_calDefGrad_fiber_pbr(MatrixXd& F_fiber, MatrixXd& T_fiber, MatrixXd& T_fiber_inv, double lambda);
 
 /** Writes a symmetric tensor into a Voigt vector form */
@@ -137,6 +141,7 @@ void fe_calculate_matlmat_pbr(MatrixXd& matl_mat, int n, double E, double nu);
 
 /** Updates the stress at each time step based on the material model */
 void fe_stressUpdate_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, MatrixXd& disp_mat, VectorXd& u, int opt, int return_opt);
+void fe_stressUpdate_pbr_array(VectorXd& sigma, int i, int x, int y, int z, MatrixXd& disp_mat, VectorXd& u, int opt, int return_opt);
 void fe_stressUpdate_fiber_pbr(VectorXd& fiber_stress, int opt, double lambda, MatrixXd& T_fiber, MatrixXd& T_fiber_inv, int return_opt);
 
 /** Updates the stress at each time step based on the material model for a 1d element */
@@ -151,15 +156,19 @@ std::string fe_get_model(int matl_code, std::string type);
 
 /** Function calculates the stress vector for a mooney-rivlin material */
 void fe_mooneyrivlin_hyperelastic_pbr(VectorXd& sigma, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, int opt, int return_opt);
+void fe_mooneyrivlin_hyperelastic_pbr_array(VectorXd& sigma, int i, int x, int y, int z, VectorXd& u, int opt, int return_opt);
 
 /** Function calculates the stress vector for a ogden-hyperelastic material */
 void fe_ogden_hyperelastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, int opt, int return_opt);
+void fe_ogden_hyperelastic_pbr_array(VectorXd& sigma_local, int i, int x, int y, int z, VectorXd& u, int opt, int return_opt);
 
 /** Function calculates the stress vector for a simple elastic (small strain) material */
 void fe_simple_elastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, MatrixXd& disp_mat, VectorXd& u, int opt, int return_opt);
+void fe_simple_elastic_pbr_array(VectorXd& sigma_local, int i, int x, int y, int z, MatrixXd& disp_mat, VectorXd& u, int opt, int return_opt);
 
 /** Function calculates the stress vector for a saint venant elastic material model */
 void fe_saintvenant_elastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, int opt, int return_opt);
+void fe_saintvenant_elastic_pbr_array(VectorXd& sigma_local, int i, int x, int y, int z, VectorXd& u, int opt, int return_opt);
 
 /* =================================================================== */
 /* Math */
@@ -324,6 +333,7 @@ void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time
 void fe_stressUpdateViscoelasticity_pbr(VectorXd& instantStress, double dT, MatrixXd& defGrad, MatrixXd invDefGrad, double defJacobian, int i_normal, int intx_normal, int inty_normal, int intz_normal, int opt, int return_opt);
 
 void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, VectorXd& u_prev, double dT, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, int material_id);
+void fe_getPressure_lbv_pbr_array(VectorXd& pressure, int i, int x, int y, int z, VectorXd& u, VectorXd& u_prev, double dT, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, int material_id);
 
 void fe_stressModify(VectorXd& sigma_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed, int choice);
 
