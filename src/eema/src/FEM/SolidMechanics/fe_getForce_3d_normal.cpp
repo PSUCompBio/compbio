@@ -8,27 +8,40 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
 
         if (t == 0) {
 
-            for (j_normal = 0; j_normal < nnel_normal; j_normal++) {
-                g_normal = (*elements_host_normal)(i_normal, j_normal + 2);
-                x_store[i_normal][j_normal] = (*nodes_host_normal)(g_normal, 1);
-                y_store[i_normal][j_normal] = (*nodes_host_normal)(g_normal, 2);
-                z_store[i_normal][j_normal] = (*nodes_host_normal)(g_normal, 3);
+            {
+                for (j_normal = 0; j_normal < nnel_normal; j_normal++) {
+                    g_normal = (*elements_host_normal)(i_normal, j_normal + 2);
+                    x_store[i_normal][j_normal] = (*nodes_host_normal)(g_normal, 1);
+                    y_store[i_normal][j_normal] = (*nodes_host_normal)(g_normal, 2);
+                    z_store[i_normal][j_normal] = (*nodes_host_normal)(g_normal, 3);
+                }
             }
 
-            for (intx_normal = 0; intx_normal < 2; intx_normal++) {
-                x_normal   = points_normal(intx_normal);
-                wtx_normal[intx_normal] = weights_normal(intx_normal);
-                for (inty_normal = 0; inty_normal < 2; inty_normal++) {
-                    y_normal   = points_normal(inty_normal);
-                    wty_normal[intx_normal][inty_normal] = weights_normal(inty_normal);
-                    for (intz_normal = 0; intz_normal < 2; intz_normal++) {
-                        z_normal   = points_normal(intz_normal);
-                        wtz_normal[intx_normal][inty_normal][intz_normal] = weights_normal(intz_normal);
-                        fe_dniso_8_array(dndr_store, dnds_store, dndt_store, x_normal, y_normal, z_normal, intx_normal, inty_normal, intz_normal);
-                        fe_calJacobian_array(jacobian_store[i_normal][intx_normal][inty_normal][intz_normal], nnel_normal, dndr_store, dnds_store, dndt_store, x_store[i_normal], y_store[i_normal], z_store[i_normal]);
-                        det_store[i_normal][intx_normal][inty_normal][intz_normal] = fe_detMatrix_pbr_array(jacobian_store[i_normal][intx_normal][inty_normal][intz_normal]);
-                        fe_invMatrix_pbr_array(invJacobian_store[i_normal][intx_normal][inty_normal][intz_normal], jacobian_store[i_normal][intx_normal][inty_normal][intz_normal], det_store[i_normal][intx_normal][inty_normal][intz_normal]);
-                        fe_dndxyz_8_pbr_array(dndx_store[i_normal][intx_normal][inty_normal][intz_normal], dndy_store[i_normal][intx_normal][inty_normal][intz_normal], dndz_store[i_normal][intx_normal][inty_normal][intz_normal], nnel_normal, dndr_store, dnds_store, dndt_store, invJacobian_store[i_normal][intx_normal][inty_normal][intz_normal]);
+            #pragma omp parallel private(intx_normal, inty_normal, intz_normal, x_normal, y_normal, z_normal)
+            {
+                for (intx_normal = 0; intx_normal < 2; intx_normal++) {
+                    x_normal   = points_normal(intx_normal);
+                    wtx_normal[intx_normal] = weights_normal(intx_normal);
+                    for (inty_normal = 0; inty_normal < 2; inty_normal++) {
+                        y_normal   = points_normal(inty_normal);
+                        wty_normal[intx_normal][inty_normal] = weights_normal(inty_normal);
+                        #pragma omp for
+                        for (intz_normal = 0; intz_normal < 2; intz_normal++) {
+                            //std::cout << "\n Thread "<< omp_get_thread_num() <<" on cpu "<< sched_getcpu() << std::endl;
+                            z_normal = points_normal(intz_normal);
+
+                            wtz_normal[intx_normal][inty_normal][intz_normal] = weights_normal(intz_normal);
+
+                            fe_dniso_8_array(dndr_store[i_normal][intx_normal][inty_normal][intz_normal], dnds_store[i_normal][intx_normal][inty_normal][intz_normal], dndt_store[i_normal][intx_normal][inty_normal][intz_normal], x_normal, y_normal, z_normal, intx_normal, inty_normal, intz_normal);
+
+                            fe_calJacobian_array(jacobian_store[i_normal][intx_normal][inty_normal][intz_normal], nnel_normal, dndr_store[i_normal][intx_normal][inty_normal][intz_normal], dnds_store[i_normal][intx_normal][inty_normal][intz_normal], dndt_store[i_normal][intx_normal][inty_normal][intz_normal], x_store[i_normal], y_store[i_normal], z_store[i_normal]);
+
+                            det_store[i_normal][intx_normal][inty_normal][intz_normal] = fe_detMatrix_pbr_array(jacobian_store[i_normal][intx_normal][inty_normal][intz_normal]);
+
+                            fe_invMatrix_pbr_array(invJacobian_store[i_normal][intx_normal][inty_normal][intz_normal], jacobian_store[i_normal][intx_normal][inty_normal][intz_normal], det_store[i_normal][intx_normal][inty_normal][intz_normal]);
+
+                            fe_dndxyz_8_pbr_array(dndx_store[i_normal][intx_normal][inty_normal][intz_normal], dndy_store[i_normal][intx_normal][inty_normal][intz_normal], dndz_store[i_normal][intx_normal][inty_normal][intz_normal], nnel_normal, dndr_store[i_normal][intx_normal][inty_normal][intz_normal], dnds_store[i_normal][intx_normal][inty_normal][intz_normal], dndt_store[i_normal][intx_normal][inty_normal][intz_normal], invJacobian_store[i_normal][intx_normal][inty_normal][intz_normal]);
+                        }
                     }
                 }
             }
@@ -58,7 +71,9 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
                     for (intz_normal = 0; intz_normal < 2; intz_normal++) {
 
                         fe_calDefGrad_pbr_array(defGrad_normal, i_normal, intx_normal, inty_normal, intz_normal, u_e_normal); // In the future, reference defGrad_normal in other functions too. We repeat this calculation many times.
+
                         defJacobian_normal = fe_detMatrix_pbr(defGrad_normal);
+
                         fe_invMatrix_pbr(invDefGrad_normal, defGrad_normal);
 
                         fe_strDispMatrix_totalLagrangian_pbr_array(disp_mat_normal, edof_normal, nnel_normal, i_normal, intx_normal, inty_normal, intz_normal, u_e_normal);

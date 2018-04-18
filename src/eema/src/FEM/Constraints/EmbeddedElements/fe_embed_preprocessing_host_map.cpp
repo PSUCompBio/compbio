@@ -55,12 +55,13 @@ VectorXi fe_embed_preprocessing_host_map(VectorXi embed_map, Mesh& host, Mesh& e
             int mat_id_embed = (*elements_embed)(embed_row,1);
 
             // Find intersection of embedded element and host element.
+            int intersection_check = 0;
             VectorXd intersection = VectorXd::Zero(ndof);
-            intersection = fe_embed_element_intersection_point(host_row, embed_row, host, embed);
+            intersection = fe_embed_element_intersection_point(host_row, embed_row, host, embed, intersection_check);
 
             // Ensure that intersection point is not coincident with either embedded element nodes.
             // If not coincident, split embedded element at intersection point.
-            if (embed_node_coord_1 != intersection && embed_node_coord_2 != intersection) {
+            if (embed_node_coord_1 != intersection && embed_node_coord_2 != intersection && intersection_check == 1) {
 
               // Create new embedded element node row. Append new row to embedded nodes matrix.
               VectorXd new_embed_node_row = VectorXd::Zero(4);
