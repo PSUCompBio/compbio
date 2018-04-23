@@ -374,9 +374,9 @@ fe_mainEXPLICIT()
       fe_checkFiberVolumeFraction(mesh[0], mesh[1]);     // Check to confirm that maximum fiber volume fraction is not too large.
     }
 
-    VectorXd d                  = VectorXd::Zero(nel_truss); // not currently used (i.e., d = 0)
-    VectorXd d_fatigue          = VectorXd::Zero(nel_truss); // damage variable representing accumulated damage due to repeated loading
-    VectorXd d_tot              = VectorXd::Zero(nel_truss); // damage variable representing total damage, d_tot = d + d_fatigue
+    VectorXd d_static           = VectorXd::Zero(nel_truss); // damage variable representing accumulated fiber damage due to static loading
+    VectorXd d_fatigue          = VectorXd::Zero(nel_truss); // damage variable representing accumulated fiber damage due to repeated loading
+    VectorXd d_tot              = VectorXd::Zero(nel_truss); // damage variable representing total fiber damage, d_tot = d_static + d_fatigue
     VectorXd lambda_min         = VectorXd::Ones(nel_truss); // minimum stretch experienced over lifetime of fiber
     VectorXd lambda_max         = VectorXd::Ones(nel_truss); // maximum stretch experienced over lifetime of fiber
     VectorXd lambda_min_cycle   = VectorXd::Ones(nel_truss); // minimum stretch experienced during current load cycle
@@ -395,7 +395,7 @@ fe_mainEXPLICIT()
       if (import_damage == 1) {
         double t_healing = cons[0].get_HealingTime();
         std::string damage_variables_import = home_path + "/" + "fiber_damage_input.txt";
-        fe_damageVariableImport(damage_variables_import, d, d_fatigue, d_tot, lambda_min, lambda_max, t_healing);
+        fe_damageVariableImport(damage_variables_import, d_static, d_fatigue, d_tot, lambda_min, lambda_max, t_healing);
       }
 
     }
@@ -423,7 +423,7 @@ fe_mainEXPLICIT()
     fe_singleDoubleWrite_new(reaction_forces, plot_state_counter, t, total_applied_fr);
 
     std::string damage_variables = home_path + "/" + "results/damage_variables_single_fiber.txt";
-    fe_damageVariableWrite_new(damage_variables, plot_state_counter, t, d[0], d_fatigue[0], d_tot[0], lambda_min[0], lambda_max[0]);
+    fe_damageVariableWrite_new(damage_variables, plot_state_counter, t, d_static[0], d_fatigue[0], d_tot[0], lambda_min[0], lambda_max[0]);
 
     std::string average_damage = home_path + "/" + "results/average_damage_full_model.txt";
     fe_singleDoubleWrite_new(average_damage, plot_state_counter, t, d_mesh_avg);
@@ -441,7 +441,7 @@ fe_mainEXPLICIT()
 
     // ----------------------------------------------------------------------------
     // Step-2: getforce step from Belytschko
-    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot);
+    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d_static, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot);
 
     mesh[0].readNodalKinematics(U, V, A);
 
@@ -484,7 +484,7 @@ fe_mainEXPLICIT()
           t_plot = 0;
 
         /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
-        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot); // Calculating the force term.
+        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d_static, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot); // Calculating the force term.
 
         /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
         fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.
@@ -536,7 +536,7 @@ fe_mainEXPLICIT()
             }
             d_mesh_avg = d_avg_tot / nel_normal;
 
-            fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d[0], d_fatigue[0], d_tot[0], lambda_min[0], lambda_max[0]);
+            fe_damageVariableWrite_append(damage_variables, plot_state_counter, t, d_static[0], d_fatigue[0], d_tot[0], lambda_min[0], lambda_max[0]);
             fe_singleDoubleWrite_append(average_damage, plot_state_counter, t, d_mesh_avg);
 
         }
@@ -552,7 +552,7 @@ fe_mainEXPLICIT()
 
     if (embedded_constraint == 1) {
       std::string damage_variables_export = home_path + "/" + "results/fiber_damage_output.txt";
-      fe_damageVariableExport(damage_variables_export, d, d_fatigue, d_tot, lambda_min, lambda_max);
+      fe_damageVariableExport(damage_variables_export, d_static, d_fatigue, d_tot, lambda_min, lambda_max);
     }
     std::cout << "\n Counter = " << counter_test << "\n";
 } // fe_mainEXPLICIT
