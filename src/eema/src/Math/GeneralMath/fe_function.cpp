@@ -9,7 +9,6 @@ double fe_function(double a, std::string b, double time, int n_steps, VectorXd t
   double omega = 2*M_PI/T;  // frequency for harmonic functions
   if(b=="RAMP"){
     result = a*(time/t_end);
-//std::cout<<" ";
 }
 
   if(b=="SIN"){
@@ -25,7 +24,6 @@ double fe_function(double a, std::string b, double time, int n_steps, VectorXd t
   }
 
   if(b=="TABULAR"){
-	//std::cout<<time<<" ";
     for(int i = 0; i<n_steps; i++){
 	if(time_data[i]<=time && time<=time_data[i+1])
 	{
@@ -36,10 +34,9 @@ double fe_function(double a, std::string b, double time, int n_steps, VectorXd t
 	if( direction == 3)
 	result = z_data[i] + (z_data[i+1]-z_data[i])*(time-time_data[i])/(time_data[i+1]-time_data[i]);
 	break;}}
-std::cout<<result<<" ";
-  return result;
+ 
 }
-
+ return result;
 }
 
 double fe_function_derivative(double a, std::string b, double time, int n_steps, VectorXd time_data, VectorXd x_data, VectorXd y_data, VectorXd z_data, int direction){

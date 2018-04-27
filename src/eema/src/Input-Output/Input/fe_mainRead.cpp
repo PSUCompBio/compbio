@@ -216,7 +216,7 @@ void fe_mainRead(std::string file) {
 	  std::string s;
   	  if(time_curve == "TABULAR")
 		{
-		std::ifstream myfile2("loadprofile.txt");
+		std::ifstream myfile2("LZ.txt");
 		while(!myfile2.eof()) {
 		    getline(myfile2, s);
 		    n_steps++;	
@@ -227,14 +227,14 @@ void fe_mainRead(std::string file) {
 	  x_data = VectorXd::Zero(n_steps);
 	  y_data = VectorXd::Zero(n_steps);
 	  z_data = VectorXd::Zero(n_steps);	  
-	if(time_curve == "TABULAR"){/*{
+	if(time_curve == "TABULAR"){{
 		std::ifstream myfile3("LX.txt");
 		for(int k = 0; k< n_steps; k++)
 		   {double t;
 		    myfile3 >> t;
 		    time_data(k) = t;
 		    myfile3 >> t;		
-		    x_data(k) = t;
+		    x_data(k) = t*amplitude;
 		   }		
 		myfile3.close();}
 		{std::ifstream myfile4("LY.txt");
@@ -243,9 +243,9 @@ void fe_mainRead(std::string file) {
 		   myfile4 >> t;
 		   time_data(l) = t;
 		   myfile4 >> t;
-		   y_data(l) = t;}
-		   myfile4.close();}*/
-		{std::ifstream myfile5("loadprofile.txt");
+		   y_data(l) = t*amplitude;}
+		   myfile4.close();}
+		{std::ifstream myfile5("LZ.txt");
 		for(int m = 0; m< n_steps; m++)
 		  {double t;
 		  myfile5 >> t;
