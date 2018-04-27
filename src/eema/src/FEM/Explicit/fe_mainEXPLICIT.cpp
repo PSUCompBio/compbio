@@ -9,6 +9,7 @@ double failure_time_step = 1e-8;
 int counter_test = 0, *matMap;
 MatrixXd I;
 
+
 // fe_getForce_3d_normal
 
 double *dndr_store, *dnds_store, *dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store;
@@ -377,7 +378,6 @@ fe_mainEXPLICIT()
     s = clock();
 
     while (t < t_end) {
-
         if ((t + dT) >= t_end) {
             dT = t_end - t;
             if (dT <= 0) {
@@ -461,7 +461,7 @@ fe_mainEXPLICIT()
         time_step_counter = time_step_counter + 1;
 
         dT = fe_getTimeStep();
-
+//dT = 1e-6;
     }
 
     if (embedded_constraint == 1) {

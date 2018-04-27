@@ -29,6 +29,10 @@ double reduction; /** Reduces the timestep value by this amount */
 int bc_types;
 BC *bc;
 
+/* Tabular Data */
+VectorXd time_data, x_data, y_data, z_data;
+int n_steps;
+
 int num_constraints;
 Constraint *cons;
 bool embedded_constraint;
@@ -197,20 +201,61 @@ void fe_mainRead(std::string file) {
         int num_dof;
         VectorXi dof;
         std::string time_curve;
+	n_steps = 1;
         while (line != "*END_BC") {
+	  myfile1 >> time_curve;
           myfile1 >> type;
           myfile1 >> amplitude;
           myfile1 >> num_dof;
           dof = VectorXi::Zero(num_dof);
           for (int i = 0; i < num_dof; i++) {
-            int tmp;
-            myfile1 >> tmp;
-            dof(i) = tmp;
-          }
-          myfile1 >> time_curve;
+          	int tmp;
+      		myfile1 >> tmp;
+          	dof(i) = tmp;
+          	}
+	  std::string s;
+  	  if(time_curve == "TABULAR")
+		{
+		std::ifstream myfile2("loadprofile.txt");
+		while(!myfile2.eof()) {
+		    getline(myfile2, s);
+		    n_steps++;	
+		    }
+		myfile2.close();
+		n_steps = n_steps - 2;}
+	  time_data = VectorXd::Zero(n_steps);
+	  x_data = VectorXd::Zero(n_steps);
+	  y_data = VectorXd::Zero(n_steps);
+	  z_data = VectorXd::Zero(n_steps);	  
+	if(time_curve == "TABULAR"){/*{
+		std::ifstream myfile3("LX.txt");
+		for(int k = 0; k< n_steps; k++)
+		   {double t;
+		    myfile3 >> t;
+		    time_data(k) = t;
+		    myfile3 >> t;		
+		    x_data(k) = t;
+		   }		
+		myfile3.close();}
+		{std::ifstream myfile4("LY.txt");
+		for(int l = 0; l< n_steps; l++)
+		   {double t;
+		   myfile4 >> t;
+		   time_data(l) = t;
+		   myfile4 >> t;
+		   y_data(l) = t;}
+		   myfile4.close();}*/
+		{std::ifstream myfile5("loadprofile.txt");
+		for(int m = 0; m< n_steps; m++)
+		  {double t;
+		  myfile5 >> t;
+		  time_data(m) = t;
+		  myfile5 >> t;
+		  z_data(m) = t*amplitude;}
+		  myfile5.close();}}
           myfile1 >> line;
         }
-        bc[bc_types_counter].readBC(type, amplitude, num_dof, dof, time_curve);
+        bc[bc_types_counter].readBC(type, amplitude, num_dof, dof, time_curve, time_data, x_data, y_data, z_data, n_steps);
         bc_types_counter = bc_types_counter + 1;
       }
 
