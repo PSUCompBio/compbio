@@ -10,7 +10,7 @@ using namespace Eigen;
  * the resultant vectors are scattered into global vectors.
  */
 
-void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t, int t_plot)
+void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t, int t_plot, int rank, VectorXd& f_tot_local, VectorXd& f_damp_local, int sdof_normal)
 {
 
     if (ndof == 3 && embedded_constraint == true) {
@@ -51,10 +51,10 @@ void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int tim
      * }*/
     else if (ndof == 3 && embedded_constraint != true) {
         f_tot = VectorXd::Zero((mesh[0].getNumNodes() * ndof));
-        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp, t, t_plot);
+        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp, t, t_plot, rank, f_tot_local, f_damp_local, sdof_normal);
     } else {
         f_tot = VectorXd::Zero((mesh[0].getNumNodes() * ndof));
-        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp, t, t_plot);
+        fe_getForce_3d_normal(f_tot, u, fext, time_step_counter, 0, u_prev, dT, f_damp, t, t_plot, rank, f_tot_local, f_damp_local, sdof_normal);
     }
 
 

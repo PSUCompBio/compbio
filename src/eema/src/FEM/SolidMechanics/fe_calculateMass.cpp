@@ -1,8 +1,9 @@
 #include "functions.h"
+#include <mpi.h>
 
 using namespace Eigen;
 
-void fe_calculateMass(VectorXd& m_system, std::string type) {
+void fe_calculateMass(VectorXd& m_system, std::string type, VectorXd& m_system_local, int rank) {
 
   if (type == "direct_lumped" && embedded_constraint == true) { // Embedded Mass
     for (int i = 0; i < num_constraints; ++i) {
@@ -26,31 +27,38 @@ void fe_calculateMass(VectorXd& m_system, std::string type) {
     }
   }
   else if (type == "direct_lumped" && embedded_constraint != true) {
-    fe_calculateMassDirectLumped(m_system, 0);
+    fe_calculateMassDirectLumped(m_system, 0, m_system_local, rank);
   }
   else {
-    fe_calculateMassDirectLumped(m_system, 0);
+    fe_calculateMassDirectLumped(m_system, 0, m_system_local, rank);
   }
 
 }
 
-void fe_calculateMassDirectLumped(VectorXd& m_system, int mesh_id) {
+void fe_calculateMassDirectLumped(VectorXd& m_system, int mesh_id, VectorXd& m_system_local, int rank) {
 
   MatrixXd* nodes = mesh[mesh_id].getNewNodesPointer();
   MatrixXi* elements = mesh[mesh_id].getNewElementsPointer();
 
   int nel = mesh[mesh_id].getNumElements();
+//  int nel = 1;
   int nnel = mesh[mesh_id].getNumNodesPerElement();
   int nnode = mesh[mesh_id].getNumNodes();
   int sdof = nnode * ndof;
+  VectorXi pe = mesh[mesh_id].getElementsProcessorID();
+//  int nnode = 8 * ndof;
   int edof = nnel * ndof;
-
+//std::cout<<"P ID "<<pe;
   for (int i = 0; i < nel; i++) {
-    VectorXd m_element = VectorXd::Zero(edof); // mass of hex elements
+	if(rank == pe(i))
+    {
+	VectorXd m_element = VectorXd::Zero(edof); // mass of hex elements
     m_element = fe_massLumped(nodes, (*elements).row(i));
-    fe_scatter_pbr(m_system, m_element, (*elements).block<1, 8>(i, 2), sdof);
-  }
+    fe_scatter_pbr(m_system_local, m_element, (*elements).block<1, 8>(i, 2), sdof);
+		}
+}
 
+MPI_Allreduce(m_system_local.data(), m_system.data(), sdof, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
   nodes = NULL;
   elements = NULL;
 

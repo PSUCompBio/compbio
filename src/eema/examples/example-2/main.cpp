@@ -4,6 +4,8 @@ using namespace Eigen;
  * This is the main file. If you want to submit a new job -- this is where you do it
  */
 int main(int argc, char **argv) {
+	int rank = 0;
+	int size = 1;
 	clock_t t;
 	t = clock();
 
@@ -11,7 +13,7 @@ int main(int argc, char **argv) {
 	home_path = argv[1];
 	job_file = argv[2];
 
-	fe_mainRead(home_path + "/" + job_file);
+	fe_mainRead(home_path + "/" + job_file, size, rank);
 	fe_electroStatics(0);
 
 	t = clock() - t;

@@ -1,5 +1,6 @@
 #include<iomanip>
 #include "functions.h"
+#include <vector>
 using namespace Eigen;
 
 /* Home Folder and Job File */
@@ -12,6 +13,9 @@ int ndof;
 /* Input meshes - number of meshes and type of meshes */
 int num_meshes;
 Mesh *mesh;
+VectorXi pe;
+MatrixXi pn;
+int nrows;
 
 /* Material Properties are stored in here */
 int material_types;
@@ -35,8 +39,7 @@ bool embedded_constraint;
 double area_truss = 0; // default 7.85398e-7
 int material_types_counter, matTypeHigh;
 
-void fe_mainRead(std::string file) {
-
+void fe_mainRead(std::string file, int size, int rank) {
   num_meshes = 0;
   int num_meshes_counter = 0;
   material_types = 0;
@@ -90,8 +93,8 @@ void fe_mainRead(std::string file) {
 
       if (line == "*MESH") {
         std::getline(myfile1, line);
-        MatrixXd nodes;
-        MatrixXi elements;
+        MatrixXd nodes, local_nodes;
+        MatrixXi elements, local_elements;
         std::string name;
 
         while (line != "*END_MESH") {
@@ -101,40 +104,52 @@ void fe_mainRead(std::string file) {
           }
 
           if (line == "*NODES") {
-            int rows = 0;
+            nrows = 0;
             int cols = 0;
-            myfile1 >> rows;
+            myfile1 >> nrows;
             myfile1 >> cols;
-            nodes = MatrixXd::Zero(rows, cols + 1);
-            for (int i = 0; i < rows; i++) {
+            nodes = MatrixXd::Zero(nrows, cols + 1);
+            for (int i = 0; i < nrows; i++) {
               for (int j = 0; j < (cols + 1); j++) {
                 myfile1 >> nodes(i, j);
               }
             }
           }
 
+
           if (line == "*ELEMENTS") {
+	    std::ifstream partition("metis.mesh.epart.5");
             int rows = 0;
             int cols = 0;
             myfile1 >> rows;
             myfile1 >> cols;
+	    pe = VectorXi::Zero(rows);
+	    pn = MatrixXi::Constant(nrows, size, -1);
             elements = MatrixXi::Zero(rows, cols + 2);
             for (int i = 0; i < rows; i++) {
-              for (int j = 0; j < (cols + 2); j++) {
-                myfile1 >> elements(i, j);
-              }
-            }
-          }
+		partition >> pe(i);
+                for (int j = 0; j < (cols + 2); j++) {
+                    myfile1 >> elements(i, j);           
+			if(j>=2)
+			  {int b = elements(i, j);
+			  pn(b, pe(i)) = pe(i);
+			  }
+		}
+		
+	}
+
+	partition.close();
+}
 
           if (nodes.rows() != 0 && elements.rows() != 0 && name.length() != 0) {
-            mesh[num_meshes_counter].readMesh(name, nodes, elements);
+            mesh[num_meshes_counter].readMesh(name, nodes, elements, pe, pn);
             num_meshes_counter = num_meshes_counter + 1;
           }
 
           myfile1 >> line;
         }
-      }
-
+      
+}
       if (line == "*MATERIAL") {
         int mat_id;
         std::string mat_model, mech_mat_model, elec_mat_model;

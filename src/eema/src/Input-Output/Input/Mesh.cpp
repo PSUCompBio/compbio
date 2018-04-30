@@ -1,13 +1,16 @@
 #include "functions.h"
 #include "Mesh.h"
+#include <list>
 
 using namespace Eigen;
 
-void Mesh::readMesh(std::string name, MatrixXd& n, MatrixXi& e)
+void Mesh::readMesh(std::string name, MatrixXd& n, MatrixXi& e, VectorXi& PE, MatrixXi& PN)
 {
     mesh_name = name;
     nodes = n;
     elements = e;
+    pe = PE;
+    pn = PN;
 }
 
 MatrixXd Mesh::getNodes(void)
@@ -18,6 +21,16 @@ MatrixXd Mesh::getNodes(void)
 MatrixXi Mesh::getElements(void)
 {
     return elements;
+}
+
+VectorXi Mesh::getElementsProcessorID(void)
+{
+    return pe;
+}
+
+MatrixXi Mesh::getNodesProcessorID(void)
+{
+    return pn;
 }
 
 MatrixXd Mesh::getNewNodes(void)

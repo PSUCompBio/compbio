@@ -54,7 +54,7 @@ void fe_pvdNew(std::string output, int time_step, double time);
 void fe_pvdAppend(std::string output, int time_step, double time);
 
 /** Read the input text file -- for a particular job */
-void fe_mainRead(std::string file);
+void fe_mainRead(std::string file, int size, int rank);
 
 /* =================================================================== */
 /* Elements */
@@ -216,13 +216,13 @@ void fe_invMatrix_pbr_array(double** A_inv, double** A, double det);
 /* =================================================================== */
 
 /** Calculates the resultant force vector - Box 6.1 of Belytschko */
-void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t, int t_plot);
+void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t, int t_plot, int rank, VectorXd& f_tot_local, VectorXd& f_damp_local, int sdof_normal);
 
 /** Find the index based on the DOF of a particular node */
 VectorXi fe_find_index(VectorXi node_list);
 
 /** Run the finite element analysis using an explicit dynamic method */
-void fe_mainEXPLICIT();
+void fe_mainEXPLICIT(int size, int rank);
 
 /** Function enforces displacement boundary condition */
 void fe_apply_bc_displacement(VectorXd& U, double& time);
@@ -302,9 +302,9 @@ void fe_writeElementStress(MatrixXd sigma_all, double time);
 /* =================================================================== */
 /* New Changes */
 /* =================================================================== */
-void fe_calculateMass(VectorXd& m_system, std::string type);
+void fe_calculateMass(VectorXd& m_system, std::string type, VectorXd& m_system_local, int rank);
 
-void fe_calculateMassDirectLumped(VectorXd& m_system, int mesh_id);
+void fe_calculateMassDirectLumped(VectorXd& m_system, int mesh_id, VectorXd& m_system_local, int rank);
 void fe_calculateMassDirectLumped_embed(VectorXd& m_system, int host_id, int embed_id, bool address_vr, VectorXi& embed_map);
 
 VectorXd fe_massLumped(MatrixXd* nodes, VectorXi elements_row);
@@ -317,7 +317,7 @@ double fe_calculateKE(MatrixXd mm, VectorXd V);
 
 VectorXd text2vector(std::string name);
 
-void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp, double t, int t_plot);
+void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp, double t, int t_plot, int rank, VectorXd& f_tot_local, VectorXd& f_damp_local, int sdof);
 
 void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, bool include_d, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t, int t_plot);
 

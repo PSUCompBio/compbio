@@ -14,6 +14,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <list>
 
 #include "Eigen/Dense"
 #include "Eigen/Eigenvalues"
@@ -27,8 +28,13 @@ class Mesh
 
   /** This contains the nodal data read from the mesh */
   MatrixXd nodes;
+
   /** This contains the element data read from the mesh */
   MatrixXi elements;
+
+  /** This contains the element and node processor data read from the mesh and metis file */
+  VectorXi pe;
+  MatrixXi pn;
 
   /** This contains the nodal data after preprocessing or any other operation */
   MatrixXd nodes_new;
@@ -83,7 +89,7 @@ class Mesh
   VectorXd* nodal_electric_potential_pointer;
 
 public:
-  void readMesh(std::string name, MatrixXd& n, MatrixXi& e);
+  void readMesh(std::string name, MatrixXd& n, MatrixXi& e, VectorXi& pe, MatrixXi& pn);
   void readNodalKinematics(VectorXd& Usystem, VectorXd& Vsystem, VectorXd& Asystem);
   void readNodalStressStrain(VectorXd& stress_tmp, VectorXd& strain_tmp);
   void readElementStressStrain(VectorXd& stress_tmp, VectorXd& strain_tmp);
@@ -94,12 +100,12 @@ public:
 
   MatrixXd getNodes();
   MatrixXi getElements();
-
+  VectorXi getElementsProcessorID();
+  MatrixXi getNodesProcessorID();
   MatrixXd getNewNodes();
   MatrixXi getNewElements();
   MatrixXd* getNewNodesPointer();
   MatrixXi* getNewElementsPointer();
-
 
   std::string getName();
   VectorXd getMaxCharLength(std::string choice);

@@ -1,4 +1,5 @@
 #include "functions.h"
+
 using namespace Eigen;
 
 double eps_energy = 0.01;
@@ -15,8 +16,8 @@ MatrixXd I;
 
 // fe_getForce_3d_normal
 
-double *dndr_store, *dnds_store, *dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, defJacobian_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store, ******internalStressVariable1_prev_normal_store, ******internalStressVariable2_prev_normal_store, ******devInstantPK2Stress_prev_normal_store, ***internalStressVariable1_prev_centroid_store, ***internalStressVariable2_prev_centroid_store, ***devInstantPK2Stress_prev_centroid_store;
-int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal, intx_normal, inty_normal, intz_normal;
+double *dndr_store, *dnds_store, *dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, defJacobian_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store, *****dndx_store_local, *****dndy_store_local, *****dndz_store_local, ******internalStressVariable1_prev_normal_store, ******internalStressVariable2_prev_normal_store, ******devInstantPK2Stress_prev_normal_store, ***internalStressVariable1_prev_centroid_store, ***internalStressVariable2_prev_centroid_store, ***devInstantPK2Stress_prev_centroid_store;
+int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, sdof_normal_local, edof_normal, intx_normal, inty_normal, intz_normal;
 VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal, *element_characteristic_embed_normal, element_stress_embed_local_normal, element_strain_embed_local_normal;
 MatrixXd disp_mat_normal, defGrad_normal, invDefGrad_normal, *nodes_host_normal, *nodes_embed_normal;
 MatrixXi *elements_host_normal, *elements_embed_normal;
@@ -60,11 +61,15 @@ void experimental() {
 
     int i, j, k ,l, m, n;
     nodes_host_normal = mesh[0].getNewNodesPointer();
+//    nodes_host_normal = mesh[0].getNewLocalNodesPointer();
     elements_host_normal = mesh[0].getNewElementsPointer();
+//    elements_host_normal = mesh[0].getNewLocalElementsPointer();
     nel_normal   = mesh[0].getNumElements();
+ //   nel_normal = 1; /*change*/   
     nnel_normal  = mesh[0].getNumNodesPerElement();
     nnode_normal = mesh[0].getNumNodes();
     sdof_normal  = nnode_normal * ndof;
+//    sdof_normal = 8 * ndof;
     edof_normal  = nnel_normal * ndof;
     if (embedded_constraint == 1) {
       nodes_embed_normal    = mesh[1].getNewNodesPointer();
@@ -260,6 +265,47 @@ void experimental() {
         }
     }
 
+ dndx_store_local = new double****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        dndx_store_local[i] = new double***[2];
+        for (j = 0; j < 2; j++) {
+            dndx_store_local[i][j] = new double**[2];
+            for (k = 0; k < 2; k++) {
+                dndx_store_local[i][j][k] = new double*[2];
+                for (l = 0; l < 2; l++) {
+                    dndx_store_local[i][j][k][l] = new double[nnel_normal];
+                }
+            }
+        }
+    }
+
+ dndy_store_local = new double****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        dndy_store_local[i] = new double***[2];
+        for (j = 0; j < 2; j++) {
+            dndy_store_local[i][j] = new double**[2];
+            for (k = 0; k < 2; k++) {
+                dndy_store_local[i][j][k] = new double*[2];
+                for (l = 0; l < 2; l++) {
+                    dndy_store_local[i][j][k][l] = new double[nnel_normal];
+                }
+            }
+        }
+    }
+
+ dndz_store_local = new double****[nel_normal];
+    for (i = 0; i < nel_normal; i++) {
+        dndz_store_local[i] = new double***[2];
+        for (j = 0; j < 2; j++) {
+            dndz_store_local[i][j] = new double**[2];
+            for (k = 0; k < 2; k++) {
+                dndz_store_local[i][j][k] = new double*[2];
+                for (l = 0; l < 2; l++) {
+                    dndz_store_local[i][j][k][l] = new double[nnel_normal];
+                }
+            }
+        }
+    }
   internalStressVariable1_prev_normal_store = new double*****[nel_normal];
   internalStressVariable2_prev_normal_store = new double*****[nel_normal];
   devInstantPK2Stress_prev_normal_store = new double*****[nel_normal];
@@ -334,8 +380,9 @@ void experimental() {
  */
 
 void
-fe_mainEXPLICIT()
+fe_mainEXPLICIT(int size, int rank)
 {
+
     experimental();
 
     // Initialization
@@ -352,6 +399,7 @@ fe_mainEXPLICIT()
     VectorXd U            = VectorXd::Zero(sdof_normal); // Displacement Vector
     VectorXd U_prev       = VectorXd::Zero(sdof_normal); // Displacement Vector used to calculate strain rate for damping force calculation
     VectorXd F_net        = VectorXd::Zero(sdof_normal); // Total Nodal force vector
+    VectorXd F_net_local  = VectorXd::Zero(sdof_normal); // Total Nodal force for each processor
     VectorXd fe           = VectorXd::Zero(sdof_normal); // External Nodal force vector
     VectorXd fe_prev      = VectorXd::Zero(sdof_normal);
 
@@ -360,6 +408,7 @@ fe_mainEXPLICIT()
     VectorXd fi_prev      = VectorXd::Zero(sdof_normal); // Internal Nodal force vector at previous timestep
     VectorXd fi_curr      = VectorXd::Zero(sdof_normal); // Internal Nodal force vector at current timestep
     VectorXd f_damp_curr  = VectorXd::Zero(sdof_normal); // Linear Bulk Viscosity Damping Nodal force vector
+    VectorXd f_damp_curr_local = VectorXd::Zero(sdof_normal); //For each processor
     VectorXd f_damp_prev  = VectorXd::Zero(sdof_normal); // Linear Bulk Viscosity Damping Nodal force vector at previous timestep
 
     double d_mesh_avg;                            // Average of d_avg values for entire host mesh
@@ -434,17 +483,18 @@ fe_mainEXPLICIT()
     // ----------------------------------------------------------------------------
     // Step-1: Calculate the mass matrix similar to that of belytschko.
     VectorXd m_system = VectorXd::Zero(sdof_normal);
-    fe_calculateMass(m_system, "direct_lumped");
+    VectorXd m_system_local = VectorXd::Zero(sdof_normal);
+    fe_calculateMass(m_system, "direct_lumped", m_system_local, rank);
 
     std::string mass = home_path + "/" + "results/system_mass.txt";
     new_vector2text(mass.c_str(), m_system, m_system.cols());
 
     // ----------------------------------------------------------------------------
     // Step-2: getforce step from Belytschko
-    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot);
+    fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot, rank, F_net_local, f_damp_curr_local, sdof_normal);
 
     mesh[0].readNodalKinematics(U, V, A);
-
+	if(rank == 0)
     for (int i = 0; i < num_meshes; i++) {
         fe_vtuWrite(plot_state_counter - 1, t, mesh[i]);
     }
@@ -484,8 +534,10 @@ fe_mainEXPLICIT()
           t_plot = 0;
 
         /** Step - 8 from Belytschko Box 6.1 - Calculate net nodal force*/
-        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot); // Calculating the force term.
-
+        fe_getforce(F_net, ndof, U, fe, time_step_counter, U_prev, dT, f_damp_curr, d, d_fatigue, d_tot, lambda_min, lambda_max, lambda_min_cycle, lambda_max_cycle, d_avg, n_load_cycle_full, n_load_cycle_partial, t, t_plot, rank, F_net_local, f_damp_curr_local, sdof_normal); // Calculating the force term.
+//if(rank == 1)
+//{std::cout<<F_net<<" "<<time_step_counter<<" ";
+//std::exit(1);}
         /** Step - 9 from Belytschko Box 6.1 - Calculate Accelerations */
         fe_calculateAccln(A, m_system, F_net); // Calculating the new accelerations from total nodal forces.
         fe_apply_bc_acceleration(A, t);
@@ -501,8 +553,8 @@ fe_mainEXPLICIT()
 
         mesh[0].readNodalKinematics(U, V, A);
 
-        if (t >= (plot_state_counter * (output_temp_1))) {
-
+        if (t >= (plot_state_counter * (output_temp_1))) 
+	if(rank == 0){
             for (int i = 0; i < num_meshes; i++) {
                 fe_vtuWrite(plot_state_counter, t, mesh[i]);
             }
