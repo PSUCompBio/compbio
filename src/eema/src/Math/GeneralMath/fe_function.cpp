@@ -34,7 +34,7 @@ double fe_function(double a, std::string b, double time, int n_steps, VectorXd t
 	if( direction == 3)
 	result = z_data[i] + (z_data[i+1]-z_data[i])*(time-time_data[i])/(time_data[i+1]-time_data[i]);
 	break;}}
- 
+
 }
  return result;
 }
@@ -60,7 +60,7 @@ double fe_function_derivative(double a, std::string b, double time, int n_steps,
   if(b=="STEP"){
     result = 0;
   }
-  
+
   if(b=="TABULAR"){
     for(int i = 0; i<n_steps; i++)
 	if(time_data[i]<=time && time<=time_data[i+1])
@@ -71,9 +71,10 @@ double fe_function_derivative(double a, std::string b, double time, int n_steps,
 	else if( direction == 3)
 	result = z_data[i] + (z_data[i+1]-z_data[i])*(time-time_data[i])/(time_data[i+1]-time_data[i]);
 	break;}
+  }
 
   return result;
-}
+
 }
 
 double fe_function_d_derivative(double a, std::string b, double time, int n_steps, VectorXd time_data, VectorXd x_data, VectorXd y_data, VectorXd z_data, int direction){
