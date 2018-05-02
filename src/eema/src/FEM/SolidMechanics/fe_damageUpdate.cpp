@@ -2,6 +2,28 @@
 
 using namespace Eigen;
 
+void fe_staticDamageUpdate_pbr(VectorXd& d_static, int element_id, VectorXd& lambda_max)
+{
+
+  // Function actions:
+  // 1. It calculates the static damage associated with a specific stretch value. The damage evolution law is linear.
+  // 2. For each fiber element, we use the maximum previous stretch for that specific fiber element.
+  // 3. For each host element, we use the maximum previous average fiber stretch for the fibers associated with that specific host element.
+
+  double lambda_initiation = 1.91; // stretch level at which damage initiates
+  double lambda_separation = 2.66; // stretch level at which final separation occurs
+
+  if (lambda_max(element_id) > lambda_initiation) {
+    if (lambda_max(element_id) <= lambda_separation) {
+      d_static(element_id) = (1 / (lambda_separation - lambda_initiation) ) * lambda_max(element_id) + ( -lambda_initiation / (lambda_separation - lambda_initiation) );
+    }
+    if (lambda_max(element_id) > lambda_separation) {
+      d_static(element_id) = 1;
+    }
+  }
+
+}
+
 void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double lambda, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t)
 {
 

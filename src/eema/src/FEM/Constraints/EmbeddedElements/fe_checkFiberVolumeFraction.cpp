@@ -13,6 +13,7 @@ void fe_checkFiberVolumeFraction(Mesh& host, Mesh& embed) {
     VectorXd fiber_volume_fraction = VectorXd::Zero(num_elements_host);
     int host_id = 0;
     double volume_host = 0;
+    double sum_fiber_volume_fraction = 0;
 
     for (int host_row = 0; host_row < num_elements_host; host_row++) {
       host_id = (*elements_host)(host_row, 0);
@@ -27,9 +28,11 @@ void fe_checkFiberVolumeFraction(Mesh& host, Mesh& embed) {
         }
       }
       fiber_volume_fraction(host_row) = ( total_length_embed * area_truss ) / volume_host;
+      sum_fiber_volume_fraction = sum_fiber_volume_fraction + fiber_volume_fraction(host_row);
     }
 
     double max_fiber_volume_fraction = fiber_volume_fraction.maxCoeff();
+    double avg_fiber_volume_fraction = sum_fiber_volume_fraction / num_elements_host;
 
     // 0.785 is the maximum volume fraction for square packing of circles.
     if (max_fiber_volume_fraction > 0.785) {
@@ -40,7 +43,8 @@ void fe_checkFiberVolumeFraction(Mesh& host, Mesh& embed) {
     }
 
     // std::cout << "fiber_volume_fraction = " << '\n' << fiber_volume_fraction << '\n';
-    // std::cout << "Max Fiber Volume Fraction is: " << max_fiber_volume_fraction << "\n" << "\n";
+    // std::cout << "Max Fiber Volume Fraction is: " << max_fiber_volume_fraction << "\n";
+    // std::cout << "Avg Fiber Volume Fraction is: " << avg_fiber_volume_fraction << "\n" << "\n";
     // std::exit(1);
 
 }
