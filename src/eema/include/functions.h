@@ -195,13 +195,15 @@ int fe_find(VectorXi& A, int a);
 VectorXd fe_newtonRhapson(VectorXd& nat_coord, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord);
 
 /** Function outputs the standard curve values */
-double fe_function(double a, std::string b, double time);
 
+double
+fe_function(double a, std::string b, double time, int n_steps, VectorXd time_data, VectorXd x_data, VectorXd y_data, VectorXd z_data, int direction);
 /** Function outputs the derivative of a time dependent variable at a time instant */
-double fe_function_derivative(double a, std::string b, double time);
-
+double
+fe_function_derivative(double a, std::string b, double time, int n_steps, VectorXd time_data, VectorXd x_data, VectorXd y_data, VectorXd z_data, int direction);
 /** Function outputs the double derivative of a time dependent variable at a time instant */
-double fe_function_d_derivative(double a, std::string b, double time);
+double
+fe_function_d_derivative(double a, std::string b, double time, int n_steps, VectorXd time_data, VectorXd x_data, VectorXd y_data, VectorXd z_data, int direction);
 
 /** Concatenate a vector to a matrix -- rowwise or coloumn wise */
 void fe_concatenate_vector2matrix(MatrixXd& A, VectorXd& B, int opt);

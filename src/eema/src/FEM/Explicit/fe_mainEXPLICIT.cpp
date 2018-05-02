@@ -13,6 +13,7 @@ bool include_viscoelasticity = 0;
 int counter_test = 0, *matMap;
 MatrixXd I;
 
+
 // fe_getForce_3d_normal
 
 double *****dndr_store, *****dnds_store, *****dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, defJacobian_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store, ******internalStressVariable1_prev_normal_store, ******internalStressVariable2_prev_normal_store, ******devInstantPK2Stress_prev_normal_store, ***internalStressVariable1_prev_centroid_store, ***internalStressVariable2_prev_centroid_store, ***devInstantPK2Stress_prev_centroid_store;
@@ -499,7 +500,6 @@ fe_mainEXPLICIT()
     s = clock();
 
     while (t < t_end) {
-
         if ((t + dT) >= t_end) {
             dT = t_end - t;
             if (dT <= 0) {
@@ -583,7 +583,7 @@ fe_mainEXPLICIT()
         time_step_counter = time_step_counter + 1;
 
         dT = fe_getTimeStep();
-
+//dT = 1e-6;
     }
 
     if (embedded_constraint == 1) {
