@@ -2,41 +2,6 @@
 
 using namespace Eigen;
 
-void fe_damageUpdate_pbr(VectorXd& d, int fib, double lambda)
-{
-
-  double lambda_LL = 0.5;  // lower limit for stretch, d = 1 for lower values
-  double lambda_UL = 1.5;  // upper limit for stretch, d = 1 for higher values
-  double tmp = 0;  // d for current value of stretch
-
-  if (lambda == 1) {
-     tmp = 0;
-  }
-
-  if (lambda < 1) {
-    if (lambda < lambda_LL) {
-      tmp = 1;
-    }
-    if (lambda > lambda_LL) {
-      tmp = (-1/(1 - lambda_LL))*lambda + (1/(1 - lambda_LL));
-    }
-  }
-
-  if (lambda > 1) {
-    if (lambda > lambda_UL) {
-      tmp = 1;
-    }
-    if (lambda < lambda_UL) {
-      tmp = (1/(lambda_UL - 1))*lambda - (1/(lambda_UL - 1));
-    }
-  }
-
-  if (tmp > d(fib)) {
-    d(fib) = tmp;
-  }
-
-}
-
 void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double lambda, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t)
 {
 

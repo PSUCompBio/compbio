@@ -1,7 +1,7 @@
 #include "functions.h"
 using namespace Eigen;
 
-VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& host, Mesh& embed) {
+VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& host, Mesh& embed, int& intersection_check) {
 
   MatrixXd* nodes_host = host.getNewNodesPointer();
   MatrixXi* elements_host = host.getNewElementsPointer();
@@ -135,6 +135,7 @@ VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& 
               // Test 3.
               if (dp > 0 || std::abs(dp) < 1e-18) {
                 intersection = intersection_tmp;
+                intersection_check = 1;
                 // We prefer an intersection with 0 < t < 1, not t = 0 or t = 1.
                 // Therefore, we will break the loop here and return the current intersection point.
                 break;
@@ -180,6 +181,7 @@ VectorXd fe_embed_element_intersection_point(int host_row, int embed_row, Mesh& 
               // Test 3.
               if (dp > 0 || std::abs(dp) < 1e-18) {
                 intersection = intersection_tmp;
+                intersection_check = 1;
               }
             }
           }

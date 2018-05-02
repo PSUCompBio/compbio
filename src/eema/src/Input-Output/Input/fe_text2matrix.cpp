@@ -4,7 +4,7 @@
 
 using namespace Eigen;
 
-//typedef vector<float> Vec;
+//typedef vector<double> Vec;
 //typedef vector<Vec> Mat;
 
 MatrixXd text2matrix(std::string name, int cols){
@@ -13,8 +13,8 @@ MatrixXd text2matrix(std::string name, int cols){
         std::ifstream myfile(name.c_str());
         int tmp=0;
         int rows=0;
-        // float **A;
-        float data;
+        // double **A;
+        double data;
 
         while(myfile>>data){
                 tmp = tmp+1;
@@ -25,7 +25,7 @@ MatrixXd text2matrix(std::string name, int cols){
 
         // std::cout<<"The size of the matrix is: "<<rows<<" rows & "<<cols<<" columns. \n";
 
-        // A = new float*[rows];
+        // A = new double*[rows];
         MatrixXd A(rows,cols);
 
         std::ifstream myfile1(name.c_str());

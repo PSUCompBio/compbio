@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
 
 	t = clock() - t;
 	std::cout << "--------------------------------------" << "\n";
-	std::cout << "Total Simulation CPU Time: " << (((float)t) / CLOCKS_PER_SEC) << "s \n";
+	std::cout << "Total Simulation CPU Time: " << (((double)t) / CLOCKS_PER_SEC) << "s \n";
 	std::cout << "Simulation Completed." << "\n";
 	std::cout << "--------------------------------------" << "\n";
 	return 0;

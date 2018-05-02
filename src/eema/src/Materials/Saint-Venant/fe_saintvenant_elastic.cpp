@@ -2,9 +2,9 @@
 
 using namespace Eigen;
 
-VectorXd fe_saintvenant_elastic(VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, int opt, int return_opt) {
+void fe_saintvenant_elastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, int opt, int return_opt) {
 
-	VectorXd sigma_local = VectorXd::Zero(6);
+	sigma_local = VectorXd::Zero(6);
 
 	double E = fe_get_mats(opt, 1, "mechanical");
 	double nu = fe_get_mats(opt, 2, "mechanical");
@@ -12,9 +12,8 @@ VectorXd fe_saintvenant_elastic(VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, 
 	double lambda = ((E * nu) / ((1 + nu) * (1 - (2 * nu))));
 
 	MatrixXd F = MatrixXd::Zero(3, 3); // deformation gradient
-	F = fe_calDefGrad(dndx, dndy, dndz, u);
+	fe_calDefGrad_pbr(F, dndx, dndy, dndz, u);
 	double defJacobian = F.determinant();
-	MatrixXd I = MatrixXd::Identity(3, 3);
 
 	MatrixXd GE = ((F.transpose() * F) - I) * (0.5);
 	MatrixXd cauchy_sigma = MatrixXd::Zero(3, 3);
@@ -30,11 +29,9 @@ VectorXd fe_saintvenant_elastic(VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, 
 		sigma_local = fe_tensor2voigt(cauchy_sigma); /** outputs cauchy stress tensor in vector form */
 	}
 
-	return sigma_local;
 }
 
-
-void fe_saintvenant_elastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, int opt, int return_opt) {
+void fe_saintvenant_elastic_pbr_array(VectorXd& sigma_local, int i, int x, int y, int z, VectorXd& u, int opt, int return_opt) {
 
 	sigma_local = VectorXd::Zero(6);
 
@@ -44,7 +41,7 @@ void fe_saintvenant_elastic_pbr(VectorXd& sigma_local, VectorXd& dndx, VectorXd&
 	double lambda = ((E * nu) / ((1 + nu) * (1 - (2 * nu))));
 
 	MatrixXd F = MatrixXd::Zero(3, 3); // deformation gradient
-	F = fe_calDefGrad(dndx, dndy, dndz, u);
+	fe_calDefGrad_pbr_array(F, i, x, y, z, u);
 	double defJacobian = F.determinant();
 
 	MatrixXd GE = ((F.transpose() * F) - I) * (0.5);
