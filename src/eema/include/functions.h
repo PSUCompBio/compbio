@@ -198,13 +198,15 @@ int fe_find(VectorXi& A, int a);
 VectorXd fe_newtonRhapson(VectorXd& nat_coord, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord);
 
 /** Function outputs the standard curve values */
-double fe_function(double a, std::string b, double time);
 
+double
+fe_function(double a, std::string b, double time, int n_steps, VectorXd time_data, VectorXd x_data, VectorXd y_data, VectorXd z_data, int direction);
 /** Function outputs the derivative of a time dependent variable at a time instant */
-double fe_function_derivative(double a, std::string b, double time);
-
+double
+fe_function_derivative(double a, std::string b, double time, int n_steps, VectorXd time_data, VectorXd x_data, VectorXd y_data, VectorXd z_data, int direction);
 /** Function outputs the double derivative of a time dependent variable at a time instant */
-double fe_function_d_derivative(double a, std::string b, double time);
+double
+fe_function_d_derivative(double a, std::string b, double time, int n_steps, VectorXd time_data, VectorXd x_data, VectorXd y_data, VectorXd z_data, int direction);
 
 /** Concatenate a vector to a matrix -- rowwise or coloumn wise */
 void fe_concatenate_vector2matrix(MatrixXd& A, VectorXd& B, int opt);
@@ -228,7 +230,7 @@ void fe_invMatrix_pbr_array(double** A_inv, double** A, double det);
 /* =================================================================== */
 
 /** Calculates the resultant force vector - Box 6.1 of Belytschko */
-void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t, int t_plot);
+void fe_getforce(VectorXd& f_tot, int ndof, VectorXd& u, VectorXd& fext, int time_step_counter, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d_static, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t, int t_plot);
 
 /** Find the index based on the DOF of a particular node */
 VectorXi fe_find_index(VectorXi node_list);
@@ -331,7 +333,7 @@ VectorXd text2vector(std::string name);
 
 void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp, double t, int t_plot);
 
-void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, bool include_d, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t, int t_plot);
+void fe_getForce_3d_embed(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, int embed_id, bool address_vr, bool include_d, VectorXi& embed_map, VectorXd& u_prev, double dT, VectorXd& f_damp, VectorXd& d_static, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXd& d_avg, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t, int t_plot);
 
 void fe_stressUpdateViscoelasticity_pbr(VectorXd& instantStress, double dT, MatrixXd& defGrad, MatrixXd invDefGrad, double defJacobian, int iterator, int ix, int iy, int iz, int opt, int return_opt);
 
@@ -339,6 +341,8 @@ void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, 
 void fe_getPressure_lbv_pbr_array(VectorXd& pressure, int i, int x, int y, int z, VectorXd& u, VectorXd& u_prev, double dT, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, int material_id);
 
 void fe_stressModify(VectorXd& sigma_embed, VectorXd& xcoord_embed, VectorXd& ycoord_embed, VectorXd& zcoord_embed, int choice);
+
+void fe_staticDamageUpdate_pbr(VectorXd& d_static, int element_id, VectorXd& lambda_max);
 
 void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double lambda, VectorXd& lambda_min_cycle, VectorXd& lambda_max_cycle, VectorXi& n_load_cycle_full, VectorXi& n_load_cycle_partial, double t);
 
@@ -382,13 +386,13 @@ void fe_singleDoubleWrite_new(std::string& filename, int plot_state_counter, dou
 
 void fe_singleDoubleWrite_append(std::string& filename, int plot_state_counter, double& t, double& variable);
 
-void fe_damageVariableWrite_new(std::string& damage_variables, int plot_state_counter, double& t, double& d_curr, double& d_fatigue_curr, double& d_tot, double& lambda_min, double& lambda_max);
+void fe_damageVariableWrite_new(std::string& damage_variables, int plot_state_counter, double& t, double& d_static_curr, double& d_fatigue_curr, double& d_tot, double& lambda_min, double& lambda_max);
 
-void fe_damageVariableWrite_append(std::string& damage_variables, int plot_state_counter, double& t, double& d_curr, double& d_fatigue_curr, double& d_tot, double& lambda_min, double& lambda_max);
+void fe_damageVariableWrite_append(std::string& damage_variables, int plot_state_counter, double& t, double& d_static_curr, double& d_fatigue_curr, double& d_tot, double& lambda_min, double& lambda_max);
 
-void fe_damageVariableExport(std::string& damage_variables_export, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max);
+void fe_damageVariableExport(std::string& damage_variables_export, VectorXd& d_static, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max);
 
-void fe_damageVariableImport(std::string& damage_variables_import, VectorXd& d, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, double t_healing);
+void fe_damageVariableImport(std::string& damage_variables_import, VectorXd& d_static, VectorXd& d_fatigue, VectorXd& d_tot, VectorXd& lambda_min, VectorXd& lambda_max, double t_healing);
 
 /* =================================================================== */
 /* BioElectroPhysics */
