@@ -349,7 +349,7 @@ void fe_stressUpdateDamage_pbr(VectorXd& fiber_stress_damaged, int opt, int fib,
 
 double fe_calStrainEnergyDensity(int opt, double lambda);
 
-void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, double dT, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id);
+void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, double dT, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id, int iterator, int ix, int iy, int iz);
 
 void fe_calCentroidStrain_3d_pbr(VectorXd& element_strain, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e);
 
