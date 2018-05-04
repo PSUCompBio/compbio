@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, double dT, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id)
+void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, double dT, int nnel, VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord, VectorXd& u_e, int material_id, int iterator, int ix, int iy, int iz)
 {
     int edof = nnel * ndof;
 
@@ -42,7 +42,7 @@ void fe_calCentroidStress_3d_pbr(VectorXd& element_stress, double dT, int nnel, 
 
     if (include_viscoelasticity == 1) {
       // modifies sigma_e_centroid to include viscoelastic effects
-      fe_stressUpdateViscoelasticity_pbr(sigma_centroid, dT, defGrad_centroid, invDefGrad_centroid, defJacobian_centroid, i_normal, intx_normal, inty_normal, intz_normal, material_id, 1);
+      fe_stressUpdateViscoelasticity_pbr(sigma_centroid, dT, defGrad_centroid, invDefGrad_centroid, defJacobian_centroid, iterator, ix, iy, iz, material_id, 1);
     }
 
     element_stress(0) = sigma_centroid(0);

@@ -102,7 +102,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
 
             if (include_viscoelasticity == 0) {
               if (t_plot == 1) {
-                fe_calCentroidStress_3d_pbr(tmp_storage_normal, dT, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1));
+                fe_calCentroidStress_3d_pbr(tmp_storage_normal, dT, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1), i_normal, 0, 0, 0);
                 element_stress_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
 
                 fe_calCentroidStrain_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal);
@@ -111,7 +111,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
             }
 
             if (include_viscoelasticity == 1) {
-              fe_calCentroidStress_3d_pbr(tmp_storage_normal, dT, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1));
+              fe_calCentroidStress_3d_pbr(tmp_storage_normal, dT, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal, (*elements_host_normal)(i_normal, 1), i_normal, 0, 0, 0);
               element_stress_host_local_normal.segment<9>(i_normal * 9) = tmp_storage_normal;
 
               fe_calCentroidStrain_3d_pbr(tmp_storage_normal, nnel_normal, xcoord_normal, ycoord_normal, zcoord_normal, u_e_normal);
