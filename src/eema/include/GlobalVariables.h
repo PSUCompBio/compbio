@@ -123,7 +123,7 @@ extern double eps_energy;
 
 // Variables added/moved
 
-extern int counter_test, material_types_counter, matTypeHigh;
+extern int counter_test, material_types_counter, matTypeHigh, *start, *total, number_of_threads, covered;
 extern MatrixXd I;
 extern int *matMap;
 extern bool include_viscoelasticity;

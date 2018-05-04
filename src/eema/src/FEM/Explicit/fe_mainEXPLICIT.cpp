@@ -10,20 +10,21 @@ bool include_viscoelasticity = 0;
 
 // Global
 
-int counter_test = 0, *matMap;
+int counter_test = 0, *matMap, *start, *total, number_of_threads, covered;
 MatrixXd I;
 
 // fe_getForce_3d_normal
 
 double *****dndr_store, *****dnds_store, *****dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, defJacobian_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store, ******internalStressVariable1_prev_normal_store, ******internalStressVariable2_prev_normal_store, ******devInstantPK2Stress_prev_normal_store, ***internalStressVariable1_prev_centroid_store, ***internalStressVariable2_prev_centroid_store, ***devInstantPK2Stress_prev_centroid_store;
 int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal, intx_normal, inty_normal, intz_normal;
-VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal, *element_characteristic_embed_normal, element_stress_embed_local_normal, element_strain_embed_local_normal, ****f_int_e_store, ****f_damp_e_store;
+VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal, *element_characteristic_embed_normal, element_stress_embed_local_normal, element_strain_embed_local_normal;
 MatrixXd disp_mat_normal, defGrad_normal, invDefGrad_normal, *nodes_host_normal, *nodes_embed_normal;
 MatrixXi *elements_host_normal, *elements_embed_normal;
 
 void experimental() {
 
-    int i, j, k ,l, m, n;
+    int i, j, k ,l, m, n, iterator, ele_left, t_left, ret;
+    double result;
     nodes_host_normal = mesh[0].getNewNodesPointer();
     elements_host_normal = mesh[0].getNewElementsPointer();
     nel_normal   = mesh[0].getNumElements();
@@ -36,6 +37,59 @@ void experimental() {
       elements_embed_normal = mesh[1].getNewElementsPointer();
       element_characteristic_embed_normal = mesh[1].getElementCharacteristicPointer();
     }
+
+    // Splitting of Threads
+
+    number_of_threads = 3;
+
+    if (nel_normal <= number_of_threads) {
+        start = new int[nel_normal];
+        total = new int[nel_normal];
+
+        for (iterator = 0; iterator < nel_normal; iterator++) {
+            start[iterator] = iterator;
+            total[iterator] = 1;
+        }
+
+        number_of_threads = nel_normal;
+    }
+
+    else {
+        start = new int[number_of_threads];
+        total = new int[number_of_threads];
+
+        if (nel_normal % number_of_threads == 0) {
+            for (iterator = 0; iterator < number_of_threads; iterator++) {
+                start[iterator] = iterator * (nel_normal / number_of_threads);
+                total[iterator] = nel_normal / number_of_threads;
+            }
+        }
+
+        else {
+            covered = 0;
+            ele_left = nel_normal;
+            t_left = number_of_threads;
+
+            for (iterator = 0; iterator < number_of_threads - 1; iterator++) {
+                result = ele_left/(double)(t_left);
+                if (result + 0.5 > (int)result + 1)
+                    ret = (int)result + 1;
+                else
+                    ret = (int)result;
+
+                start[iterator] = covered;
+                total[iterator] = ret;
+                covered += ret;
+
+                ele_left -= ret;
+                t_left--;
+            }
+
+            start[iterator] = covered;
+            total[iterator] = ele_left;
+        }
+    }
+
 
     // Allocating Memory
 
@@ -70,34 +124,12 @@ void experimental() {
     else
         matMap = new int[matTypeHigh + 1];
 
-    for (int iterator = 0; iterator < material_types_counter; iterator++) {
+    for (iterator = 0; iterator < material_types_counter; iterator++) {
         i_normal = mat[iterator].getMatID();
         matMap[i_normal] = iterator;
     }
 
     i_normal = 0;
-
-    f_int_e_store = new VectorXd***[2];
-    for (i = 0; i < 2; i++) {
-        f_int_e_store[i] = new VectorXd**[2];
-        for (j = 0; j < 2; j++) {
-            f_int_e_store[i][j] = new VectorXd*[2];
-            for (k = 0; k < 2; k++) {
-                f_int_e_store[i][j][k] = new (VectorXd)(VectorXd::Zero(edof_normal));
-            }
-        }
-    }
-
-    f_damp_e_store = new VectorXd***[2];
-    for (i = 0; i < 2; i++) {
-        f_damp_e_store[i] = new VectorXd**[2];
-        for (j = 0; j < 2; j++) {
-            f_damp_e_store[i][j] = new VectorXd*[2];
-            for (k = 0; k < 2; k++) {
-                f_damp_e_store[i][j][k] = new (VectorXd)(VectorXd::Zero(edof_normal));
-            }
-        }
-    }
 
     dndr_store = new double****[nel_normal];
     for (i = 0; i < nel_normal; i++) {

@@ -1,6 +1,4 @@
 #include "functions.h"
-#include <thread>
-#include <mutex>
 
 using namespace Eigen;
 
@@ -8,7 +6,7 @@ std::mutex m;
 VectorXd global_tot, global_damp;
 
 
-void task(int start, int total, VectorXd u, VectorXd fext, int time_step_counter, int host_id, VectorXd u_prev, double dT, double t, int t_plot, VectorXd element_stress_host_local, VectorXd element_strain_host_local) {
+void task(int begin, int end, VectorXd u, VectorXd fext, int time_step_counter, int host_id, VectorXd u_prev, double dT, double t, int t_plot, VectorXd element_stress_host_local, VectorXd element_strain_host_local) {
     int i, j, g, ix, iy, iz;
     double x, y, z;
 
@@ -33,7 +31,7 @@ void task(int start, int total, VectorXd u, VectorXd fext, int time_step_counter
     MatrixXd invDefGrad = MatrixXd::Identity(ndof, ndof);
     MatrixXd disp_mat = MatrixXd::Zero(6, edof_normal);
 
-    for (i = start; i < start + total; i++) {
+    for (i = begin; i < begin + end; i++) {
         double f_ext_e_sum, defJacobian;
 
         VectorXd f_int_e = VectorXd::Zero(edof_normal);
@@ -91,7 +89,6 @@ void task(int start, int total, VectorXd u, VectorXd fext, int time_step_counter
             for (ix = 0; ix < 2; ix++) {
                 for (iy = 0; iy < 2; iy++) {
                     for (iz = 0; iz < 2; iz++) {
-
                         fe_calDefGrad_pbr_array(defGrad, i, ix, iy, iz, u_e);
 
                         defJacobian = fe_detMatrix_pbr(defGrad);
@@ -117,7 +114,7 @@ void task(int start, int total, VectorXd u, VectorXd fext, int time_step_counter
 
             if (include_viscoelasticity == 0) {
                 if (t_plot == 1) {
-                    fe_calCentroidStress_3d_pbr(tmp_storage, dT, nnel_normal, xcoord, ycoord, zcoord, u_e, (*elements_host)(i, 1));
+                    fe_calCentroidStress_3d_pbr(tmp_storage, dT, nnel_normal, xcoord, ycoord, zcoord, u_e, (*elements_host)(i, 1), i, ix, iy, iz);
                     element_stress_host_local.segment<9>(i * 9) = tmp_storage;
 
                     fe_calCentroidStrain_3d_pbr(tmp_storage, nnel_normal, xcoord, ycoord, zcoord, u_e);
@@ -126,7 +123,7 @@ void task(int start, int total, VectorXd u, VectorXd fext, int time_step_counter
             }
 
             else {
-                fe_calCentroidStress_3d_pbr(tmp_storage, dT, nnel_normal, xcoord, ycoord, zcoord, u_e, (*elements_host)(i, 1));
+                fe_calCentroidStress_3d_pbr(tmp_storage, dT, nnel_normal, xcoord, ycoord, zcoord, u_e, (*elements_host)(i, 1), i, ix, iy, iz);
                 element_stress_host_local.segment<9>(i * 9) = tmp_storage;
 
                 fe_calCentroidStrain_3d_pbr(tmp_storage, nnel_normal, xcoord, ycoord, zcoord, u_e);
@@ -148,8 +145,6 @@ void task(int start, int total, VectorXd u, VectorXd fext, int time_step_counter
 
 void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp, double t, int t_plot)
 {
-    int i, number_of_threads = 4;
-
     VectorXd element_stress_host_local = VectorXd::Zero(nel_normal * 9);
     VectorXd element_strain_host_local = VectorXd::Zero(nel_normal * 9);
 
@@ -161,16 +156,15 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
     global_tot += f_tot;
     global_damp += f_damp;
 
-    for (i = 0; i < number_of_threads; i++)
-        thread_runner[i] = std::thread(task, i*2, 2, u, fext, time_step_counter, host_id, u_prev, dT, t, t_plot, element_stress_host_local, element_strain_host_local);
+    for (int i = 0; i < number_of_threads; i++)
+        thread_runner[i] = std::thread(task, start[i], total[i], u, fext, time_step_counter, host_id, u_prev, dT, t, t_plot, element_stress_host_local, element_strain_host_local);
 
-    for (i = 0; i < number_of_threads; i++)
+    for (int i = 0; i < number_of_threads; i++)
 		thread_runner[i].join();
 
     f_tot = global_tot;
     f_damp = global_damp;
 
-    if (t_plot == 1) {
+    if (t_plot == 1)
         mesh[host_id].readElementStressStrain(element_stress_host_local, element_strain_host_local);
-    }
 }

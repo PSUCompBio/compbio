@@ -144,7 +144,3 @@ double fe_calEquivalentStrain(int opt, double lambda)
   return equivalent_strain;
 
 }
-
-
-
-

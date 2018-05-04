@@ -2,7 +2,7 @@
 
 using namespace Eigen;
 
-void fe_stressUpdateViscoelasticity_pbr(VectorXd& instantStress, double dT, MatrixXd& defGrad, MatrixXd invDefGrad, double defJacobian, int i_normal, int intx_normal, int inty_normal, int intz_normal, int opt, int return_opt)
+void fe_stressUpdateViscoelasticity_pbr(VectorXd& instantStress, double dT, MatrixXd& defGrad, MatrixXd invDefGrad, double defJacobian, int iterator, int ix, int iy, int iz, int opt, int return_opt)
 {
 
 	// Primary Reference: "Formulation and implementation of three-dimensional viscoelasticity at small and finite strains," (Kaliske, 1997).
@@ -52,9 +52,9 @@ void fe_stressUpdateViscoelasticity_pbr(VectorXd& instantStress, double dT, Matr
 		// retrive data from previous time Step
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				internalStressVariable1_prev(i, j) = internalStressVariable1_prev_normal_store[i_normal][intx_normal][inty_normal][intz_normal][i][j]; // internal stress variable H for i = 1
-				internalStressVariable2_prev(i, j) = internalStressVariable2_prev_normal_store[i_normal][intx_normal][inty_normal][intz_normal][i][j]; // internal stress variable H for i = 2
-				devInstantPk2Stress_prev(i, j) = devInstantPK2Stress_prev_normal_store[i_normal][intx_normal][inty_normal][intz_normal][i][j]; // deviatoric part of instantaneous PK2 stress
+				internalStressVariable1_prev(i, j) = internalStressVariable1_prev_normal_store[iterator][ix][iy][iz][i][j]; // internal stress variable H for i = 1
+				internalStressVariable2_prev(i, j) = internalStressVariable2_prev_normal_store[iterator][ix][iy][iz][i][j]; // internal stress variable H for i = 2
+				devInstantPk2Stress_prev(i, j) = devInstantPK2Stress_prev_normal_store[iterator][ix][iy][iz][i][j]; // deviatoric part of instantaneous PK2 stress
 			}
 		}
 	}
@@ -66,9 +66,9 @@ void fe_stressUpdateViscoelasticity_pbr(VectorXd& instantStress, double dT, Matr
 		// retrive data from previous time Step
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				internalStressVariable1_prev(i, j) = internalStressVariable1_prev_centroid_store[i_normal][i][j]; // internal stress variable H for i = 1
-				internalStressVariable2_prev(i, j) = internalStressVariable2_prev_centroid_store[i_normal][i][j]; // internal stress variable H for i = 2
-				devInstantPk2Stress_prev(i, j) = devInstantPK2Stress_prev_centroid_store[i_normal][i][j]; // deviatoric part of instantaneous PK2 stress
+				internalStressVariable1_prev(i, j) = internalStressVariable1_prev_centroid_store[iterator][i][j]; // internal stress variable H for i = 1
+				internalStressVariable2_prev(i, j) = internalStressVariable2_prev_centroid_store[iterator][i][j]; // internal stress variable H for i = 2
+				devInstantPk2Stress_prev(i, j) = devInstantPK2Stress_prev_centroid_store[iterator][i][j]; // deviatoric part of instantaneous PK2 stress
 			}
 		}
 	}
@@ -106,9 +106,9 @@ void fe_stressUpdateViscoelasticity_pbr(VectorXd& instantStress, double dT, Matr
 		// store current data for next time Step
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				internalStressVariable1_prev_normal_store[i_normal][intx_normal][inty_normal][intz_normal][i][j] = internalStressVariable1(i, j); // internal stress variable H for i = 1
-				internalStressVariable2_prev_normal_store[i_normal][intx_normal][inty_normal][intz_normal][i][j] = internalStressVariable2(i, j); // internal stress variable H for i = 2
-				devInstantPK2Stress_prev_normal_store[i_normal][intx_normal][inty_normal][intz_normal][i][j] = devInstantPk2Stress(i, j); // deviatoric part of instantaneous PK2 stress
+				internalStressVariable1_prev_normal_store[iterator][ix][iy][iz][i][j] = internalStressVariable1(i, j); // internal stress variable H for i = 1
+				internalStressVariable2_prev_normal_store[iterator][ix][iy][iz][i][j] = internalStressVariable2(i, j); // internal stress variable H for i = 2
+				devInstantPK2Stress_prev_normal_store[iterator][ix][iy][iz][i][j] = devInstantPk2Stress(i, j); // deviatoric part of instantaneous PK2 stress
 			}
 		}
 	}
@@ -121,12 +121,10 @@ void fe_stressUpdateViscoelasticity_pbr(VectorXd& instantStress, double dT, Matr
 		// store current data for next time Step
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
-				internalStressVariable1_prev_centroid_store[i_normal][i][j] = internalStressVariable1(i, j); // internal stress variable H for i = 1
-				internalStressVariable2_prev_centroid_store[i_normal][i][j] = internalStressVariable2(i, j); // internal stress variable H for i = 2
-				devInstantPK2Stress_prev_centroid_store[i_normal][i][j] = devInstantPk2Stress(i, j); // deviatoric part of instantaneous PK2 stress
+				internalStressVariable1_prev_centroid_store[iterator][i][j] = internalStressVariable1(i, j); // internal stress variable H for i = 1
+				internalStressVariable2_prev_centroid_store[iterator][i][j] = internalStressVariable2(i, j); // internal stress variable H for i = 2
+				devInstantPK2Stress_prev_centroid_store[iterator][i][j] = devInstantPk2Stress(i, j); // deviatoric part of instantaneous PK2 stress
 			}
 		}
 	}
-
 }
-
