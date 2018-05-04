@@ -123,7 +123,7 @@ extern double eps_energy;
 
 // Variables added/moved
 
-extern int counter_test, material_types_counter, matTypeHigh;
+extern int counter_test, material_types_counter, matTypeHigh, *start, *total, number_of_threads, covered;
 extern MatrixXd I;
 extern int *matMap;
 extern bool include_viscoelasticity;
@@ -132,43 +132,8 @@ extern bool include_viscoelasticity;
 
 extern double *****dndr_store, *****dnds_store, *****dndt_store, **x_store, **y_store, **z_store, x_normal, y_normal, z_normal, *wtx_normal, **wty_normal, ***wtz_normal, f_ext_e_sum_normal, defJacobian_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store, ******internalStressVariable1_prev_normal_store, ******internalStressVariable2_prev_normal_store, ******devInstantPK2Stress_prev_normal_store, ***internalStressVariable1_prev_centroid_store, ***internalStressVariable2_prev_centroid_store, ***devInstantPK2Stress_prev_centroid_store;
 extern int i_normal, j_normal, g_normal, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal, intx_normal, inty_normal, intz_normal;
-extern VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal, *element_characteristic_embed_normal, element_stress_embed_local_normal, element_strain_embed_local_normal;
+extern VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, xcoord_normal, ycoord_normal, zcoord_normal, element_stress_host_local_normal, element_strain_host_local_normal, tmp_storage_normal, u_e_normal, u_e_prev_normal, f_ext_e_normal, pressure_e_normal, sigma_e_normal, *element_characteristic_embed_normal, element_stress_embed_local_normal, element_strain_embed_local_normal, ****f_int_e_store, ****f_damp_e_store;
 extern MatrixXd disp_mat_normal, defGrad_normal, invDefGrad_normal, *nodes_host_normal, *nodes_embed_normal;
 extern MatrixXi *elements_host_normal, *elements_embed_normal;
-
-// fe_getPressure_lbv_pbr
-
-extern int nnel_lbv, i_lbv;
-extern double vol_strain_rate_lbv, volume_initial_lbv, volume_current_lbv, lc_lbv, c_wave_lbv, rho_initial_lbv, rho_current_lbv, pressure_scalar_lbv;
-extern MatrixXd F_curr_lbv, F_inv_lbv, F_invT_lbv, F_prev_lbv, F_dot_lbv, F_dotT_lbv, D_lbv, pressure_matrix_lbv;
-
-// fe_calDefGrad
-
-extern MatrixXd H_DefGrad;
-
-// fe_strDispMatrix_totalLagrangian_pbr
-
-extern MatrixXd F_sdm, FT_sdm;
-extern int i_sdm;
-
-// fe_mooneyrivlin_hyperelastic_pbr
-
-extern MatrixXd F_mrh, C_mrh, C_inv_mrh, C_square_mrh, C_bar_mrh, C_bar_inv_mrh, cauchy_sigma_mrh, pk_S_mrh;
-extern double I1_mrh, tmp1_mrh, I2_mrh, defJacobian_mrh, defJacobian_frac_mrh, I1_bar_mrh, I2_bar_mrh, c1_mrh, c2_mrh, D_mrh, p_mrh;
-
-// fe_calWaveSpeed
-
-extern double E_cws, nu_cws, rho_cws, c_wave_cws;
-extern std::string model_cws;
-
-// fe_calArea_4
-
-extern Vector3d tr1_side1, tr1_side2, tr2_side1, tr2_side2, area_tr1, area_tr2;
-extern double area;
-
-// fe_calVolume
-
-extern Vector3d a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3, e1, e2, e3;
-extern double volume, tet1_vol, tet2_vol, tet3_vol, tet4_vol, tet5_vol;
 
 #endif

@@ -10,7 +10,7 @@ bool include_viscoelasticity = 0;
 
 // Global
 
-int counter_test = 0, *matMap;
+int counter_test = 0, *matMap, *start, *total, number_of_threads, covered;
 MatrixXd I;
 
 
@@ -22,44 +22,10 @@ VectorXd points_normal, weights_normal, dndx_normal, dndy_normal, dndz_normal, x
 MatrixXd disp_mat_normal, defGrad_normal, invDefGrad_normal, *nodes_host_normal, *nodes_embed_normal;
 MatrixXi *elements_host_normal, *elements_embed_normal;
 
-// fe_getPressure_lbv_pbr
-
-int nnel_lbv, i_lbv;
-double vol_strain_rate_lbv, volume_initial_lbv, volume_current_lbv, lc_lbv, c_wave_lbv, rho_initial_lbv, rho_current_lbv, pressure_scalar_lbv;
-MatrixXd F_curr_lbv, F_inv_lbv, F_invT_lbv, F_prev_lbv, F_dot_lbv, F_dotT_lbv, D_lbv, pressure_matrix_lbv;
-
-// fe_calDefGrad
-
-MatrixXd H_DefGrad;
-
-// fe_strDispMatrix_totalLagrangian_pbr
-
-MatrixXd F_sdm, FT_sdm;
-int i_sdm;
-
-// fe_mooneyrivlin_hyperelastic_pbr
-
-MatrixXd F_mrh, C_mrh, C_inv_mrh, C_square_mrh, C_bar_mrh, C_bar_inv_mrh, cauchy_sigma_mrh, pk_S_mrh;
-double I1_mrh, tmp1_mrh, I2_mrh, defJacobian_mrh, defJacobian_frac_mrh, I1_bar_mrh, I2_bar_mrh, c1_mrh, c2_mrh, D_mrh, p_mrh;
-
-// fe_calWaveSpeed
-
-double E_cws, nu_cws, rho_cws, c_wave_cws;
-std::string model_cws;
-
-// fe_calArea_4
-
-Vector3d tr1_side1, tr1_side2, tr2_side1, tr2_side2, area_tr1, area_tr2;
-double area;
-
-// fe_calVolume
-
-Vector3d a1, a2, a3, b1, b2, b3, c1, c2, c3, d1, d2, d3, e1, e2, e3;
-double volume, tet1_vol, tet2_vol, tet3_vol, tet4_vol, tet5_vol;
-
 void experimental() {
 
-    int i, j, k ,l, m, n;
+    int i, j, k ,l, m, n, iterator, ele_left, t_left, ret;
+    double result;
     nodes_host_normal = mesh[0].getNewNodesPointer();
     elements_host_normal = mesh[0].getNewElementsPointer();
     nel_normal   = mesh[0].getNumElements();
@@ -72,6 +38,59 @@ void experimental() {
       elements_embed_normal = mesh[1].getNewElementsPointer();
       element_characteristic_embed_normal = mesh[1].getElementCharacteristicPointer();
     }
+
+    // Splitting of Threads
+
+    number_of_threads = 3;
+
+    if (nel_normal <= number_of_threads) {
+        start = new int[nel_normal];
+        total = new int[nel_normal];
+
+        for (iterator = 0; iterator < nel_normal; iterator++) {
+            start[iterator] = iterator;
+            total[iterator] = 1;
+        }
+
+        number_of_threads = nel_normal;
+    }
+
+    else {
+        start = new int[number_of_threads];
+        total = new int[number_of_threads];
+
+        if (nel_normal % number_of_threads == 0) {
+            for (iterator = 0; iterator < number_of_threads; iterator++) {
+                start[iterator] = iterator * (nel_normal / number_of_threads);
+                total[iterator] = nel_normal / number_of_threads;
+            }
+        }
+
+        else {
+            covered = 0;
+            ele_left = nel_normal;
+            t_left = number_of_threads;
+
+            for (iterator = 0; iterator < number_of_threads - 1; iterator++) {
+                result = ele_left/(double)(t_left);
+                if (result + 0.5 > (int)result + 1)
+                    ret = (int)result + 1;
+                else
+                    ret = (int)result;
+
+                start[iterator] = covered;
+                total[iterator] = ret;
+                covered += ret;
+
+                ele_left -= ret;
+                t_left--;
+            }
+
+            start[iterator] = covered;
+            total[iterator] = ele_left;
+        }
+    }
+
 
     // Allocating Memory
 
@@ -95,31 +114,6 @@ void experimental() {
     f_ext_e_normal = VectorXd::Zero(edof_normal);
     pressure_e_normal = VectorXd::Zero(6);
     sigma_e_normal = VectorXd::Zero(6);
-    F_curr_lbv = MatrixXd::Zero(ndof, ndof);
-    F_inv_lbv = MatrixXd::Zero(ndof, ndof);
-    F_invT_lbv = MatrixXd::Zero(ndof, ndof);
-    F_prev_lbv = MatrixXd::Zero(ndof, ndof);
-    F_dot_lbv = MatrixXd::Zero(ndof, ndof);
-    F_dotT_lbv = MatrixXd::Zero(ndof, ndof);
-    D_lbv = MatrixXd::Zero(ndof, ndof);
-    pressure_matrix_lbv = MatrixXd::Zero(ndof, ndof);
-    H_DefGrad = MatrixXd::Zero(ndof, ndof);
-    F_sdm = MatrixXd::Zero(3, 3);
-    FT_sdm = MatrixXd::Zero(3, 3);
-    F_mrh = MatrixXd::Zero(ndof, ndof);
-    C_mrh = MatrixXd::Zero(ndof, ndof);
-    C_inv_mrh = MatrixXd::Zero(ndof, ndof);
-    C_square_mrh = MatrixXd::Zero(ndof, ndof);
-    C_bar_mrh = MatrixXd::Zero(ndof, ndof);
-    C_bar_inv_mrh = MatrixXd::Zero(ndof, ndof);
-    cauchy_sigma_mrh = MatrixXd::Zero(ndof, ndof);
-    pk_S_mrh = MatrixXd::Zero(ndof, ndof);
-    tr1_side1 = Vector3d(3);
-    tr1_side2 = Vector3d(3);
-    tr2_side1 = Vector3d(3);
-    tr2_side2 = Vector3d(3);
-    area_tr1 = Vector3d(3);
-    area_tr2 = Vector3d(3);
 
     if (embedded_constraint == 1) {
       element_stress_embed_local_normal = VectorXd::Zero((*elements_embed_normal).rows() * 9);
@@ -131,12 +125,11 @@ void experimental() {
     else
         matMap = new int[matTypeHigh + 1];
 
-    for (i_lbv = 0; i_lbv < material_types_counter; i_lbv++) {
-        i_normal = mat[i_lbv].getMatID();
-        matMap[i_normal] = i_lbv;
+    for (iterator = 0; iterator < material_types_counter; iterator++) {
+        i_normal = mat[iterator].getMatID();
+        matMap[i_normal] = iterator;
     }
 
-    i_lbv = 0;
     i_normal = 0;
 
     dndr_store = new double****[nel_normal];
