@@ -7,23 +7,35 @@ void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, 
     // Reference: "Getting Started with Abaqus," Section 9.5.1 "Bulk Viscosity"
     // Linear bulk viscosity is always included to damp "ringing" in the highest element frequency.
 
-    fe_calDefGrad_pbr(F_curr_lbv, dndx, dndy, dndz, u);
+    int nnel_lbv;
+    double vol_strain_rate, volume_initial, volume_current, lc, c_wave, rho_initial, rho_current, pressure_scalar;
 
-    fe_invMatrix_pbr(F_inv_lbv, F_curr_lbv);
+    MatrixXd F_curr = MatrixXd::Zero(ndof, ndof);
+    MatrixXd F_inv = MatrixXd::Zero(ndof, ndof);
+    MatrixXd F_invT = MatrixXd::Zero(ndof, ndof);
+    MatrixXd F_prev = MatrixXd::Zero(ndof, ndof);
+    MatrixXd F_dot = MatrixXd::Zero(ndof, ndof);
+    MatrixXd F_dotT = MatrixXd::Zero(ndof, ndof);
+    MatrixXd D = MatrixXd::Zero(ndof, ndof);
+    MatrixXd pressure_matrix = MatrixXd::Zero(ndof, ndof);
 
-    F_invT_lbv = F_inv_lbv.transpose();
+    fe_calDefGrad_pbr(F_curr, dndx, dndy, dndz, u);
 
-    fe_calDefGrad_pbr(F_prev_lbv, dndx, dndy, dndz, u_prev);
+    fe_invMatrix_pbr(F_inv, F_curr);
 
-    F_dot_lbv = (F_curr_lbv - F_prev_lbv) / dT;
+    F_invT = F_inv.transpose();
 
-    F_dotT_lbv = F_dot_lbv.transpose();
+    fe_calDefGrad_pbr(F_prev, dndx, dndy, dndz, u_prev);
 
-    D_lbv = 0.5 * ((F_dot_lbv * F_inv_lbv) + (F_invT_lbv * F_dotT_lbv));
+    F_dot = (F_curr - F_prev) / dT;
 
-    vol_strain_rate_lbv = D_lbv.trace(); // volumetric strain rate
+    F_dotT = F_dot.transpose();
 
-    volume_initial_lbv = fe_calVolume(xcoord, ycoord, zcoord); // initial volume of element
+    D = 0.5 * ((F_dot * F_inv) + (F_invT * F_dotT));
+
+    vol_strain_rate = D.trace(); // volumetric strain rate
+
+    volume_initial = fe_calVolume(xcoord, ycoord, zcoord); // initial volume of element
 
     // calculate current nodal coordinates
     nnel_lbv = xcoord.size();
@@ -32,27 +44,27 @@ void fe_getPressure_lbv_pbr(VectorXd& pressure, VectorXd& dndx, VectorXd& dndy, 
     VectorXd ycoord_curr = VectorXd::Zero(nnel_lbv);
     VectorXd zcoord_curr = VectorXd::Zero(nnel_lbv);
 
-    for (i_lbv = 0; i_lbv < nnel_lbv; i_lbv++) {
-        xcoord_curr(i_lbv) = xcoord(i_lbv) + u(i_lbv * 3);
-        ycoord_curr(i_lbv) = ycoord(i_lbv) + u((i_lbv * 3) + 1);
-        zcoord_curr(i_lbv) = zcoord(i_lbv) + u((i_lbv * 3) + 2);
+    for (int iterator = 0; iterator < nnel_lbv; iterator++) {
+        xcoord_curr(iterator) = xcoord(iterator) + u(iterator * 3);
+        ycoord_curr(iterator) = ycoord(iterator) + u((iterator * 3) + 1);
+        zcoord_curr(iterator) = zcoord(iterator) + u((iterator * 3) + 2);
     }
 
-    volume_current_lbv = fe_calVolume(xcoord_curr, ycoord_curr, zcoord_curr); // current volume of element
+    volume_current = fe_calVolume(xcoord_curr, ycoord_curr, zcoord_curr); // current volume of element
 
-    lc_lbv = fe_minElementLength(xcoord_curr, ycoord_curr, zcoord_curr); // current element characteristic length
+    lc = fe_minElementLength(xcoord_curr, ycoord_curr, zcoord_curr); // current element characteristic length
 
-    c_wave_lbv = fe_calWaveSpeed(material_id, volume_initial_lbv, volume_current_lbv); // current dilatational wave speed
+    c_wave = fe_calWaveSpeed(material_id, volume_initial, volume_current); // current dilatational wave speed
 
-    rho_initial_lbv = fe_get_mats(material_id, 0, "mechanical"); // initial material density
+    rho_initial = fe_get_mats(material_id, 0, "mechanical"); // initial material density
 
-    rho_current_lbv = rho_initial_lbv * (volume_initial_lbv / volume_current_lbv); // current material density
+    rho_current = rho_initial * (volume_initial / volume_current); // current material density
 
-    pressure_scalar_lbv = 0.06 * rho_current_lbv * c_wave_lbv * lc_lbv * vol_strain_rate_lbv; // bulk viscosity pressure, scalar format
+    pressure_scalar = 0.06 * rho_current * c_wave * lc * vol_strain_rate; // bulk viscosity pressure, scalar format
 
-    pressure_matrix_lbv = pressure_scalar_lbv * I;
+    pressure_matrix = pressure_scalar * I;
 
-    pressure = fe_tensor2voigt(pressure_matrix_lbv); // bulk viscosity pressure, voigt format
+    pressure = fe_tensor2voigt(pressure_matrix); // bulk viscosity pressure, voigt format
 
 }
 
@@ -62,23 +74,35 @@ void fe_getPressure_lbv_pbr_array(VectorXd& pressure, int i, int x, int y, int z
     // Reference: "Getting Started with Abaqus," Section 9.5.1 "Bulk Viscosity"
     // Linear bulk viscosity is always included to damp "ringing" in the highest element frequency.
 
-    fe_calDefGrad_pbr_array(F_curr_lbv, i, x, y, z, u);
+    int nnel_lbv;
+    double vol_strain_rate, volume_initial, volume_current, lc, c_wave, rho_initial, rho_current, pressure_scalar;
 
-    fe_invMatrix_pbr(F_inv_lbv, F_curr_lbv);
+    MatrixXd F_curr = MatrixXd::Zero(ndof, ndof);
+    MatrixXd F_inv = MatrixXd::Zero(ndof, ndof);
+    MatrixXd F_invT = MatrixXd::Zero(ndof, ndof);
+    MatrixXd F_prev = MatrixXd::Zero(ndof, ndof);
+    MatrixXd F_dot = MatrixXd::Zero(ndof, ndof);
+    MatrixXd F_dotT = MatrixXd::Zero(ndof, ndof);
+    MatrixXd D = MatrixXd::Zero(ndof, ndof);
+    MatrixXd pressure_matrix = MatrixXd::Zero(ndof, ndof);
 
-    F_invT_lbv = F_inv_lbv.transpose();
+    fe_calDefGrad_pbr_array(F_curr, i, x, y, z, u);
 
-    fe_calDefGrad_pbr_array(F_prev_lbv, i, x, y, z, u_prev);
+    fe_invMatrix_pbr(F_inv, F_curr);
 
-    F_dot_lbv = (F_curr_lbv - F_prev_lbv) / dT;
+    F_invT = F_inv.transpose();
 
-    F_dotT_lbv = F_dot_lbv.transpose();
+    fe_calDefGrad_pbr_array(F_prev, i, x, y, z, u_prev);
 
-    D_lbv = 0.5 * ((F_dot_lbv * F_inv_lbv) + (F_invT_lbv * F_dotT_lbv));
+    F_dot = (F_curr - F_prev) / dT;
 
-    vol_strain_rate_lbv = D_lbv.trace(); // volumetric strain rate
+    F_dotT = F_dot.transpose();
 
-    volume_initial_lbv = fe_calVolume(xcoord, ycoord, zcoord); // initial volume of element
+    D = 0.5 * ((F_dot * F_inv) + (F_invT * F_dotT));
+
+    vol_strain_rate = D.trace(); // volumetric strain rate
+
+    volume_initial = fe_calVolume(xcoord, ycoord, zcoord); // initial volume of element
 
     // calculate current nodal coordinates
     nnel_lbv = xcoord.size();
@@ -87,26 +111,26 @@ void fe_getPressure_lbv_pbr_array(VectorXd& pressure, int i, int x, int y, int z
     VectorXd ycoord_curr = VectorXd::Zero(nnel_lbv);
     VectorXd zcoord_curr = VectorXd::Zero(nnel_lbv);
 
-    for (i_lbv = 0; i_lbv < nnel_lbv; i_lbv++) {
-        xcoord_curr(i_lbv) = xcoord(i_lbv) + u(i_lbv * 3);
-        ycoord_curr(i_lbv) = ycoord(i_lbv) + u((i_lbv * 3) + 1);
-        zcoord_curr(i_lbv) = zcoord(i_lbv) + u((i_lbv * 3) + 2);
+    for (int iterator = 0; iterator < nnel_lbv; iterator++) {
+        xcoord_curr(iterator) = xcoord(iterator) + u(iterator * 3);
+        ycoord_curr(iterator) = ycoord(iterator) + u((iterator * 3) + 1);
+        zcoord_curr(iterator) = zcoord(iterator) + u((iterator * 3) + 2);
     }
 
-    volume_current_lbv = fe_calVolume(xcoord_curr, ycoord_curr, zcoord_curr); // current volume of element
+    volume_current = fe_calVolume(xcoord_curr, ycoord_curr, zcoord_curr); // current volume of element
 
-    lc_lbv = fe_minElementLength(xcoord_curr, ycoord_curr, zcoord_curr); // current element characteristic length
+    lc = fe_minElementLength(xcoord_curr, ycoord_curr, zcoord_curr); // current element characteristic length
 
-    c_wave_lbv = fe_calWaveSpeed(material_id, volume_initial_lbv, volume_current_lbv); // current dilatational wave speed
+    c_wave = fe_calWaveSpeed(material_id, volume_initial, volume_current); // current dilatational wave speed
 
-    rho_initial_lbv = fe_get_mats(material_id, 0, "mechanical"); // initial material density
+    rho_initial = fe_get_mats(material_id, 0, "mechanical"); // initial material density
 
-    rho_current_lbv = rho_initial_lbv * (volume_initial_lbv / volume_current_lbv); // current material density
+    rho_current = rho_initial * (volume_initial / volume_current); // current material density
 
-    pressure_scalar_lbv = 0.06 * rho_current_lbv * c_wave_lbv * lc_lbv * vol_strain_rate_lbv; // bulk viscosity pressure, scalar format
+    pressure_scalar = 0.06 * rho_current * c_wave * lc * vol_strain_rate; // bulk viscosity pressure, scalar format
 
-    pressure_matrix_lbv = pressure_scalar_lbv * I;
+    pressure_matrix = pressure_scalar * I;
 
-    pressure = fe_tensor2voigt(pressure_matrix_lbv); // bulk viscosity pressure, voigt format
+    pressure = fe_tensor2voigt(pressure_matrix); // bulk viscosity pressure, voigt format
 
 }

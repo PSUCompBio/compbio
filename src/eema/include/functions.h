@@ -118,7 +118,7 @@ double fe_maxElementLength(VectorXd& xcoord, VectorXd& ycoord, VectorXd& zcoord)
 
 /** Calculates the strain displacement matrix in total lagrangian system */
 void fe_strDispMatrix_totalLagrangian_pbr(MatrixXd& disp_mat_modified, int edof, int nnel, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u);
-void fe_strDispMatrix_totalLagrangian_pbr_array(MatrixXd& disp_mat_modified, int edof, int nnel, int i, int x, int y, int z, VectorXd& u);
+void fe_strDispMatrix_totalLagrangian_pbr_array(MatrixXd& disp_mat_modified, int edof, int nnel, int i, int x, int y, int z, VectorXd& u, double* dndx, double* dndy, double* dndz);
 void fe_strDispMatrix_totalLagrangian_fiber_pbr(MatrixXd& disp_mat_modified, int edof, int nnel, VectorXd& dndx, VectorXd& dndy, VectorXd& dndz, VectorXd& u, MatrixXd& F_fiber_ref);
 
 /** Calculates the deformation gradient */

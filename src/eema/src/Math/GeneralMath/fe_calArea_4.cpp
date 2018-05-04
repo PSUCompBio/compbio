@@ -6,6 +6,15 @@ double fe_calArea_4(double x1, double x2, double x3, double x4, double y1, doubl
 
 	//Area of a side is the sum of area of triangles
 	// area of triangle is half the cross-product of two edges
+	double area = 0;
+	Vector3d tr1_side1, tr1_side2, tr2_side1, tr2_side2, area_tr1, area_tr2;
+
+	tr1_side1 = Vector3d(3);
+    tr1_side2 = Vector3d(3);
+    tr2_side1 = Vector3d(3);
+    tr2_side2 = Vector3d(3);
+    area_tr1 = Vector3d(3);
+    area_tr2 = Vector3d(3);
 
 	tr1_side1(0) = x1 - x2;
 	tr1_side1(1) = y1 - y2;

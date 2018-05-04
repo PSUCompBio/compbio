@@ -32,72 +32,77 @@ void fe_strDispMatrix_totalLagrangian_pbr(MatrixXd& disp_mat_modified, int edof,
 
 	// Refer to Belytschko if you have questions about the formation of this matrix
 
-	fe_calDefGrad_pbr(F_sdm, dndx, dndy, dndz, u);
-	FT_sdm = F_sdm.transpose();
+	MatrixXd F = MatrixXd::Zero(3, 3);
+	MatrixXd FT = MatrixXd::Zero(3, 3);
 
-	for (i_sdm = 0; i_sdm < nnel; i_sdm++) {
+	fe_calDefGrad_pbr(F, dndx, dndy, dndz, u);
 
-		disp_mat_modified(0, (i_sdm * 3)) = dndx(i_sdm) * FT_sdm(0, 0);
-		disp_mat_modified(0, ((i_sdm * 3) + 1)) = dndx(i_sdm) * FT_sdm(0, 1);
-		disp_mat_modified(0, (((i_sdm * 3) + 1) + 1)) = dndx(i_sdm) * FT_sdm(0, 2);
+	FT = F.transpose();
 
-		disp_mat_modified(1, (i_sdm * 3)) = dndy(i_sdm) * FT_sdm(1, 0);
-		disp_mat_modified(1, ((i_sdm * 3) + 1)) = dndy(i_sdm) * FT_sdm(1, 1);
-		disp_mat_modified(1, (((i_sdm * 3) + 1) + 1)) = dndy(i_sdm) * FT_sdm(1, 2);
+	for (int iterator = 0; iterator < nnel; iterator++) {
 
-		disp_mat_modified(2, (i_sdm * 3)) = dndz(i_sdm) * FT_sdm(2, 0);
-		disp_mat_modified(2, ((i_sdm * 3) + 1)) = dndz(i_sdm) * FT_sdm(2, 1);
-		disp_mat_modified(2, (((i_sdm * 3) + 1) + 1)) = dndz(i_sdm) * FT_sdm(2, 2);
+		disp_mat_modified(0, (iterator * 3)) = dndx(iterator) * FT(0, 0);
+		disp_mat_modified(0, ((iterator * 3) + 1)) = dndx(iterator) * FT(0, 1);
+		disp_mat_modified(0, (((iterator * 3) + 1) + 1)) = dndx(iterator) * FT(0, 2);
 
+		disp_mat_modified(1, (iterator * 3)) = dndy(iterator) * FT(1, 0);
+		disp_mat_modified(1, ((iterator * 3) + 1)) = dndy(iterator) * FT(1, 1);
+		disp_mat_modified(1, (((iterator * 3) + 1) + 1)) = dndy(iterator) * FT(1, 2);
 
-		disp_mat_modified(3, (i_sdm * 3)) = (dndy(i_sdm) * FT_sdm(0, 0)) + (dndx(i_sdm) * FT_sdm(1, 0));
-		disp_mat_modified(3, ((i_sdm * 3) + 1)) = (dndy(i_sdm) * FT_sdm(0, 1)) + (dndx(i_sdm) * FT_sdm(1, 1));
-		disp_mat_modified(3, (((i_sdm * 3) + 1) + 1)) = (dndy(i_sdm) * FT_sdm(0, 2)) + (dndx(i_sdm) * FT_sdm(1, 2));
+		disp_mat_modified(2, (iterator * 3)) = dndz(iterator) * FT(2, 0);
+		disp_mat_modified(2, ((iterator * 3) + 1)) = dndz(iterator) * FT(2, 1);
+		disp_mat_modified(2, (((iterator * 3) + 1) + 1)) = dndz(iterator) * FT(2, 2);
 
-		disp_mat_modified(4, (i_sdm * 3)) = (dndz(i_sdm) * FT_sdm(1, 0)) + (dndy(i_sdm) * FT_sdm(2, 0));
-		disp_mat_modified(4, ((i_sdm * 3) + 1)) = (dndz(i_sdm) * FT_sdm(1, 1)) + (dndy(i_sdm) * FT_sdm(2, 1));
-		disp_mat_modified(4, (((i_sdm * 3) + 1) + 1)) = (dndz(i_sdm) * FT_sdm(1, 2)) + (dndy(i_sdm) * FT_sdm(2, 2));
+		disp_mat_modified(3, (iterator * 3)) = (dndy(iterator) * FT(0, 0)) + (dndx(iterator) * FT(1, 0));
+		disp_mat_modified(3, ((iterator * 3) + 1)) = (dndy(iterator) * FT(0, 1)) + (dndx(iterator) * FT(1, 1));
+		disp_mat_modified(3, (((iterator * 3) + 1) + 1)) = (dndy(iterator) * FT(0, 2)) + (dndx(iterator) * FT(1, 2));
 
-		disp_mat_modified(5, (i_sdm * 3)) = (dndz(i_sdm) * FT_sdm(0, 0)) + (dndx(i_sdm) * FT_sdm(2, 0));
-		disp_mat_modified(5, ((i_sdm * 3) + 1)) = (dndz(i_sdm) * FT_sdm(0, 1)) + (dndx(i_sdm) * FT_sdm(2, 1));
-		disp_mat_modified(5, (((i_sdm * 3) + 1) + 1)) = (dndz(i_sdm) * FT_sdm(0, 2)) + (dndx(i_sdm) * FT_sdm(2, 2));
+		disp_mat_modified(4, (iterator * 3)) = (dndz(iterator) * FT(1, 0)) + (dndy(iterator) * FT(2, 0));
+		disp_mat_modified(4, ((iterator * 3) + 1)) = (dndz(iterator) * FT(1, 1)) + (dndy(iterator) * FT(2, 1));
+		disp_mat_modified(4, (((iterator * 3) + 1) + 1)) = (dndz(iterator) * FT(1, 2)) + (dndy(iterator) * FT(2, 2));
+
+		disp_mat_modified(5, (iterator * 3)) = (dndz(iterator) * FT(0, 0)) + (dndx(iterator) * FT(2, 0));
+		disp_mat_modified(5, ((iterator * 3) + 1)) = (dndz(iterator) * FT(0, 1)) + (dndx(iterator) * FT(2, 1));
+		disp_mat_modified(5, (((iterator * 3) + 1) + 1)) = (dndz(iterator) * FT(0, 2)) + (dndx(iterator) * FT(2, 2));
 	}
 }
 
-void fe_strDispMatrix_totalLagrangian_pbr_array(MatrixXd& disp_mat_modified, int edof, int nnel, int i, int x, int y, int z, VectorXd& u) {
+void fe_strDispMatrix_totalLagrangian_pbr_array(MatrixXd& disp_mat, int edof, int nnel, int i, int x, int y, int z, VectorXd& u, double* dndx, double* dndy, double* dndz) {
 
 	// Refer to Belytschko if you have questions about the formation of this matrix
 
-	fe_calDefGrad_pbr_array(F_sdm, i, x, y, z, u);
-	
-	FT_sdm = F_sdm.transpose();
+	MatrixXd F = MatrixXd::Zero(3, 3);
+	MatrixXd FT = MatrixXd::Zero(3, 3);
 
-	for (i_sdm = 0; i_sdm < nnel; i_sdm++) {
+	fe_calDefGrad_pbr_array(F, i, x, y, z, u);
 
-		disp_mat_modified(0, (i_sdm * 3)) = dndx_store[i][x][y][z][i_sdm] * FT_sdm(0, 0);
-		disp_mat_modified(0, ((i_sdm * 3) + 1)) = dndx_store[i][x][y][z][i_sdm] * FT_sdm(0, 1);
-		disp_mat_modified(0, (((i_sdm * 3) + 1) + 1)) = dndx_store[i][x][y][z][i_sdm] * FT_sdm(0, 2);
+	FT = F.transpose();
 
-		disp_mat_modified(1, (i_sdm * 3)) = dndy_store[i][x][y][z][i_sdm] * FT_sdm(1, 0);
-		disp_mat_modified(1, ((i_sdm * 3) + 1)) = dndy_store[i][x][y][z][i_sdm] * FT_sdm(1, 1);
-		disp_mat_modified(1, (((i_sdm * 3) + 1) + 1)) = dndy_store[i][x][y][z][i_sdm] * FT_sdm(1, 2);
+	for (int iterator = 0; iterator < nnel; iterator++) {
 
-		disp_mat_modified(2, (i_sdm * 3)) = dndz_store[i][x][y][z][i_sdm] * FT_sdm(2, 0);
-		disp_mat_modified(2, ((i_sdm * 3) + 1)) = dndz_store[i][x][y][z][i_sdm] * FT_sdm(2, 1);
-		disp_mat_modified(2, (((i_sdm * 3) + 1) + 1)) = dndz_store[i][x][y][z][i_sdm] * FT_sdm(2, 2);
+	    disp_mat(0, (iterator * 3)) = dndx[iterator] * FT(0, 0);
+	    disp_mat(0, ((iterator * 3) + 1)) = dndx[iterator] * FT(0, 1);
+	    disp_mat(0, (((iterator * 3) + 1) + 1)) = dndx[iterator] * FT(0, 2);
 
+	    disp_mat(1, (iterator * 3)) = dndy[iterator] * FT(1, 0);
+	    disp_mat(1, ((iterator * 3) + 1)) = dndy[iterator] * FT(1, 1);
+	    disp_mat(1, (((iterator * 3) + 1) + 1)) = dndy[iterator] * FT(1, 2);
 
-		disp_mat_modified(3, (i_sdm * 3)) = (dndy_store[i][x][y][z][i_sdm] * FT_sdm(0, 0)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(1, 0));
-		disp_mat_modified(3, ((i_sdm * 3) + 1)) = (dndy_store[i][x][y][z][i_sdm] * FT_sdm(0, 1)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(1, 1));
-		disp_mat_modified(3, (((i_sdm * 3) + 1) + 1)) = (dndy_store[i][x][y][z][i_sdm] * FT_sdm(0, 2)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(1, 2));
+	    disp_mat(2, (iterator * 3)) = dndz[iterator] * FT(2, 0);
+	    disp_mat(2, ((iterator * 3) + 1)) = dndz[iterator] * FT(2, 1);
+	    disp_mat(2, (((iterator * 3) + 1) + 1)) = dndz[iterator] * FT(2, 2);
 
-		disp_mat_modified(4, (i_sdm * 3)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(1, 0)) + (dndy_store[i][x][y][z][i_sdm] * FT_sdm(2, 0));
-		disp_mat_modified(4, ((i_sdm * 3) + 1)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(1, 1)) + (dndy_store[i][x][y][z][i_sdm] * FT_sdm(2, 1));
-		disp_mat_modified(4, (((i_sdm * 3) + 1) + 1)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(1, 2)) + (dndy_store[i][x][y][z][i_sdm] * FT_sdm(2, 2));
+	    disp_mat(3, (iterator * 3)) = (dndy[iterator] * FT(0, 0)) + (dndx[iterator] * FT(1, 0));
+	    disp_mat(3, ((iterator * 3) + 1)) = (dndy[iterator] * FT(0, 1)) + (dndx[iterator] * FT(1, 1));
+	    disp_mat(3, (((iterator * 3) + 1) + 1)) = (dndy[iterator] * FT(0, 2)) + (dndx[iterator] * FT(1, 2));
 
-		disp_mat_modified(5, (i_sdm * 3)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(0, 0)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(2, 0));
-		disp_mat_modified(5, ((i_sdm * 3) + 1)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(0, 1)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(2, 1));
-		disp_mat_modified(5, (((i_sdm * 3) + 1) + 1)) = (dndz_store[i][x][y][z][i_sdm] * FT_sdm(0, 2)) + (dndx_store[i][x][y][z][i_sdm] * FT_sdm(2, 2));
+	    disp_mat(4, (iterator * 3)) = (dndz[iterator] * FT(1, 0)) + (dndy[iterator] * FT(2, 0));
+	    disp_mat(4, ((iterator * 3) + 1)) = (dndz[iterator] * FT(1, 1)) + (dndy[iterator] * FT(2, 1));
+	    disp_mat(4, (((iterator * 3) + 1) + 1)) = (dndz[iterator] * FT(1, 2)) + (dndy[iterator] * FT(2, 2));
+
+	    disp_mat(5, (iterator * 3)) = (dndz[iterator] * FT(0, 0)) + (dndx[iterator] * FT(2, 0));
+	    disp_mat(5, ((iterator * 3) + 1)) = (dndz[iterator] * FT(0, 1)) + (dndx[iterator] * FT(2, 1));
+	    disp_mat(5, (((iterator * 3) + 1) + 1)) = (dndz[iterator] * FT(0, 2)) + (dndx[iterator] * FT(2, 2));
 	}
 }
 
