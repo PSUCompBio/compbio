@@ -316,6 +316,9 @@ void fe_writeElementStress(MatrixXd sigma_all, double time);
 /* =================================================================== */
 /* New Changes */
 /* =================================================================== */
+
+void initial_alloc();
+
 void fe_calculateMass(VectorXd& m_system, std::string type);
 
 void fe_calculateMassDirectLumped(VectorXd& m_system, int mesh_id);

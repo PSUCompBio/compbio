@@ -5,6 +5,7 @@ SET(Input_Output_src
     Input/Materials.cpp
     Input/BC.cpp
     Input/Constraint.cpp
+    Input/initial.cpp
     Input/fe_damageVariableImport.cpp
     Output/fe_vtu.cpp
     Output/fe_vector2text.cpp
