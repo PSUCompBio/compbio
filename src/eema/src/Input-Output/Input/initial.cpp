@@ -4,8 +4,9 @@ using namespace Eigen;
 
 void initial_alloc() {
 
-    int i, j, k ,l, m, n, iterator, ele_left, t_left, ret;
+    int i, j, k ,l, m, n, iterator, ele_left, t_left, ret, covered;
     double result;
+
     nel_normal   = mesh[0].getNumElements();
     nnel_normal  = mesh[0].getNumNodesPerElement();
     nnode_normal = mesh[0].getNumNodes();

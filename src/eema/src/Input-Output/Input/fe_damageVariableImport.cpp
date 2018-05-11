@@ -19,7 +19,7 @@ void fe_damageVariableImport(std::string& damage_variables_import, VectorXd& d_s
 				myfile >> lambda_min(embed_row);
 				myfile >> lambda_max(embed_row);
 				if (t_healing > 0) {
-					double healing_rate = 0.01; // constant healing rate per day (i.e., 0.01 = 1 %/day)
+					double healing_rate = 0.025; // damage parameters fully heal in approximately 6 months
 					lambda_max(embed_row) = (lambda_max(embed_row) - 1)*pow((1 - healing_rate), t_healing) + 1;
 					lambda_min(embed_row) = 1 - (1 - lambda_min(embed_row))*pow((1 - healing_rate), t_healing);
 					d_static(embed_row) = d_static(embed_row)*pow((1 - healing_rate), t_healing);
@@ -55,4 +55,3 @@ void fe_damageVariableImport(std::string& damage_variables_import, VectorXd& d_s
 	}
 
 }
-

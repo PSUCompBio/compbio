@@ -8,7 +8,7 @@ double failure_time_step = 1e-8;
 // set include_viscoelasticity = 1 to include viscoelasticity in the hex elements
 bool include_viscoelasticity = 0;
 
-int counter_test = 0, *matMap, *start, *total, number_of_threads, covered, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal;
+int counter_test = 0, *matMap, *start, *total, number_of_threads, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal;
 
 double *****dndr_store, *****dnds_store, *****dndt_store, **x_store, **y_store, **z_store, *wtx_normal, **wty_normal, ***wtz_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store, ******internalStressVariable1_prev_normal_store, ******internalStressVariable2_prev_normal_store, ******devInstantPK2Stress_prev_normal_store, ***internalStressVariable1_prev_centroid_store, ***internalStressVariable2_prev_centroid_store, ***devInstantPK2Stress_prev_centroid_store;
 

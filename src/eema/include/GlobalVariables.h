@@ -125,7 +125,7 @@ extern double eps_energy;
 
 extern bool include_viscoelasticity;
 
-extern int material_types_counter, matTypeHigh, counter_test, *matMap, *start, *total, number_of_threads, covered, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal;
+extern int material_types_counter, matTypeHigh, counter_test, *matMap, *start, *total, number_of_threads, nel_normal, nnel_normal, nnode_normal, sdof_normal, edof_normal;
 
 extern double *****dndr_store, *****dnds_store, *****dndt_store, **x_store, **y_store, **z_store, *wtx_normal, **wty_normal, ***wtz_normal, ******jacobian_store, ******invJacobian_store, ****det_store, *****dndx_store, *****dndy_store, *****dndz_store, ******internalStressVariable1_prev_normal_store, ******internalStressVariable2_prev_normal_store, ******devInstantPK2Stress_prev_normal_store, ***internalStressVariable1_prev_centroid_store, ***internalStressVariable2_prev_centroid_store, ***devInstantPK2Stress_prev_centroid_store;
 

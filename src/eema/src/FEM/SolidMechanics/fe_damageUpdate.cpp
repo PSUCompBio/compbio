@@ -46,10 +46,10 @@ void fe_fatigueDamageUpdate_pbr(int opt, VectorXd& d_fatigue, int fib, double la
   double n_max = 0;         // maximum number of fatigue cycles
 
   if (model == "ogden_hyperelastic") {
-    alpha_fatigue = 1;
-    beta_fatigue = 25;
-    psi_min = 5;
-    psi_max = 1200;
+    alpha_fatigue = 5;
+    beta_fatigue = 10;
+    psi_min = 1.75;
+    psi_max = 200;
     n_max = 500;
   } else {
     std::cout << "Fiber material must be Ogden for damage to be included." << '\n'; // Later on, we can add the material thresholds for other material models.

@@ -23,7 +23,7 @@ void fe_stressUpdateDamage_pbr(VectorXd& fiber_stress_damaged, int opt, int fib,
 
 	if (model == "ogden_hyperelastic") {
     r = 1.25;
-    m = 300e3;
+    m = 3e3;
 
 	  // The following material properties follow the nomenclature convention used in the ABAQUS USER'S GUIDE VOLUME III: MATERIALS, section 22.5.1.
 		double D_1 = 2 / fe_get_mats(opt, 1, "mechanical");
@@ -105,4 +105,3 @@ double fe_calStrainEnergyDensity(int opt, double lambda)
   return U_density;
 
 }
-
