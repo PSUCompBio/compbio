@@ -40,14 +40,14 @@ Fiber
 *MATERIAL
 1
 mechanical mooney-rivlin_hyperelastic 5
-1040 2.2e9 0 -1.034e3 7.803e3
+1040 2.2e9 0 -100 1.2e3
 *END_MATERIAL
 # -------------------------------
 # Material-2
 *MATERIAL
 2
 mechanical ogden_hyperelastic 6
-1040 2.2e9 0 1 35.64e3 6.101
+1040 2.2e9 0 1 2.5e3 4.5
 *END_MATERIAL
 # ------------------------------
 # Time Details. Include the values in this order line by line.
