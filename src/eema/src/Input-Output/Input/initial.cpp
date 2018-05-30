@@ -67,6 +67,7 @@ void initial_alloc() {
         }
     }
 
+    std::cout << "\n Number of threads: " << number_of_threads << std::endl;
 
     // Allocating Memory
 

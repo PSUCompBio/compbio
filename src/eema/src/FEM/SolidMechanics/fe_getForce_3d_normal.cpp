@@ -5,8 +5,7 @@ using namespace Eigen;
 std::mutex m;
 VectorXd global_tot, global_damp;
 
-
-void task(int begin, int end, VectorXd u, VectorXd fext, int time_step_counter, int host_id, VectorXd u_prev, double dT, double t, int t_plot, VectorXd element_stress_host_local, VectorXd element_strain_host_local) {
+void task(int begin, int end, VectorXd u, VectorXd fext, int time_step_counter, int host_id, VectorXd u_prev, double dT, double t, int t_plot, VectorXd& element_stress_host_local, VectorXd& element_strain_host_local) {
     int i, j, g, ix, iy, iz;
     double x, y, z;
 
@@ -145,9 +144,9 @@ void task(int begin, int end, VectorXd u, VectorXd fext, int time_step_counter, 
 
 void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int time_step_counter, int host_id, VectorXd& u_prev, double dT, VectorXd& f_damp, double t, int t_plot)
 {
-    VectorXd element_stress_host_local = VectorXd::Zero(nel_normal * 9);
-    VectorXd element_strain_host_local = VectorXd::Zero(nel_normal * 9);
-
+	VectorXd element_stress_host_local = VectorXd::Zero(nel_normal * 9);
+	VectorXd element_strain_host_local = VectorXd::Zero(nel_normal * 9);
+    
     std::thread thread_runner[number_of_threads];
 
     global_tot = VectorXd::Zero(sdof_normal);
@@ -157,7 +156,7 @@ void fe_getForce_3d_normal(VectorXd& f_tot, VectorXd& u, VectorXd& fext, int tim
     global_damp += f_damp;
 
     for (int i = 0; i < number_of_threads; i++)
-        thread_runner[i] = std::thread(task, start[i], total[i], u, fext, time_step_counter, host_id, u_prev, dT, t, t_plot, element_stress_host_local, element_strain_host_local);
+        thread_runner[i] = std::thread(task, start[i], total[i], u, fext, time_step_counter, host_id, u_prev, dT, t, t_plot, std::ref(element_stress_host_local), std::ref(element_strain_host_local));
 
     for (int i = 0; i < number_of_threads; i++)
 		thread_runner[i].join();
