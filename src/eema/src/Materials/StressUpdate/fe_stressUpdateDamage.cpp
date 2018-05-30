@@ -105,4 +105,3 @@ double fe_calStrainEnergyDensity(int opt, double lambda)
   return U_density;
 
 }
-

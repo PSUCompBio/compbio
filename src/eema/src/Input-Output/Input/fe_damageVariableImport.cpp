@@ -55,4 +55,3 @@ void fe_damageVariableImport(std::string& damage_variables_import, VectorXd& d_s
 	}
 
 }
-

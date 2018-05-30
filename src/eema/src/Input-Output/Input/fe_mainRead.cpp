@@ -230,34 +230,34 @@ void fe_mainRead(std::string file) {
       	  z_data = VectorXd::Zero(n_steps);
 
         	if(time_curve == "TABULAR"){
-        		// std::ifstream myfile3("LX.txt");
-        		// for(int k = 0; k< n_steps; k++) {
-      		  //   double t;
-      		  //   myfile3 >> t;
-      		  //   time_data(k) = t;
-      		  //   myfile3 >> t;
-      		  //   x_data(k) = t*amplitude;
-    		    // }
-        		// myfile3.close();
-            //
-        		// std::ifstream myfile4("LY.txt");
-        		// for(int l = 0; l< n_steps; l++) {
-        		//   double t;
-        		//   myfile4 >> t;
-        		//   time_data(l) = t;
-        		//   myfile4 >> t;
-        		//   y_data(l) = t*amplitude;
-            // }
-      		  // myfile4.close();
+                std::ifstream myfile3("LX.txt");
+                for(int k = 0; k< n_steps; k++) {
+                    double t;
+                    myfile3 >> t;
+                    time_data(k) = t;
+                    myfile3 >> t;
+                    x_data(k) = t*amplitude;
+                }
+                myfile3.close();
 
+                std::ifstream myfile4("LY.txt");
+                for(int l = 0; l< n_steps; l++) {
+                    double t;
+                    myfile4 >> t;
+                    time_data(l) = t;
+                    myfile4 >> t;
+                    y_data(l) = t*amplitude;
+                }
+                myfile4.close();
+                
         		std::ifstream myfile5("LZ.txt");
-        		for(int m = 0; m< n_steps; m++)
-        		  {double t;
+        		for(int m = 0; m< n_steps; m++) {
+        		  double t;
         		  myfile5 >> t;
         		  time_data(m) = t;
         		  myfile5 >> t;
         		  z_data(m) = t*amplitude;
-            }
+                }
       		  myfile5.close();
           }
           myfile1 >> line;

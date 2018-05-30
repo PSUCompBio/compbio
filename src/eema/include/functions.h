@@ -8,8 +8,6 @@
 #include <sstream>
 #include <string>
 #include <iomanip>
-#include <omp.h>
-#include <utmpx.h>
 #include <thread>
 #include <mutex>
 #include <cmath>
