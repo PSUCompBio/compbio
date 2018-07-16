@@ -240,4 +240,57 @@ void fe_mainEXPLICIT() {
       fe_damageVariableExport(damage_variables_export, d_static, d_fatigue, d_tot, lambda_min, lambda_max);
     }
     std::cout << "\n Counter = " << counter_test << "\n";
+
+    int ele_number = -1, it = 0;
+    double max = -10000, temp = 0;
+    VectorXd strains = mesh[0].getCellStrain();
+
+    std::cout << "\n Actual Values: ";
+    for (it = 0; it < strains.size(); it++) {
+        if (it % 9 == 0) {
+            if (it != 0) {
+                std::cout << temp << " ";
+                if (max < temp) {
+                    max = temp;
+                    ele_number = (it / 9) - 1;
+                }
+            }
+            temp = 0;
+        }
+        temp += strains[it];
+    }
+
+    if (max < temp) {
+        max = temp;
+        ele_number = nel_normal - 1;
+    }
+
+    std::cout << temp << " ";
+    std::cout << "\n Max: " << max << " Number: " << ele_number + 1;
+
+    MatrixXi mat = mesh[0].getElements();
+    MatrixXd nodes = mesh[0].getNodes();
+
+    VectorXi row = mat.row(ele_number);
+    VectorXi node_number(8);
+    VectorXd row1;
+
+    for (it = 0; it < 8; it++)
+        node_number(it) = row(it + 2);
+
+    double xcen = 0, ycen = 0, zcen = 0;
+
+    for (it = 0; it < 8; it++) {
+        row1 = nodes.row(node_number(it));
+        xcen += row1(1);
+        ycen += row1(2);
+        zcen += row1(3);
+    }
+
+    xcen /= 8;
+    ycen /= 8;
+    zcen /= 8;
+
+    std::cout << "\n Centroid: " << xcen << ", " << ycen << ", " << zcen;
+
 } // fe_mainEXPLICIT
