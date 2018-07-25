@@ -16,6 +16,169 @@ VectorXd points_normal, weights_normal;
 
 MatrixXd I;
 
+int distance(double x, double y, double z) {
+    // Basal Ganglia Left - 1
+    double x_val = x - 0.01548871995399654;
+    double y_val = y + 0.03766766302472687;
+    double z_val = z - 0.3594873651523867;
+    double min = sqrt(pow(x_val, 2) + pow(y_val, 2) + pow(z_val, 2));
+    int region = 1;
+    double val = min;
+
+    // Cerebral Hemisphere Left - 2
+    x_val = x - 0.024666063660731406;
+    y_val = y + 0.03607660654796103;
+    z_val = z - 0.3734379613249099;
+    val = sqrt(pow(x_val, 2) + pow(y_val, 2) + pow(z_val, 2));
+    if (min > val) {
+        min = val;
+        region = 2;
+    }
+
+    // Hippocamp Left - 3
+    x_val = x - 0.01881109166666667;
+    y_val = y + 0.0235482361111111;
+    z_val = z - 0.3499761333333335;
+    val = sqrt(pow(x_val, 2) + pow(y_val, 2) + pow(z_val, 2));
+    if (min > val) {
+        min = val;
+        region = 3;
+    }
+
+    // Hippocamp Right - 4
+    x_val = x + 0.01881109166666667;
+    y_val = y + 0.0235482361111111;
+    z_val = z - 0.3499761333333335;
+    val = sqrt(pow(x_val, 2) + pow(y_val, 2) + pow(z_val, 2));
+    if (min > val) {
+        min = val;
+        region = 4;
+    }
+
+    // Basal Ganglia Right - 5
+    x_val = x + 0.01548871995399654;
+    y_val = y + 0.03766766302472687;
+    z_val = z - 0.35948740253019007;
+    val = sqrt(pow(x_val, 2) + pow(y_val, 2) + pow(z_val, 2));
+    if (min > val) {
+        min = val;
+        region = 5;
+    }
+
+    // Cerebellum - 6
+    x_val = x - 8.993241379309219e-05;
+    y_val = y + 0.00037706800000000194;
+    z_val = z - 0.3269086681379307;
+    val = sqrt(pow(x_val, 2) + pow(y_val, 2) + pow(z_val, 2));
+    if (min > val) {
+        min = val;
+        region = 6;
+    }
+
+    // Thalamus - 7
+    x_val = x + 2.9542119565219158e-05;
+    y_val = y + 0.03399703464673913;
+    z_val = z - 0.35345655570652196;
+    val = sqrt(pow(x_val, 2) + pow(y_val, 2) + pow(z_val, 2));
+    if (min > val) {
+        min = val;
+        region = 7;
+    }
+
+    // Cerebral Hemisphere Right - 8
+    x_val = x + 0.024666063660731406;
+    y_val = y + 0.03607660654796103;
+    z_val = z - 0.3734379613249099;
+    val = sqrt(pow(x_val, 2) + pow(y_val, 2) + pow(z_val, 2));
+    if (min > val) {
+        min = val;
+        region = 8;
+    }
+
+    // Corpus Collosum - 9
+    x_val = x + 4.989068441064677e-05;
+    y_val = y + 0.03924151711026619;
+    z_val = z - 0.3669639534220539;
+    val = sqrt(pow(x_val, 2) + pow(y_val, 2) + pow(z_val, 2));
+    if (min > val) {
+        min = val;
+        region = 9;
+    }
+
+    return region;
+}
+
+void getRegion() {
+    int ele_number = -1, it = 0;
+    double max = -10000, temp = 0;
+    VectorXd strains = mesh[0].getCellStrain();
+
+    for (it = 0; it < strains.size(); it++) {
+        if (it % 9 == 0) {
+            if (it != 0) {
+                if (max < temp) {
+                    max = temp;
+                    ele_number = (it / 9) - 1;
+                }
+            }
+            temp = 0;
+        }
+        temp += strains[it];
+    }
+
+    if (max < temp) {
+        max = temp;
+        ele_number = nel_normal - 1;
+    }
+
+    MatrixXi mat = mesh[0].getElements();
+    MatrixXd nodes = mesh[0].getNodes();
+
+    VectorXi row = mat.row(ele_number);
+    VectorXi node_number(8);
+    VectorXd row1;
+
+    for (it = 0; it < 8; it++)
+        node_number(it) = row(it + 2);
+
+    double xcen = 0, ycen = 0, zcen = 0;
+
+    for (it = 0; it < 8; it++) {
+        row1 = nodes.row(node_number(it));
+        xcen += row1(1);
+        ycen += row1(2);
+        zcen += row1(3);
+    }
+
+    xcen /= 8;
+    ycen /= 8;
+    zcen /= 8;
+
+    int region = distance(xcen, ycen, zcen);
+
+    switch(region) {
+        case 1: std::cout << "\n Basal Ganglia Left";
+                break;
+        case 2: std::cout << "\n Cerebral Hemisphere Left";
+                break;
+        case 3: std::cout << "\n Hippocamp Left";
+                break;
+        case 4: std::cout << "\n Hippocamp Right";
+                break;
+        case 5: std::cout << "\n Basal Ganglia Right";
+                break;
+        case 6: std::cout << "\n Cerebellum";
+                break;
+        case 7: std::cout << "\n Thalamus";
+                break;
+        case 8: std::cout << "\n Cerebral Hemisphere Right";
+                break;
+        case 9: std::cout << "\n Corpus Collosum";
+                break;
+        default: std::cout << "\n Unknown ...";
+    }
+}
+
 /*! \brief
  * This function carries out the explicit dynamic analysis of the FEM problem.
  */
@@ -240,57 +403,5 @@ void fe_mainEXPLICIT() {
       fe_damageVariableExport(damage_variables_export, d_static, d_fatigue, d_tot, lambda_min, lambda_max);
     }
     std::cout << "\n Counter = " << counter_test << "\n";
-
-    int ele_number = -1, it = 0;
-    double max = -10000, temp = 0;
-    VectorXd strains = mesh[0].getCellStrain();
-
-    std::cout << "\n Actual Values: ";
-    for (it = 0; it < strains.size(); it++) {
-        if (it % 9 == 0) {
-            if (it != 0) {
-                std::cout << temp << " ";
-                if (max < temp) {
-                    max = temp;
-                    ele_number = (it / 9) - 1;
-                }
-            }
-            temp = 0;
-        }
-        temp += strains[it];
-    }
-
-    if (max < temp) {
-        max = temp;
-        ele_number = nel_normal - 1;
-    }
-
-    std::cout << temp << " ";
-    std::cout << "\n Max: " << max << " Number: " << ele_number + 1;
-
-    MatrixXi mat = mesh[0].getElements();
-    MatrixXd nodes = mesh[0].getNodes();
-
-    VectorXi row = mat.row(ele_number);
-    VectorXi node_number(8);
-    VectorXd row1;
-
-    for (it = 0; it < 8; it++)
-        node_number(it) = row(it + 2);
-
-    double xcen = 0, ycen = 0, zcen = 0;
-
-    for (it = 0; it < 8; it++) {
-        row1 = nodes.row(node_number(it));
-        xcen += row1(1);
-        ycen += row1(2);
-        zcen += row1(3);
-    }
-
-    xcen /= 8;
-    ycen /= 8;
-    zcen /= 8;
-
-    std::cout << "\n Centroid: " << xcen << ", " << ycen << ", " << zcen;
-
+    getRegion();
 } // fe_mainEXPLICIT
