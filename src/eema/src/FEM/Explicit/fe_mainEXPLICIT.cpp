@@ -156,27 +156,32 @@ void getRegion() {
 
     int region = distance(xcen, ycen, zcen);
 
+    std::fstream outFile;
+    outFile.open("region.txt", std::fstream::out | std::fstream::trunc);
+
     switch(region) {
-        case 1: std::cout << "\n Basal Ganglia Left";
+        case 1: outFile << "Basal Ganglia Left";
                 break;
-        case 2: std::cout << "\n Cerebral Hemisphere Left";
+        case 2: outFile << "Cerebral Hemisphere Left";
                 break;
-        case 3: std::cout << "\n Hippocamp Left";
+        case 3: outFile << "Hippocamp Left";
                 break;
-        case 4: std::cout << "\n Hippocamp Right";
+        case 4: outFile << "Hippocamp Right";
                 break;
-        case 5: std::cout << "\n Basal Ganglia Right";
+        case 5: outFile << "Basal Ganglia Right";
                 break;
-        case 6: std::cout << "\n Cerebellum";
+        case 6: outFile << "Cerebellum";
                 break;
-        case 7: std::cout << "\n Thalamus";
+        case 7: outFile << "Thalamus";
                 break;
-        case 8: std::cout << "\n Cerebral Hemisphere Right";
+        case 8: outFile << "Cerebral Hemisphere Right";
                 break;
-        case 9: std::cout << "\n Corpus Collosum";
+        case 9: outFile << "Corpus Collosum";
                 break;
-        default: std::cout << "\n Unknown ...";
+        default: outFile << "Unknown ...";
     }
+
+    outFile.close();
 }
 
 /*! \brief

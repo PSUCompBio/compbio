@@ -11,9 +11,6 @@
 #include <thread>
 #include <mutex>
 #include <cmath>
-#include <opencv2/core.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <opencv2/highgui.hpp>
 
 #include "Eigen/Dense"
 #include "Eigen/Eigenvalues"
